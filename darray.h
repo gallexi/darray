@@ -1,6 +1,10 @@
 #ifndef _DARRAY_H_
 #define _DARRAY_H_
 
+//#ifndef DA_DEBUG
+//#   pragma GCC system_header
+//#endif
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -124,31 +128,32 @@ static inline void* da_reserve(void* darr, size_t nelem)
 )                                                                              \
 : /* else */                                                                   \
 (                                                                              \
+    ( /* "then" paren(s) */                                                    \
     /* darr.tmp = new_darr */                                                  \
     (*DA_P_TMP_PTR_FROM_HANDLE(darr) = da_alloc(                               \
         da_length(darr),                                                       \
         *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)))                                  \
-    && /* then */                                                              \
+    ), /* then */                                                              \
     /* if darr.tmp == NULL (i.e. if new_darr alloc failed) */                  \
     (*DA_P_TMP_PTR_FROM_HANDLE(darr) == NULL) ?                                \
         /* return NULL */                                                      \
         (NULL)                                                                 \
     : /* else */                                                               \
     (                                                                          \
-        ((                                                                     \
+        ((((( /* "then" paren(s) */                                            \
         /* darr.tmp.tmp = darr (i.e. new_darr.tmp = orig_darr) */              \
         (*DA_P_TMP_PTR_FROM_HANDLE(*DA_P_TMP_PTR_FROM_HANDLE(darr)) = (darr))  \
-        && /* then */                                                          \
+        ), /* then */                                                          \
         /* darr = darr.tmp (i.e. darr = new_darr) */                           \
         ((darr) = *DA_P_TMP_PTR_FROM_HANDLE(darr))                             \
-        && /* then */                                                          \
+        ), /* then */                                                          \
         /* darr[0:darr.length-1] = darr.tmp[0:darr.length-1] */                \
         memcpy(                                                                \
             (darr), /* dest == new_arr */                                      \
             (*DA_P_TMP_PTR_FROM_HANDLE(darr)), /* src == dest.tmp */           \
             (*DA_P_LENGTH_FROM_HANDLE(darr)) * /* n == darr.length*darr.elsz */\
                 (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)))                         \
-        && /* then */                                                          \
+        ), /* then */                                                          \
         /* darr[darr.length++] = value */                                      \
         ((darr)[(*DA_P_LENGTH_FROM_HANDLE(darr))++] = value)                   \
         ), /* then */                                                          \
