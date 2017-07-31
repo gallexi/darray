@@ -69,7 +69,7 @@ static inline void da_free(void* darr);
 static inline size_t da_length(void* darr);
 
 /**@function
- * @brief Returns the maximum number of elements the darray hand hold without
+ * @brief Returns the maximum number of elements the darray can hold without
     resizing.
  *
  * @param darr : Target darray.
@@ -78,7 +78,7 @@ static inline size_t da_length(void* darr);
 static inline size_t da_capacity(void* darr);
 
 /**@function
- * @brief Returns the size of contained elements in the darray.
+ * @brief Returns the sizeof the contained elements in the darray.
  *
  * @param darr : Target darray.
  * @return sizeof elements in the darray.
@@ -86,11 +86,12 @@ static inline size_t da_capacity(void* darr);
 static inline size_t da_sizeof_elem(void* darr);
 
 /**@function
- * @brief Change the length of the array to nelem. Data for elements with index
-    >= nelem may be lost.
+ * @brief Change the length of the array to `nelem`. Data for elements with
+    index >= nelem may be lost.
  *
  * @param darr : Target darray. Upon function completion, darr may or may not
-    point to its previous location, potentially breaking references to the darr.
+    point to its previous block on the heap, potentially breaking references to
+    the darr.
  * @return Pointer to the new location of the darray upon successful function
     completion. If da_resize returns NULL, allocation failed and darr is left
     untouched.
@@ -104,7 +105,8 @@ static inline void* da_resize(void* darr, size_t nelem);
     current length of the darray without requiring resizing.
  *
  * @param darr : Target darray. Upon function completion, darr may or may not
-    point to its previous location, potentially breaking references to the darr.
+    point to its previous block on the heap, potentially breaking references to
+    the darr.
  * @return Pointer to the new location of the darray upon successful function
     completion. If da_reserve returns NULL, allocation failed and darr is left
     untouched.
@@ -114,7 +116,7 @@ static inline void* da_resize(void* darr, size_t nelem);
 static inline void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
- * @brief Add a value to the back of darr.
+ * @brief Push a value to the back of darr.
  *
  * @param darr : lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the array.
@@ -135,7 +137,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
     _da_push(darr, value)
 
 /**@macro
- * @brief Remove a value to the back of darr and return it.
+ * @brief Remove a value from the back of darr and return it.
  *
  * @param darr : lvalue pointing to the target darray.
  *
