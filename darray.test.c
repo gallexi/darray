@@ -7,6 +7,10 @@
 #define INITIAL_NUM_ELEMS 10
 #define RESIZE_NUM_ELEMS 100
 
+#define CARR_STK_STR  "stack allocated array"
+#define CARR_HEAP_STR "heap allocated array"
+#define DARR_STR      "dynamic array"
+
 EMU_TEST(alloc_and_free_functions)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
@@ -105,7 +109,7 @@ EMU_TEST(da_push)
     int* da = da_alloc(0, sizeof(int));
     for (int i = 0; i <= max_index; ++i)
     {
-        da = da_push(da, i);
+        da_push(da, i);
     }
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
@@ -149,5 +153,10 @@ EMU_GROUP(all_tests)
 
 int main(void)
 {
-    return EMU_RUN(all_tests);
+    int ut_failures = EMU_RUN(all_tests);
+    if (ut_failures == 0)
+    {
+        printf("\nPERFORMANCE TESTS\n");
+        printf("TODO!!!\n");
+    }
 }
