@@ -22,27 +22,6 @@
  *  void*  : tmp pointer for use in array functions
  */
 
-#define DA_SIZEOF_ELEM_OFFSET 0
-#define DA_LENGTH_OFFSET      (1*sizeof(size_t))
-#define DA_CAPACITY_OFFSET    (2*sizeof(size_t))
-#define DA_TMP_PTR_OFFSET     (3*sizeof(size_t))
-#define DA_HANDLE_OFFSET      (3*sizeof(size_t) + 1*sizeof(void*))
-
-#define DA_HEAD_FROM_HANDLE(darr_h) \
-    (((char*)(darr_h)) - DA_HANDLE_OFFSET)
-#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
-#define DA_P_LENGTH_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
-#define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
-#define DA_P_TMP_PTR_FROM_HANDLE(darr_h) \
-    ((void**)(DA_HEAD_FROM_HANDLE(darr_h) + DA_TMP_PTR_OFFSET))
-
-#define DA_CAPACITY_FACTOR 1.3
-#define DA_NEW_CAPACITY_FROM_LENGTH(length) \
-    (length < 10 ? 10 : (length*DA_CAPACITY_FACTOR))
-
 /**@function
  * @brief Allocate an darray of `nelem` elements each of size `size`.
  *
@@ -153,6 +132,26 @@ static inline void* da_reserve(void* darr, size_t nelem);
 ////////////////////////////////////////////////////////////////////////////////
 // DEFINITIONS
 ////////////////////////////////////////////////////////////////////////////////
+#define DA_SIZEOF_ELEM_OFFSET 0
+#define DA_LENGTH_OFFSET      (1*sizeof(size_t))
+#define DA_CAPACITY_OFFSET    (2*sizeof(size_t))
+#define DA_TMP_PTR_OFFSET     (3*sizeof(size_t))
+#define DA_HANDLE_OFFSET      (3*sizeof(size_t) + 1*sizeof(void*))
+
+#define DA_HEAD_FROM_HANDLE(darr_h) \
+    (((char*)(darr_h)) - DA_HANDLE_OFFSET)
+#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
+#define DA_P_LENGTH_FROM_HANDLE(darr_h) \
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
+#define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
+#define DA_P_TMP_PTR_FROM_HANDLE(darr_h) \
+    ((void**)(DA_HEAD_FROM_HANDLE(darr_h) + DA_TMP_PTR_OFFSET))
+
+#define DA_CAPACITY_FACTOR 1.3
+#define DA_NEW_CAPACITY_FROM_LENGTH(length) \
+    (length < 10 ? 10 : (length*DA_CAPACITY_FACTOR))
 
 static inline void* da_alloc(size_t nelem, size_t size)
 {
