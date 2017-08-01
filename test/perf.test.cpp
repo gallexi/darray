@@ -139,7 +139,7 @@ void fill_push_back_helper(size_t max_sz)
 
 void fill_push_back(void)
 {
-    puts("FILLING AN ARRAY BY DYNAMIC RESIZING");
+    puts("FILLING AN ARRAY VIA PUSH BACK");
     fill_push_back_helper(SMALL_SIZE);
     fill_push_back_helper(MED_SIZE);
     fill_push_back_helper(LARGE_SIZE);
