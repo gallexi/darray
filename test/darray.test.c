@@ -2,14 +2,10 @@
 #   define _EMU_ENABLE_COLOR_
 #endif
 #include <EMUtest.h>
-#include "darray.h"
+#include "../darray.h"
 
 #define INITIAL_NUM_ELEMS 10
 #define RESIZE_NUM_ELEMS 100
-
-#define CARR_STK_STR  "stack allocated array"
-#define CARR_HEAP_STR "heap allocated array"
-#define DARR_STR      "dynamic array"
 
 EMU_TEST(alloc_and_free_functions)
 {
@@ -30,7 +26,7 @@ EMU_TEST(da_length)
 
     EMU_EXPECT_EQ_UINT(da_length(da), INITIAL_NUM_ELEMS);
     EMU_PRINT_INDENT();
-    printf("length : %zu\n", da_length(da));
+    printf("length  : %zu\n", da_length(da));
 
     da_free(da);
     EMU_END_TEST();
@@ -153,10 +149,5 @@ EMU_GROUP(all_tests)
 
 int main(void)
 {
-    int ut_failures = EMU_RUN(all_tests);
-    if (ut_failures == 0)
-    {
-        printf("\nPERFORMANCE TESTS\n");
-        printf("TODO!!!\n");
-    }
+    return EMU_RUN(all_tests);
 }

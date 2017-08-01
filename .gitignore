@@ -4,7 +4,9 @@
 *.obj
 *.a
 
-/.vscode
+/.vscode/settings.json
+unit_tests
+perf_tests
 
 CMakeCache.txt
 CMakeFiles

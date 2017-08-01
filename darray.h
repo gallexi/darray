@@ -100,20 +100,29 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @param darr : lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the array.
  *
- * @return Pointer to the new location of the darray upon successful macro
-    completion. If da_push returns NULL, allocation failed and darr is left
+ * @note Affects the length of the darray.
+ * @note This macro implimentation is the fast version of da_pushs. Unlike the
+    rest of the API, failed allocations from da resizing with da push blow up
+    your program as reallocs are always reassigned back to the darr param. With
+    this version of push, the user sacrifices safety for speed.
+ */
+#define /* void */da_push(/* void* */darr, /* ARRAY TYPE */value) \
+    _da_push(darr, value)
+
+/**@macro
+ * @brief Push a value to the back of darr. This is the safe version of da_push.
+ *
+ * @param darr : lvalue pointing to the target darray.
+ * @param value : Value to be pushed onto the array.
+ *
+ * @return Pointer to the new location of the darray upon successful function
+    completion. If da_pushs returns NULL, allocation failed and darr is left
     untouched.
  *
  * @note Affects the length of the darray.
- * @note Due to the macro implementation of da_push there is no need to
-    reassign the darray unless you are checking for macro failure. Since the
-    common case for dynamic arrays is to push back a lot of values, assignment
-    could waste a lot of clock cycles, so if you are confident memory allocation
-    will not fail, or if you know you have enough space reserved, feel free to
-    push without assigning the result of da_push back to darr.
  */
-#define /* void* */da_push(/* void* */darr, /* ARRAY TYPE */value) \
-    _da_push(darr, value)
+#define /* void* */da_pushs(/* void* */darr, /* ARRAY TYPE */value) \
+    _da_safe_push(darr, value)
 
 /**@macro
  * @brief Remove a value from the back of darr and return it.
@@ -223,6 +232,21 @@ static inline void* da_reserve(void* darr, size_t nelem)
 }
 
 #define /* void* */_da_push(/* void* */darr, /* ARRAY TYPE */value)            \
+do                                                                             \
+{                                                                              \
+    register size_t* p_len = DA_P_LENGTH_FROM_HANDLE(darr);                    \
+    if (*p_len < *DA_P_CAPACITY_FROM_HANDLE(darr))                             \
+    {                                                                          \
+        (darr)[(*p_len)++] = value;                                            \
+    }                                                                          \
+    else                                                                       \
+    {                                                                          \
+        (darr) = da_resize((darr), *p_len);                                    \
+        (darr)[(*DA_P_LENGTH_FROM_HANDLE(darr))++] = value;                    \
+    }                                                                          \
+}while(0)
+
+#define /* void* */_da_safe_push(/* void* */darr, /* ARRAY TYPE */value)       \
                     /* ABANDON HOPE ALL YE WHO ENTER HERE */                   \
 (                                                                              \
 /* if darr.length < darr.capacity */                                           \
