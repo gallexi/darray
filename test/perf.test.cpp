@@ -4,10 +4,11 @@
 #include <time.h>
 #include <vector>
 
-#define CARR   "built in array      : "
-#define DARR   "dynamic array       : "
-#define DARR_S "dynamic array (safe): "
-#define VECTOR "std::vector         : "
+#define CARR      "built in array         : "
+#define DARR      "dynamic array          : "
+#define DARR_S    "dynamic array (safe)   : "
+#define VECTOR    "std::vector            : "
+#define VECTOR_RF "std::vector (range-for): "
 #define SMALL_SIZE 100
 #define MED_SIZE   100000
 #define LARGE_SIZE 100000000
@@ -28,6 +29,7 @@ double clock_to_msec(clock_t c)
     return (((double)c) * 1000) / CLOCKS_PER_SEC;
 }
 
+// FILL ////////////////////////////////////////////////////////////////////////
 void fill_pre_sized_helper(size_t max_sz)
 {
     clock_t begin;
@@ -37,6 +39,7 @@ void fill_pre_sized_helper(size_t max_sz)
     std::vector<int> vec;
 
     printf("vvv %d ELEMENTS vvv\n", max_sz);
+
     printf(CARR);
     arr = malloc(max_sz*sizeof(int));
     begin = clock();
@@ -47,6 +50,7 @@ void fill_pre_sized_helper(size_t max_sz)
     end = clock();
     free(arr);
     printf("%dms\n", (int)clock_to_msec(end-begin));
+
     printf(DARR);
     darr = da_alloc(max_sz, sizeof(int));
     begin = clock();
@@ -57,10 +61,21 @@ void fill_pre_sized_helper(size_t max_sz)
     end = clock();
     da_free(darr);
     printf("%dms\n", (int)clock_to_msec(end-begin));
+
     printf(VECTOR);
     vec = std::vector<int>(max_sz);
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
+    {
+        vec[i] = rand();
+    }
+    end = clock();
+    printf("%dms\n", (int)clock_to_msec(end-begin));
+
+    printf(VECTOR_RF);
+    vec = std::vector<int>(max_sz);
+    begin = clock();
+    for (i : vec)
     {
         vec[i] = rand();
     }
@@ -77,6 +92,7 @@ void fill_pre_sized(void)
 
 }
 
+// PUSH BACK ///////////////////////////////////////////////////////////////////
 void fill_push_back_helper(size_t max_sz)
 {
     clock_t begin;
@@ -87,6 +103,7 @@ void fill_push_back_helper(size_t max_sz)
     size_t curr_len;
 
     printf("vvv %d ELEMENTS vvv\n", max_sz);
+
     printf(CARR);
     curr_len = 1;
     arr = malloc(curr_len*sizeof(int));

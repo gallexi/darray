@@ -118,6 +118,25 @@ EMU_TEST(da_push)
     EMU_END_TEST();
 }
 
+EMU_TEST(da_pushs)
+{
+    const int max_index = 15;
+    int* da = da_alloc(0, sizeof(int));
+    for (int i = 0; i <= max_index; ++i)
+    {
+        da = da_pushs(da, i);
+        EMU_REQUIRE_NOT_NULL(da);
+    }
+    EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
+    for (int i = 0; i <= max_index; ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], i);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
 EMU_TEST(da_pop)
 {
     int* da = da_alloc(2, sizeof(int));
@@ -143,6 +162,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_resize);
     EMU_ADD(da_reserve);
     EMU_ADD(da_push);
+    EMU_ADD(da_pushs);
     EMU_ADD(da_pop);
     EMU_END_GROUP();
 }

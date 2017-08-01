@@ -7,15 +7,15 @@
 
 /* DARRAY MEMORY LAYOUT
  * ====================
- * +----------+---------+---------+-----+------------------+
- * | metadata | elem[0] | elem[1] | ... | elem[capacity-1] |
- * +----------+---------+---------+-----+------------------+
- *            ^
- *            Handle to the darray points to the first
- *            element of the array.
+ * +--------+---------+---------+-----+------------------+
+ * | header | elem[0] | elem[1] | ... | elem[capacity-1] |
+ * +--------+---------+---------+-----+------------------+
+ *          ^
+ *          Handle to the darray points to the first
+ *          element of the array.
  *
- * METADATA
- * ========
+ * HEADER DATA
+ * ===========
  *  size_t : sizeof contained element
  *  size_t : length of the darray
  *  size_t : capacity of the darray
@@ -157,8 +157,9 @@ static inline void* da_reserve(void* darr, size_t nelem);
     ((void**)(DA_HEAD_FROM_HANDLE(darr_h) + DA_TMP_PTR_OFFSET))
 
 #define DA_CAPACITY_FACTOR 1.3
+#define DA_CAPACITY_MIN 10
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) \
-    (length < 10 ? 10 : (length*DA_CAPACITY_FACTOR))
+    (length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
 
 static inline void* da_alloc(size_t nelem, size_t size)
 {
