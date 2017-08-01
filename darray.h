@@ -49,7 +49,7 @@ static inline size_t da_length(void* darr);
 
 /**@function
  * @brief Returns the maximum number of elements the darray can hold without
-    resizing.
+ *  resizing.
  *
  * @param darr : Target darray.
  * @return Total number of allocated elements in the darray.
@@ -66,14 +66,14 @@ static inline size_t da_sizeof_elem(void* darr);
 
 /**@function
  * @brief Change the length of the array to `nelem`. Data for elements with
-    index >= nelem may be lost.
+ * index >= nelem may be lost.
  *
  * @param darr : Target darray. Upon function completion, darr may or may not
-    point to its previous block on the heap, potentially breaking references to
-    the darr.
+ *  point to its previous block on the heap, potentially breaking references to
+ *  the darr.
  * @return Pointer to the new location of the darray upon successful function
-    completion. If da_resize returns NULL, allocation failed and darr is left
-    untouched.
+ *  completion. If da_resize returns NULL, allocation failed and darr is left
+ *  untouched.
  *
  * @note Affects the length attribute of the darray.
  */
@@ -81,14 +81,14 @@ static inline void* da_resize(void* darr, size_t nelem);
 
 /**@function
  * @brief Ensure there is at least `nelem` valid elements available beyond the
-    current length of the darray without requiring resizing.
+ *  current length of the darray without requiring resizing.
  *
  * @param darr : Target darray. Upon function completion, darr may or may not
-    point to its previous block on the heap, potentially breaking references to
-    the darr.
+ *  point to its previous block on the heap, potentially breaking references to
+ *  the darr.
  * @return Pointer to the new location of the darray upon successful function
-    completion. If da_reserve returns NULL, allocation failed and darr is left
-    untouched.
+ *  completion. If da_reserve returns NULL, allocation failed and darr is left
+ *  untouched.
  *
  * @note Does not affect the length attribute of the darray.
  */
@@ -102,9 +102,9 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  * @note This macro implimentation is the fast version of da_pushs. Unlike the
-    rest of the API, failed allocations from da resizing with da push blow up
-    your program as reallocs are always reassigned back to the darr param. With
-    this version of push, the user sacrifices safety for speed.
+ *  rest of the API, failed allocations from da resizing with da push blow up
+ *  your program as reallocs are always reassigned back to the darr param. With
+ *  this version of push, the user sacrifices safety for speed.
  */
 #define /* void */da_push(/* void* */darr, /* ARRAY TYPE */value) \
     _da_push(darr, value)
@@ -116,8 +116,8 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @param value : Value to be pushed onto the array.
  *
  * @return Pointer to the new location of the darray upon successful function
-    completion. If da_pushs returns NULL, allocation failed and darr is left
-    untouched.
+ *  completion. If da_pushs returns NULL, allocation failed and darr is left
+ *  untouched.
  *
  * @note Affects the length of the darray.
  */
@@ -133,7 +133,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  * @note da_pop will never reallocate memory, so popping is always
-    allocation-safe.
+ *  allocation-safe.
  */
 #define /* ARRAY TYPE */da_pop(/* void* */darr) \
     _da_pop(darr)
