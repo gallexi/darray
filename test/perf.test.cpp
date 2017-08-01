@@ -70,13 +70,6 @@ void fill_pre_sized_helper(size_t max_sz)
 
 void fill_pre_sized(void)
 {
-    clock_t begin;
-    clock_t end;
-    int* arr;
-    int* darr;
-    std::vector<int> vec;
-    size_t max_sz;
-
     puts("FILLING A PRE-SIZED ARRAY");
     fill_pre_sized_helper(SMALL_SIZE);
     fill_pre_sized_helper(MED_SIZE);
