@@ -103,6 +103,7 @@ EMU_TEST(da_push)
 {
     const int max_index = 15;
     int* da = da_alloc(0, sizeof(int));
+
     for (int i = 0; i <= max_index; ++i)
     {
         da_push(da, i);
@@ -122,6 +123,7 @@ EMU_TEST(da_pushs)
 {
     const int max_index = 15;
     int* da = da_alloc(0, sizeof(int));
+
     for (int i = 0; i <= max_index; ++i)
     {
         da = da_pushs(da, i);
@@ -153,6 +155,47 @@ EMU_TEST(da_pop)
     EMU_END_TEST();
 }
 
+EMU_TEST(da_insert)
+{
+    int* da = da_alloc(2, sizeof(int));
+    da[0] = 3;
+    da[1] = 5;
+
+    da_insert(da, 0, 7);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 3);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 3);
+    EMU_EXPECT_EQ_INT(da[2], 5);
+
+    da_insert(da, 1, 9);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 4);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 9);
+    EMU_EXPECT_EQ_INT(da[2], 3);
+    EMU_EXPECT_EQ_INT(da[3], 5);
+
+    da_free(da);
+
+    da = da_alloc(0, sizeof(int));
+    const int max_index = 15;
+
+    // mimic push front
+    for (int i = max_index; i >= 0; --i)
+    {
+        da_insert(da, 0, i);
+    }
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
+    for (int i = max_index; i >= 0; --i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], i);
+    }
+    da_free(da);
+    EMU_END_TEST();
+}
+
 EMU_GROUP(all_tests)
 {
     EMU_ADD(alloc_and_free_functions);
@@ -164,6 +207,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_push);
     EMU_ADD(da_pushs);
     EMU_ADD(da_pop);
+    EMU_ADD(da_insert);
     EMU_END_GROUP();
 }
 
