@@ -305,39 +305,23 @@ do                                                                             \
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
-/*
+#define /* void */_da_insert(/* void* */darr, /* size_t */index, value)        \
 do                                                                             \
 {                                                                              \
-    register size_t* p_len = DA_P_LENGTH_FROM_HANDLE(darr);                    \
-    if (*p_len < *DA_P_CAPACITY_FROM_HANDLE(darr))                             \
-    {                                                                          \
-        (darr)[(*p_len)++] = value;                                            \
-    }                                                                          \
-    else                                                                       \
-    {                                                                          \
-        (darr) = da_resize((darr), *p_len);                                    \
-        (darr)[(*DA_P_LENGTH_FROM_HANDLE(darr))++] = value;                    \
-    }                                                                          \
-}while(0)
-*/
-
-#define /* void */_da_insert(/* void* */darr, /* size_t */index, value) \
-do \
-{ \
-    register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr); \
-    register size_t* __p_elsz; \
+    register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
+    register size_t* __p_elsz;                                                 \
     if (*__p_len == *DA_P_CAPACITY_FROM_HANDLE(darr))                          \
     {                                                                          \
-        (darr) = da_resize((darr), *__p_len); \
-        __p_len  = DA_P_LENGTH_FROM_HANDLE(darr); \
-    } \
-    __p_elsz = DA_P_SIZEOF_ELEM_FROM_HANDLE(darr); \
-    memmove(                                                               \
-        (darr) + (index) +1,                                  \
-        (darr) + (index),                                  \
-        (*__p_elsz)*((*__p_len)-(index))                                   \
-    );                                                                     \
-    (darr)[index] = value;                                                 \
+        (darr) = da_resize((darr), *__p_len);                                  \
+        __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                              \
+    }                                                                          \
+    __p_elsz = DA_P_SIZEOF_ELEM_FROM_HANDLE(darr);                             \
+    memmove(                                                                   \
+        (darr) + (index) +1,                                                   \
+        (darr) + (index),                                                      \
+        (*__p_elsz)*((*__p_len)-(index))                                       \
+    );                                                                         \
+    (darr)[index] = value;                                                     \
     (*__p_len)++; \
 }while(0)
 
