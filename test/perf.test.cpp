@@ -29,6 +29,11 @@ double clock_to_msec(clock_t c)
     return (((double)c) * 1000) / CLOCKS_PER_SEC;
 }
 
+void print_clocks(clock_t begin, clock_t end)
+{
+    printf("%u clocks\n", end-begin);
+}
+
 // FILL ////////////////////////////////////////////////////////////////////////
 void fill_pre_sized_helper(size_t max_sz)
 {
@@ -49,7 +54,7 @@ void fill_pre_sized_helper(size_t max_sz)
     }
     end = clock();
     free(arr);
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(DARR);
     darr = da_alloc(max_sz, sizeof(int));
@@ -60,7 +65,7 @@ void fill_pre_sized_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(max_sz);
@@ -70,7 +75,7 @@ void fill_pre_sized_helper(size_t max_sz)
         vec[i] = rand();
     }
     end = clock();
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(VECTOR_RF);
     vec = std::vector<int>(max_sz);
@@ -80,7 +85,7 @@ void fill_pre_sized_helper(size_t max_sz)
         vec[i] = rand();
     }
     end = clock();
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 }
 
 void fill_pre_sized(void)
@@ -119,7 +124,7 @@ void fill_push_back_helper(size_t max_sz)
     }
     end = clock();
     free(arr);
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(DARR);
     darr = da_alloc(max_sz, sizeof(int));
@@ -130,7 +135,7 @@ void fill_push_back_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(DARR_S);
     darr = da_alloc(max_sz, sizeof(int));
@@ -141,7 +146,7 @@ void fill_push_back_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(1);
@@ -151,7 +156,7 @@ void fill_push_back_helper(size_t max_sz)
         vec.push_back(rand());
     }
     end = clock();
-    printf("%dms\n", (int)clock_to_msec(end-begin));
+    print_clocks(begin, end);
 }
 
 void fill_push_back(void)
