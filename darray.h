@@ -4,6 +4,7 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 /* DARRAY MEMORY LAYOUT
  * ====================
@@ -140,6 +141,9 @@ static inline void* da_reserve(void* darr, size_t nelem);
 
 #define /* void */da_insert(/* void* */darr, /* size_t */index, value) \
     _da_insert(darr, index, value)
+
+#define /* ARRAY TYPE */da_remove(/* void* */darr, /* size_t */index) \
+    _da_remove(darr, index)
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
@@ -312,12 +316,58 @@ do                                                                             \
         __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                              \
     }                                                                          \
     memmove(                                                                   \
-        (darr) + (index) +1,                                                   \
-        (darr) + (index),                                                      \
+        (darr)+(index)+1,                                                      \
+        (darr)+(index),                                                        \
         (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*((*__p_len)-(index))             \
     );                                                                         \
     (darr)[index] = value;                                                     \
     (*__p_len)++;                                                              \
 }while(0)
+
+// Performes the following transform:
+// [0][1][2][3][rest] => [0][2][3][1][rest]
+//     ^                           ^
+//     target                      moved to back
+static inline void* _da_remove_mem_mov(
+    void* darr,
+    size_t target_index,
+    size_t length,
+    size_t elsz
+)
+{
+    void* tmp = malloc(elsz);
+    assert(tmp != NULL); // Using an assert is kind of ugly, but if a program
+                         // can't allocate a single element of space then
+                         // something is probably messed up anyway.
+                         // Eventually I should try to impliment this algorithm
+                         // without an allocation. Maybe useing xor swap or
+                         // something.
+    memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
+    memmove(
+        (char*)darr + target_index*elsz,
+        (char*)darr + (target_index+1)*elsz,
+        elsz*(length-target_index-1)
+    );
+    memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
+    free(tmp);
+    return NULL; /* return value needed for comma operator wizardry */
+}
+
+#define /* ARRAY TYPE */_da_remove(/* void* */darr, /* size_t */index)         \
+( \
+    ((/* "then" paren(s) */ \
+    /* move element to be removed to the back of the array */ \
+    _da_remove_mem_mov( \
+        (darr), \
+        index, \
+        *DA_P_LENGTH_FROM_HANDLE(darr), \
+        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) \
+    ), /* then */ \
+    /* darr.length-- */ \
+    (*DA_P_LENGTH_FROM_HANDLE(darr))-- \
+    ), /* then */ \
+    /* return darr[length] (i.e the removed element) */ \
+    (darr)[da_length(darr)] \
+)
 
 #endif // !_DARRAY_H_

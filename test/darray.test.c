@@ -146,9 +146,11 @@ EMU_TEST(da_pop)
     da[1] = 5;
 
     EMU_EXPECT_EQ_INT(da_pop(da), 5);
+    EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 1);
 
     EMU_EXPECT_EQ_INT(da_pop(da), 3);
+    EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 0);
 
     da_free(da);
@@ -192,6 +194,34 @@ EMU_TEST(da_insert)
     {
         EMU_EXPECT_EQ_INT(da[i], i);
     }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_remove)
+{
+    int* da = da_alloc(4, sizeof(int));
+    da[0] = 3;
+    da[1] = 5;
+    da[2] = 7;
+    da[3] = 9;
+
+    // remove from middle
+    EMU_EXPECT_EQ_INT(da_remove(da, 1), 5);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 3);
+
+    // remove from front
+    EMU_EXPECT_EQ_INT(da_remove(da, 0), 3);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 2);
+
+    // remove from back
+    EMU_EXPECT_EQ_INT(da_remove(da, 1), 9);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 1);
+
     da_free(da);
     EMU_END_TEST();
 }
@@ -208,6 +238,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_pushs);
     EMU_ADD(da_pop);
     EMU_ADD(da_insert);
+    EMU_ADD(da_remove);
     EMU_END_GROUP();
 }
 
