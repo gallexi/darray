@@ -130,7 +130,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *
  * @param darr : lvalue pointing to the target darray.
  *
- * @return Value popped off of the  back of the darray.
+ * @return Value popped off of the back of the darray.
  *
  * @note Affects the length of the darray.
  * @note da_pop will never reallocate memory, so popping is always
@@ -139,9 +139,32 @@ static inline void* da_reserve(void* darr, size_t nelem);
 #define da_pop(/* void* */darr) \
     _da_pop(darr)
 
+/**@macro
+ * @brief Insert a value to into darr at the specified index, pushing the rest
+ *  of the values past index in darr back one.
+ *
+ * @param darr : lvalue pointing to the target darray.
+ * @param index : Array index where the new value will appear.
+ * @param value : Value to be inserted onto the array.
+ *
+ * @note Affects the length of the darray.
+ */
 #define /* void */da_insert(/* void* */darr, /* size_t */index, value) \
     _da_insert(darr, index, value)
 
+/**@macro
+ * @brief Remove the value at index from darr and return it, moving the rest if
+ *  the values past index up one.
+ *
+ * @param darr : lvalue pointing to the target darray.
+ * @param index : Array index of the value to be removed.
+ *
+ * @return Value removed from the darray.
+ *
+ * @note Affects the length of the darray.
+ * @note da_remove will never reallocate memory, so removing is always
+ *  allocation-safe.
+ */
 #define /* ARRAY TYPE */da_remove(/* void* */darr, /* size_t */index) \
     _da_remove(darr, index)
 
@@ -354,20 +377,20 @@ static inline void* _da_remove_mem_mov(
 }
 
 #define /* ARRAY TYPE */_da_remove(/* void* */darr, /* size_t */index)         \
-( \
-    ((/* "then" paren(s) */ \
-    /* move element to be removed to the back of the array */ \
-    _da_remove_mem_mov( \
-        (darr), \
-        index, \
-        *DA_P_LENGTH_FROM_HANDLE(darr), \
-        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) \
-    ), /* then */ \
-    /* darr.length-- */ \
-    (*DA_P_LENGTH_FROM_HANDLE(darr))-- \
-    ), /* then */ \
-    /* return darr[length] (i.e the removed element) */ \
-    (darr)[da_length(darr)] \
+(                                                                              \
+    ((/* "then" paren(s) */                                                    \
+    /* move element to be removed to the back of the array */                  \
+    _da_remove_mem_mov(                                                        \
+        (darr),                                                                \
+        index,                                                                 \
+        *DA_P_LENGTH_FROM_HANDLE(darr),                                        \
+        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))                                   \
+    ), /* then */                                                              \
+    /* darr.length-- */                                                        \
+    (*DA_P_LENGTH_FROM_HANDLE(darr))--                                         \
+    ), /* then */                                                              \
+    /* return darr[length] (i.e the removed element) */                        \
+    (darr)[da_length(darr)]                                                    \
 )
 
 #endif // !_DARRAY_H_
