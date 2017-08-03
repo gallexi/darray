@@ -107,7 +107,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  your program as reallocs are always reassigned back to the darr param. With
  *  this version of push, the user sacrifices safety for speed.
  */
-#define /* void */da_push(/* void* */darr, /* ARRAY TYPE */value) \
+#define /* void */da_push(/* void* */darr, value) \
     _da_push(darr, value)
 
 /**@macro
@@ -199,10 +199,10 @@ static inline void* da_alloc(size_t nelem, size_t size)
     {
         return mem;
     }
-    (*(size_t*)(mem + DA_SIZEOF_ELEM_OFFSET)) = size;
-    (*(size_t*)(mem + DA_LENGTH_OFFSET))      = nelem;
-    (*(size_t*)(mem + DA_CAPACITY_OFFSET))    = capacity;
-    return mem + DA_HANDLE_OFFSET;
+    (*(size_t*)((char*)mem + DA_SIZEOF_ELEM_OFFSET)) = size;
+    (*(size_t*)((char*)mem + DA_LENGTH_OFFSET))      = nelem;
+    (*(size_t*)((char*)mem + DA_CAPACITY_OFFSET))    = capacity;
+    return (char*)mem + DA_HANDLE_OFFSET;
 }
 
 static inline void da_free(void* darr)
@@ -235,9 +235,9 @@ static inline void* da_resize(void* darr, size_t nelem)
         return NULL;
     }
     darr = ptr;
-    *((size_t*)(ptr + DA_CAPACITY_OFFSET)) = new_capacity;
-    *((size_t*)(ptr + DA_LENGTH_OFFSET))   = nelem;
-    return ptr + DA_HANDLE_OFFSET;
+    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
+    *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
+    return (char*)ptr + DA_HANDLE_OFFSET;
 }
 
 static inline void* da_reserve(void* darr, size_t nelem)
@@ -256,8 +256,8 @@ static inline void* da_reserve(void* darr, size_t nelem)
     {
         return NULL;
     }
-    *((size_t*)(ptr + DA_CAPACITY_OFFSET)) = new_capacity;
-    return ptr + DA_HANDLE_OFFSET;
+    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
+    return (char*)ptr + DA_HANDLE_OFFSET;
 }
 
 #define /* void* */_da_push(/* void* */darr, /* ARRAY TYPE */value)            \
@@ -288,9 +288,9 @@ do                                                                             \
 (                                                                              \
     ( /* "then" paren(s) */                                                    \
     /* darr.tmp = new_darr */                                                  \
-    (*DA_P_TMP_PTR_FROM_HANDLE(darr) = da_alloc(                               \
+    *DA_P_TMP_PTR_FROM_HANDLE(darr) = da_alloc(                                \
         da_length(darr),                                                       \
-        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)))                                  \
+        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))                                   \
     ), /* then */                                                              \
     /* if darr.tmp == NULL (i.e. if new_darr alloc failed) */                  \
     (*DA_P_TMP_PTR_FROM_HANDLE(darr) == NULL) ?                                \

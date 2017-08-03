@@ -74,7 +74,7 @@ EMU_TEST(da_resize)
     EMU_EXPECT_EQ_UINT(da_length(da), RESIZE_NUM_ELEMS);
     for (size_t i = 0; i < INITIAL_NUM_ELEMS; ++i)
     {
-        EMU_EXPECT_EQ_INT(da[i], i);
+        EMU_EXPECT_EQ_INT(da[i], (int)i);
     }
 
     da_free(da);
