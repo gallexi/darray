@@ -333,17 +333,18 @@ do                                                                             \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
-    if (*__p_len == *DA_P_CAPACITY_FROM_HANDLE(darr))                          \
+    register size_t __index = (index);                                         \
+    if ((*__p_len) == (*DA_P_CAPACITY_FROM_HANDLE(darr)))                      \
     {                                                                          \
         (darr) = da_resize((darr), *__p_len);                                  \
-        __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                              \
+        __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                               \
     }                                                                          \
     memmove(                                                                   \
         (darr)+(index)+1,                                                      \
         (darr)+(index),                                                        \
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*((*__p_len)-(index))             \
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*((*__p_len)-(__index))           \
     );                                                                         \
-    (darr)[index] = value;                                                     \
+    (darr)[__index] = value;                                                   \
     (*__p_len)++;                                                              \
 }while(0)
 
@@ -351,6 +352,10 @@ do                                                                             \
 // [0][1][2][3][rest] => [0][2][3][1][rest]
 //     ^                           ^
 //     target                      moved to back
+#pragma GCC diagnostic push
+// A return value is needed for comma operator magic, but loading a return value
+// just wastes clock cycles, so we ignore it.
+#pragma GCC diagnostic ignored "-Wreturn-type"
 static inline void* _da_remove_mem_mov(
     void* darr,
     size_t target_index,
@@ -358,7 +363,7 @@ static inline void* _da_remove_mem_mov(
     size_t elsz
 )
 {
-    void* tmp = malloc(elsz);
+    register void* tmp = malloc(elsz);
     assert(tmp != NULL); // Using an assert is kind of ugly, but if a program
                          // can't allocate a single element of space then
                          // something is probably messed up anyway.
@@ -373,12 +378,12 @@ static inline void* _da_remove_mem_mov(
     );
     memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
     free(tmp);
-    return NULL; /* return value needed for comma operator wizardry */
 }
+#pragma GCC diagnostic pop
 
 #define /* ARRAY TYPE */_da_remove(/* void* */darr, /* size_t */index)         \
 (                                                                              \
-    ((/* "then" paren(s) */                                                    \
+    (/* "then" paren(s) */                                                     \
     /* move element to be removed to the back of the array */                  \
     _da_remove_mem_mov(                                                        \
         (darr),                                                                \
@@ -386,11 +391,8 @@ static inline void* _da_remove_mem_mov(
         *DA_P_LENGTH_FROM_HANDLE(darr),                                        \
         *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))                                   \
     ), /* then */                                                              \
-    /* darr.length-- */                                                        \
-    (*DA_P_LENGTH_FROM_HANDLE(darr))--                                         \
-    ), /* then */                                                              \
-    /* return darr[length] (i.e the removed element) */                        \
-    (darr)[da_length(darr)]                                                    \
+    /* return darr[--length] (i.e the removed element) */                      \
+    (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
 #endif // !_DARRAY_H_
