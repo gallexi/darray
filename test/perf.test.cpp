@@ -23,16 +23,11 @@ void remove_rand(void);
 int main(void)
 {
     srand(time(NULL));
-    fill_pre_sized();
-    putchar('\n');
-    fill_push_back();
-    putchar('\n');
-    insert_front();
-    putchar('\n');
-    insert_rand();
-    putchar('\n');
-    remove_front();
-    putchar('\n');
+    fill_pre_sized(); putchar('\n');
+    fill_push_back(); putchar('\n');
+    insert_front();   putchar('\n');
+    insert_rand();    putchar('\n');
+    remove_front();   putchar('\n');
     remove_rand();
 }
 
