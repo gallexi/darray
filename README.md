@@ -79,3 +79,15 @@ printf("this darray holds %zu elements, but can hold up to %zu elements without 
 
 ### Make Sonic The Hedgehog happy
 We love arrays because they are fast. Darrays are just regular old arrays under the hood so all the optimizations you get from built in arrays automatically get pulled into darrays. The library comes in with some built in performance tests so you can see how darrays perform in relation to built in arrays and std::vector.
+
+### Tailor to the common case
+This library comes with a certain set of advantages as well as a certain set of drawbacks. Darrays try and make the most used cases the fastest, If your common cases are the same as mine then great, if not then that's fine too, eveyone programs differently.
+
+## How it works
+TODO
+
+## API
+TODO
+
+## License
+TODO
