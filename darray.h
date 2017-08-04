@@ -373,8 +373,8 @@ do                                                                             \
 #pragma GCC diagnostic ignored "-Wreturn-type"
 // Performes the following transform:
 // [0][1][2][3][rest...] => [0][2][3][1][rest...]
-//     ^                           ^
-//     target index                target moved to back
+//     ^                              ^
+//     target index                   target moved to back
 static inline void* _da_remove_mem_mov(
     void* darr,
     size_t target_index,

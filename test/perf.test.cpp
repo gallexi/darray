@@ -23,7 +23,7 @@ void remove_rand(void);
 int main(void)
 {
     time_t seed = time(NULL);
-    printf("random seed: %d\n\n", seed);
+    printf("random seed: %ld\n\n", seed);
     srand(seed);
     fill_pre_sized(); putchar('\n');
     fill_push_back(); putchar('\n');
@@ -41,7 +41,7 @@ int clock_to_msec(clock_t c)
 void print_elapsed_time(clock_t begin, clock_t end)
 {
     clock_t c = end-begin;
-    printf("%u clocks | %u msec\n", c, clock_to_msec(c));
+    printf("%u clocks | %ld msec\n", c, clock_to_msec(c));
 }
 
 void print_numelem(size_t n)
@@ -61,7 +61,7 @@ void fill_pre_sized_helper(size_t max_sz)
     print_numelem(max_sz);
 
     printf(CARR);
-    arr = malloc(max_sz*sizeof(int));
+    arr = (int*)malloc(max_sz*sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -72,7 +72,7 @@ void fill_pre_sized_helper(size_t max_sz)
     print_elapsed_time(begin, end);
 
     printf(DARR);
-    darr = da_alloc(max_sz, sizeof(int));
+    darr = (int*)da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -125,7 +125,7 @@ void fill_push_back_helper(size_t max_sz)
 
     printf(CARR);
     curr_len = init_elem;
-    arr = malloc(init_elem*sizeof(int));
+    arr = (int*)malloc(init_elem*sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -141,7 +141,7 @@ void fill_push_back_helper(size_t max_sz)
     print_elapsed_time(begin, end);
 
     printf(DARR);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -152,7 +152,7 @@ void fill_push_back_helper(size_t max_sz)
     print_elapsed_time(begin, end);
 
     printf(DARR_S);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     int* bak;
     for (size_t i = 0; i < max_sz; ++i)
@@ -200,7 +200,7 @@ void insert_front_helper(size_t max_sz)
     print_numelem(max_sz);
 
     printf(DARR);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -211,7 +211,7 @@ void insert_front_helper(size_t max_sz)
     print_elapsed_time(begin, end);
 
     printf(DARR_S);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     int* bak;
     for (size_t i = 0; i < max_sz; ++i)
@@ -258,7 +258,7 @@ void insert_rand_helper(size_t max_sz)
     print_numelem(max_sz);
 
     printf(DARR);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -269,7 +269,7 @@ void insert_rand_helper(size_t max_sz)
     print_elapsed_time(begin, end);
 
     printf(DARR_S);
-    darr = da_alloc(init_elem, sizeof(int));
+    darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     int* bak;
     for (size_t i = 0; i < max_sz; ++i)
@@ -317,7 +317,7 @@ void remove_front_helper(size_t max_sz)
     print_numelem(max_sz);
 
     printf(DARR);
-    darr = da_alloc(max_sz, sizeof(int));
+    darr = (int*)da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -372,7 +372,7 @@ void remove_rand_helper(size_t max_sz)
     print_numelem(max_sz);
 
     printf(DARR);
-    darr = da_alloc(max_sz, sizeof(int));
+    darr = (int*)da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {

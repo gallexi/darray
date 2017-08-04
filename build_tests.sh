@@ -1,2 +1,2 @@
-gcc -ounit_tests -Wall -Wextra -std=c11 -g -I${EMU_ROOT} ./test/darray.test.c
-g++ -operf_tests -w -fpermissive -g ./test/perf.test.cpp
+gcc -ounit_tests -g -Wall -Wextra -std=c11 -I${EMU_ROOT} ./test/darray.test.c
+g++ -operf_tests -g -w -fpermissive ./test/perf.test.cpp
