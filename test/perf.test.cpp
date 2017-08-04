@@ -22,7 +22,9 @@ void remove_rand(void);
 
 int main(void)
 {
-    srand(time(NULL));
+    time_t seed = time(NULL);
+    printf("random seed: %d\n\n", seed);
+    srand(seed);
     fill_pre_sized(); putchar('\n');
     fill_push_back(); putchar('\n');
     insert_front();   putchar('\n');
@@ -152,9 +154,15 @@ void fill_push_back_helper(size_t max_sz)
     printf(DARR_S);
     darr = da_alloc(init_elem, sizeof(int));
     begin = clock();
+    int* bak;
     for (size_t i = 0; i < max_sz; ++i)
     {
-        darr = da_pushs(darr, rand());
+        da_spush(darr, rand(), bak);
+        if (!darr)
+        {
+            printf("OH NO! %d %d", __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+        }
     }
     end = clock();
     da_free(darr);
@@ -202,6 +210,23 @@ void insert_front_helper(size_t max_sz)
     da_free(darr);
     print_elapsed_time(begin, end);
 
+    printf(DARR_S);
+    darr = da_alloc(init_elem, sizeof(int));
+    begin = clock();
+    int* bak;
+    for (size_t i = 0; i < max_sz; ++i)
+    {
+        da_sinsert(darr, 0, rand(), bak);
+        if (!darr)
+        {
+            printf("OH NO! %d %d", __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+        }
+    }
+    end = clock();
+    da_free(darr);
+    print_elapsed_time(begin, end);
+
     printf(VECTOR);
     vec = std::vector<int>(init_elem);
     begin = clock();
@@ -243,6 +268,23 @@ void insert_rand_helper(size_t max_sz)
     da_free(darr);
     print_elapsed_time(begin, end);
 
+    printf(DARR_S);
+    darr = da_alloc(init_elem, sizeof(int));
+    begin = clock();
+    int* bak;
+    for (size_t i = 0; i < max_sz; ++i)
+    {
+        da_sinsert(darr, rand() % da_length(darr), rand(), bak);
+        if (!darr)
+        {
+            printf("OH NO! %d %d", __FILE__, __LINE__);
+            exit(EXIT_FAILURE);
+        }
+    }
+    end = clock();
+    da_free(darr);
+    print_elapsed_time(begin, end);
+
     printf(VECTOR);
     vec = std::vector<int>(init_elem);
     begin = clock();
@@ -258,7 +300,6 @@ void insert_rand(void)
 {
     puts("INSERT AT RANDOM INDEXES");
     puts("*results may vary significantly from run to run");
-    insert_rand_helper(SMALL_SIZE);
     insert_rand_helper(MED_SIZE);
 }
 
@@ -371,6 +412,5 @@ void remove_rand(void)
 {
     puts("REMOVE AT RANDOM INDEXES");
     puts("*results may vary significantly from run to run");
-    remove_rand_helper(SMALL_SIZE);
     remove_rand_helper(MED_SIZE);
 }

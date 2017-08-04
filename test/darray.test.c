@@ -119,16 +119,18 @@ EMU_TEST(da_push)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_pushs)
+EMU_TEST(da_spush)
 {
     const int max_index = 15;
     int* da = da_alloc(0, sizeof(int));
+    int* bak = NULL;
 
     for (int i = 0; i <= max_index; ++i)
     {
-        da = da_pushs(da, i);
+        da_spush(da, i, bak);
         EMU_REQUIRE_NOT_NULL(da);
     }
+    EMU_EXPECT_EQ(da, bak);
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
     for (int i = 0; i <= max_index; ++i)
     {
@@ -187,8 +189,52 @@ EMU_TEST(da_insert)
     for (int i = max_index; i >= 0; --i)
     {
         da_insert(da, 0, i);
+        EMU_REQUIRE_NOT_NULL(da);
     }
+    EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
+    for (int i = max_index; i >= 0; --i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], i);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_sinsert)
+{
+    int* da = da_alloc(2, sizeof(int));
+    int* bak = NULL;
+    da[0] = 3;
+    da[1] = 5;
+
+    da_sinsert(da, 0, 7, bak);
     EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 3);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 3);
+    EMU_EXPECT_EQ_INT(da[2], 5);
+
+    da_sinsert(da, 1, 9, bak);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), 4);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 9);
+    EMU_EXPECT_EQ_INT(da[2], 3);
+    EMU_EXPECT_EQ_INT(da[3], 5);
+
+    da_free(da);
+
+    da = da_alloc(0, sizeof(int));
+    const int max_index = 15;
+
+    // mimic push front
+    for (int i = max_index; i >= 0; --i)
+    {
+        da_sinsert(da, 0, i, bak);
+        EMU_REQUIRE_NOT_NULL(da);
+    }
+    EMU_EXPECT_EQ(da, bak);
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
     for (int i = max_index; i >= 0; --i)
     {
@@ -235,9 +281,10 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_resize);
     EMU_ADD(da_reserve);
     EMU_ADD(da_push);
-    EMU_ADD(da_pushs);
+    EMU_ADD(da_spush);
     EMU_ADD(da_pop);
     EMU_ADD(da_insert);
+    EMU_ADD(da_sinsert);
     EMU_ADD(da_remove);
     EMU_END_GROUP();
 }
