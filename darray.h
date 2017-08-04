@@ -20,7 +20,6 @@
  *  size_t : sizeof contained element
  *  size_t : length of the darray
  *  size_t : capacity of the darray
- *  void*  : tmp pointer for use in array functions
  */
 
 /**@function
@@ -130,7 +129,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Remove a value from the back of darr and return it.
  *
- * @param darr : lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  *
  * @return Value popped off of the back of the darray.
  *
@@ -143,7 +142,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
  * @brief Insert a value to into darr at the specified index, pushing the rest
- *  of the values past index in darr back one.
+ *  of the values past index in darr back one element.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
@@ -162,8 +161,8 @@ static inline void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
  * @brief Insert a value to into darr at the specified index, pushing the rest
- *  of the values past index in darr back one. This is the safe version of
- *  da_insert.
+ *  of the values past index in darr back one element. This is the safe version
+ *  of da_insert.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
@@ -182,7 +181,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
  * @brief Remove the value at index from darr and return it, moving the rest if
- *  the values past index up one.
+ *  the values past index up one element.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index of the value to be removed.
@@ -200,7 +199,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 #define DA_SIZEOF_ELEM_OFFSET 0
 #define DA_LENGTH_OFFSET      (1*sizeof(size_t))
 #define DA_CAPACITY_OFFSET    (2*sizeof(size_t))
-#define DA_HANDLE_OFFSET      (3*sizeof(size_t) + 1*sizeof(void*))
+#define DA_HANDLE_OFFSET      (3*sizeof(size_t))
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
     (((char*)(darr_h)) - DA_HANDLE_OFFSET)
