@@ -98,7 +98,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Push a value to the back of darr.
  *
- * @param darr : unchanging lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the array.
  *
  * @note Affects the length of the darray.
@@ -113,7 +113,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Push a value to the back of darr. This is the safe version of da_push.
  *
- * @param darr : unchanging lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the array.
  * @param backup : lvalue that will store a backup of darr in in case of
  *  resize failure.
@@ -145,7 +145,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Insert a value to into darr at the specified index, pushing the rest
  *  of the values past index in darr back one.
  *
- * @param darr : unchanging lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the array.
  *
@@ -160,7 +160,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  of the values past index in darr back one. This is the safe version of
  *  da_insert.
  *
- * @param darr : unchanging lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the array.
  * @param backup : lvalue that will store a backup of darr in in case of
@@ -179,7 +179,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Remove the value at index from darr and return it, moving the rest if
  *  the values past index up one.
  *
- * @param darr : unchanging lvalue pointing to the target darray.
+ * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index of the value to be removed.
  *
  * @return Value removed from the darray.
