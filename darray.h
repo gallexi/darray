@@ -103,9 +103,9 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  * @note This macro implimentation is the fast version of da_spush. Unlike the
- *  rest of the API, failed allocations from da resizing with da push blow up
- *  your program as reallocs are always reassigned back to the darr param. With
- *  this version of push, the user sacrifices safety for speed.
+ *  rest of the API, failed allocations from da resizing with da push may
+ *  cause your program to blow up as reallocs are always reassigned back to the
+ *  darr param. With this version of push, the user sacrifices safety for speed.
  */
 #define /* void */da_push(/* void* */darr, /* ARRAY TYPE */value)              \
                                                            _da_push(darr, value)
@@ -151,9 +151,10 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  * @note This macro implimentation is the fast version of da_sinsert. Unlike the
- *  rest of the API, failed allocations from da resizing with da push blow up
- *  your program as reallocs are always reassigned back to the darr param. With
- *  this version of insert, the user sacrifices safety for speed.
+ *  rest of the API, failed allocations from da resizing with da_insert may
+ *  cause your program to blow up as reallocs are always reassigned back to the
+ *  darr param. With this version of insert, the user sacrifices safety for
+ *  speed.
  */
 #define /* void */da_insert(/* void* */darr, /* size_t */index,                \
     /* ELEM TYPE */value)                                                      \
