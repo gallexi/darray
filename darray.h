@@ -150,6 +150,10 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @param value : Value to be inserted onto the array.
  *
  * @note Affects the length of the darray.
+ * @note This macro implimentation is the fast version of da_sinsert. Unlike the
+ *  rest of the API, failed allocations from da resizing with da push blow up
+ *  your program as reallocs are always reassigned back to the darr param. With
+ *  this version of insert, the user sacrifices safety for speed.
  */
 #define /* void */da_insert(/* void* */darr, /* size_t */index,                \
     /* ELEM TYPE */value)                                                      \
