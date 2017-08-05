@@ -77,7 +77,7 @@ There are two main insertion functions `da_insert` and `da_push`, implemented th
     /* ...macro implementation */
 ```
 ```C
-#define /* void */da_push(/* void* */darr, /* ARRAY TYPE */value) \
+#define /* void */da_push(/* void* */darr, /* ELEM TYPE */value) \
     /* ...macro implementation */
 ```
 Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
@@ -189,7 +189,7 @@ Most dynamic array implementations use something along the lines of
 where the container is a struct, you have to use that a weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages over this library's implementation of dynamic arrays, but to me the struct approach feels, for lack of a better phrase, like a shitty STL container, not the random access data structure we are all used to. Darrays let you work with the data directly, and feel much more like what we are accustomed to as C programmers.
 
 ### Speed (づ ￣ ³￣)づ
-Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays automatically get pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built in arrays and std::vector.
+Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays automatically get pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
 
 ## LICENSE
 MIT
