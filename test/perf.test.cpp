@@ -160,7 +160,7 @@ void fill_push_back_helper(size_t max_sz)
         da_spush(darr, rand(), bak);
         if (!darr)
         {
-            printf("OH NO! %d %d", __FILE__, __LINE__);
+            printf("OH NO! %d %d\n", __FILE__, __LINE__);
             exit(EXIT_FAILURE);
         }
     }

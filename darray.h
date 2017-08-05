@@ -159,7 +159,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note da_pop will never reallocate memory, so popping is always
  *  allocation-safe.
  */
-#define da_pop(/* void* */darr)                                                \
+#define /* ARRAY TYPE */da_pop(/* void* */darr)                                \
                                                                    _da_pop(darr)
 
 /**@macro
