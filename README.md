@@ -186,7 +186,7 @@ Most dynamic array implementations use something along the lines of
 ```C
 #define arr_t(T) struct{size_t capacity, length; T* data}
 ```
-where the container is a struct, you have to use that a weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages over this library's implementation of dynamic arrays, but to me the struct approach feels, for lack of a better phrase, like a shitty STL container, not the random access data structure we are all used to. Darrays let you work with the data directly, and feel much more like what we are accustomed to as C programmers.
+where the container is a struct, you have to use that a weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages over this library's implementation of dynamic arrays, but to me the struct approach feels dirty. It doesn't look or feel like the random access data structure we are all used to. Darrays let you work with the data directly, and feel much more like what we are accustomed to as C programmers.
 
 ### Speed (づ ￣ ³￣)づ
 Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays automatically get pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
