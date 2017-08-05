@@ -344,7 +344,8 @@ do                                                                             \
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
-#define /* void */_da_insert(/* void* */darr, /* size_t */index, value)        \
+#define /* void */_da_insert(/* void* */darr, /* size_t */index,               \
+    /* ELEM TYPE */value)                                                      \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
@@ -364,7 +365,7 @@ do                                                                             \
 }while(0)
 
 #define _da_safe_insert(/* void* */darr, /* size_t */index,                    \
-    /* ELEM TYPE*/value, /* void* */backup )                                   \
+    /* ELEM TYPE*/value, /* void* */backup)                                    \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
@@ -397,7 +398,7 @@ do                                                                             \
 // [0][1][2][3][rest...] => [0][2][3][1][rest...]
 //     ^                              ^
 //     target index                   target moved to back
-static inline void* _da_remove_mem_mov(
+static inline int _da_remove_mem_mov(
     void* darr,
     size_t target_index,
     size_t length,

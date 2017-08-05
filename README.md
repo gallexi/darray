@@ -100,9 +100,9 @@ Both of these macros are identical to their unsafe counterparts save for an addi
     + Reallocate memory.
     + If reallocation fails set `darr` to `NULL` and return
     + If reallocation succeeds set `darr` to the new darray and continue
-3. Insert the new value and return
+3. Insert the value and return
 
-After each call to a safe insertion function, you can check if `darr` is set to `NULL` and if so, restore it from the backup copy and handle the error.
+After each call to a safe insertion macro, you can check if `darr` is set to `NULL` and if so, restore it from the backup copy and handle the error.
 
 As an example:
 ```C
@@ -133,7 +133,7 @@ Removing values from a darray is a much more straightforward process, because th
 ```
 
 #### Accessing Header Data
-Darrays know their own length, capacity, and of course the `sizeof` the contained elements. All of this data stored in the darray header can be accessed through the following functions:
+Darrays know their own length, capacity, and of course the `sizeof` the contained elements. All of this data in the darray header can be accessed through the following functions:
 ```C
 size_t da_length(void* darr);
 ```
