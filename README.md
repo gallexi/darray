@@ -45,10 +45,10 @@ Freeing memory is as easy as calling `da_free` on a darray.
 ```C
 da_free(my_arr);
 ```
-Due to the fact that the handle to the darray is not actually the start of the darray's memory block, so using free from `stdlib.h` on a darray will cause a runtime error.
+Due to the fact that the handle to the darray is not actually the start of the darray's memory block, using `free` from `stdlib.h` on a darray will cause a runtime error.
 
 #### Resizing
-If you know ahead of time how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate enough storage within the darray.
+If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage within the darray ahead of time.
 ```C
 // returns pointer the the newly resized darray
 void* da_resize(void* darr, size_t nelem);
@@ -66,7 +66,7 @@ Reserving space in a darray will reallocate memory as neccesary such that the da
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
-/* length is still 15, but I can insert/push
+/* length is still 15, but you can now insert/push
  * up to 50 values without reallocation
  */
 ```
@@ -101,12 +101,12 @@ These macros are identical to their unsafe counterparts save for an additional p
 
 1. Check if memory needs to be reallocated
 2. If so, store the existing array in `backup`
-    + Reallocate memory.
+    + Reallocate memory
     + If reallocation fails set `darr` to `NULL` and return
     + If reallocation succeeds set `darr` to the new darray and continue
 3. Insert the value and return
 
-After each call to a safe insertion macro, you can check if `darr` is set to `NULL` and if so, restore it from the backup copy and handle the error.
+After each call to a safe insertion macro, you can check if `darr` is set to `NULL` and if so, restore the darray from the backup copy and handle the error.
 ```C
 int* darr = da_alloc(init_elem, sizeof(int));
 int* bak;
@@ -135,7 +135,7 @@ Removing values from a darray is a much more straightforward process, because th
 ```
 
 #### Accessing Header Data
-Darrays know their own length, capacity, and `sizeof` the contained elements. All of this data lives in the darray header can be accessed through the following functions:
+Darrays know their own length, capacity, and `sizeof` the contained elements. All of this data lives in the darray header and can be accessed through the following functions:
 ```C
 size_t da_length(void* darr);
 ```
