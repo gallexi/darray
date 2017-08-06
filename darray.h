@@ -45,7 +45,7 @@
  */
 
 /**@function
- * @brief Allocate an darray of `nelem` elements each of size `size`.
+ * @brief Allocate a darray of `nelem` elements each of size `size`.
  *
  * @param nelem : Initial number of elements in the darray.
  * @param size : Size of each element.
@@ -71,7 +71,7 @@ static inline size_t da_length(void* darr);
 
 /**@function
  * @brief Returns the maximum number of elements the darray can hold without
- *  resizing.
+ *  requiring resizing.
  *
  * @param darr : Target darray.
  * @return Total number of allocated elements in the darray.
@@ -87,14 +87,13 @@ static inline size_t da_capacity(void* darr);
 static inline size_t da_sizeof_elem(void* darr);
 
 /**@function
- * @brief Change the length of the array to `nelem`. Data for elements with
- * index >= nelem may be lost.
+ * @brief Change the length of the darray to `nelem`. Data for elements with
+ *  indices >= `nelem` may be lost when downsizing.
  *
- * @param darr : Target darray. Upon function completion, darr may or may not
- *  point to its previous block on the heap, potentially breaking references to
- *  the darr.
+ * @param darr : Target darray. Upon function completion, `darr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If da_resize returns NULL, allocation failed and darr is left
+ *  completion. If da_resize returns NULL, allocation failed and `darr` is left
  *  untouched.
  *
  * @note Affects the length attribute of the darray.
@@ -102,46 +101,46 @@ static inline size_t da_sizeof_elem(void* darr);
 static inline void* da_resize(void* darr, size_t nelem);
 
 /**@function
- * @brief Ensure there is at least `nelem` valid elements available beyond the
- *  current length of the darray without requiring resizing.
+ * @brief Guarantee that at least `nelem` elements beyond the current length of
+ *  the darray can be added without requiring resizing.
  *
- * @param darr : Target darray. Upon function completion, darr may or may not
- *  point to its previous block on the heap, potentially breaking references to
- *  the darr.
+ * @param darr : Target darray. Upon function completion, `darr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If da_reserve returns NULL, allocation failed and darr is left
+ *  completion. If da_reserve returns NULL, allocation failed and `darr` is left
  *  untouched.
  *
- * @note Does not affect the length attribute of the darray.
+ * @note Does NOT affect the length attribute of the darray.
  */
 static inline void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
- * @brief Push a value to the back of darr.
+ * @brief Push a value to the back of `darr`.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param value : Value to be pushed onto the array.
+ * @param value : Value to be pushed onto the back of the darray.
  *
  * @note Affects the length of the darray.
  * @note This macro implimentation is the fast version of da_spush. Unlike the
- *  rest of the API, failed allocations from da resizing with da push may
- *  cause your program to blow up as reallocs are always reassigned back to the
- *  darr param. With this version of push, the user sacrifices safety for speed.
+ *  rest of the API, failed allocations from resizing with da_push may
+ *  cause your program to blow up as reallocs are always reassigned back to
+ *  `darr`. With this version of push, the user sacrifices safety for speed.
  */
 #define /* void */da_push(/* void* */darr, /* ELEM TYPE */value)               \
                                                            _da_push(darr, value)
 
 /**@macro
- * @brief Push a value to the back of darr. This is the safe version of da_push.
+ * @brief Push a value to the back of `darr`. This is the safe version of
+ *  da_push.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param value : Value to be pushed onto the array.
- * @param backup : lvalue that will store a backup of darr in in case of
- *  resize failure.
+ * @param value : Value to be pushed onto the back of the darray.
+ * @param backup : lvalue that will store a backup of `darr` in in case of
+ *  reallocation failure.
  *
  * @note Affects the length of the darray.
  * @note If malloc fails to allocate memory during automatic array resizeing
- *  a backup of the darray will be saved to the backup param and darr will be
+ *  a backup of the darray will be saved to `backup` and `darr` will be
  *  set to NULL.
  */
 #define /* void* */da_spush(/* void* */darr, /* ELEM TYPE */value,            \
@@ -149,7 +148,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
                                               _da_safe_push(darr, value, backup)
 
 /**@macro
- * @brief Remove a value from the back of darr and return it.
+ * @brief Remove a value from the back of `darr` and return it.
  *
  * @param darr : const lvalue pointing to the target darray.
  *
@@ -163,18 +162,18 @@ static inline void* da_reserve(void* darr, size_t nelem);
                                                                    _da_pop(darr)
 
 /**@macro
- * @brief Insert a value to into darr at the specified index, pushing the rest
- *  of the values past index in darr back one element.
+ * @brief Insert a value to into `darr` at the specified index, moving the
+ * values past `index` back one element.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
- * @param value : Value to be inserted onto the array.
+ * @param value : Value to be inserted onto the darray.
  *
  * @note Affects the length of the darray.
  * @note This macro implimentation is the fast version of da_sinsert. Unlike the
- *  rest of the API, failed allocations from da resizing with da_insert may
+ *  rest of the API, failed allocations from resizing with da_insert may
  *  cause your program to blow up as reallocs are always reassigned back to the
- *  darr param. With this version of insert, the user sacrifices safety for
+ *  `darr` param. With this version of insert, the user sacrifices safety for
  *  speed.
  */
 #define /* void */da_insert(/* void* */darr, /* size_t */index,                \
@@ -182,28 +181,27 @@ static inline void* da_reserve(void* darr, size_t nelem);
                                                   _da_insert(darr, index, value)
 
 /**@macro
- * @brief Insert a value to into darr at the specified index, pushing the rest
- *  of the values past index in darr back one element. This is the safe version
- *  of da_insert.
+ * @brief Insert a value to into `darr` at the specified index, moving the
+ * values past `index` back one element. This is the safe version of da_insert.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the array.
- * @param backup : lvalue that will store a backup of darr in in case of
+ * @param backup : lvalue that will store a backup of `darr` in in case of
  *  resize failure.
  *
  * @note Affects the length of the darray.
  * @note If malloc fails to allocate memory during automatic array resizeing
- *  a backup of the darray will be saved to the backup param and darr will be
- *  set to NULL.
+ *  a backup of the darray will be saved to `backup` and `darr` will be set to
+ *  NULL.
  */
 #define /* void* */da_sinsert(/* void* */darr, /* size_t */index,              \
     /* ELEM TYPE */value, /* void* */backup)                                   \
                                      _da_safe_insert(darr, index, value, backup)
 
 /**@macro
- * @brief Remove the value at index from darr and return it, moving the rest if
- *  the values past index up one element.
+ * @brief Remove the value at index from `darr` and return it, moving the
+ * values past `index` up one element.
  *
  * @param darr : const lvalue pointing to the target darray.
  * @param index : Array index of the value to be removed.
