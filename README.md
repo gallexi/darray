@@ -1,9 +1,9 @@
 # Dynamic C Arrays
 
 ## INTRO
-This library provides an implementation of dynamic arrays in C with similar functionality to C++'s std::vector.
+This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s std::vector.
 
-Darrays are implemented much like std::vector where a buffer of some size is allocated for a user requested N element array, expanding to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is passed a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array, and it expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
 +--------+---------+---------+-----+------------------+
 | header | elem[0] | elem[1] | ... | elem[capacity-1] |
@@ -31,7 +31,7 @@ The function signature of `da_alloc` is identical to that of calloc and is used 
 ```C
 // Allocate a darray on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
-````
+```
 Be aware that the `size` parameter is stored internally by the darray and is used
 throughout the library for pointer math. If the `size` parameter doesn't match
 the `sizeof` the contained element many darray functions will have undefined behavior.
@@ -45,8 +45,9 @@ da_free(my_arr);
 ```
 Due to the fact that the handle to a darray is not actually the start of the darray's memory block, using `free` from `stdlib.h` on a darray will cause a runtime error.
 
-#### Resizing
-If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time.
+### Resizing
+If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundemental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
+
 ```C
 // Returns pointer the newly resized darray.
 void* da_resize(void* darr, size_t nelem);
@@ -55,24 +56,24 @@ void* da_resize(void* darr, size_t nelem);
 // Returns pointer the new darray with reserved space.
 void* da_reserve(void* darr, size_t nelem);
 ```
-Resizeing a darray will set its length to `nelem`, reallocating memory if neccesary. Downsizeing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray may contain garbage values.
+Resizing a darray will set the length of the darray to `nelem`, reallocating memory if neccesary. Downsizing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray may contain garbage values.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
 ```
-Reserving space in a darray will reallocate memory as neccesary such that the darray can hold an additional `nelem` elements after insertion. The fundemental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
+Reserving space in a darray will reallocate memory as neccesary such that the darray can hold an additional `nelem` elements after insertion. It will thus change the capacity, but not the length.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
 // Length is still 15, but you can now insert/push
 // up to 50 values without reallocation.
 ```
-Note that `da_alloc` and `da_reserve` will return pointers to the darray after function completion which may or may not point to the same location in memory as before function execution depending on whether reallocation was required or not. **Always** assume pointer invalidation.
+Note that the pointers returned `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
 
 Also note that if reallocation fails both `da_alloc` and `da_reserve` will return `NULL`, and the original darray will be left untouched.
 
-#### Value Insertion
-There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and incriment the darray's length.
+### Value Insertion
+There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and increment the darray's length.
 ```C
 // Insert value into the darray at the specified index.
 // All following elements are moved back one index.
@@ -123,10 +124,10 @@ for (size_t i = 0; i < 1000000; ++i) // push back a million random values
 
 ```
 
-#### Value Removal
-Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removeing/returning the target value and decrimenting the length of the darray. Neither macro will invalidate a pointer to the darray.
+### Value Removal
+Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the darray.
 ```C
-// Remove/return the value at the specified index from the darray.
+// Remove/return the value at the specified index from darr.
 // All following elements are moved forward one index.
 #define /* ARRAY TYPE */da_remove(/* void* */darr, /* size_t */index) \
     /* ...macro implementation */
@@ -137,7 +138,7 @@ Removing values from a darray is a much more straightforward process, because th
     /* ...macro implementation */
 ```
 
-#### Accessing Header Data
+### Accessing Header Data
 Darrays know their own length, capacity, and `sizeof` their contained elements. All of this data lives in the darray header and can be accessed through the following functions:
 ```C
 size_t da_length(void* darr);
@@ -151,7 +152,7 @@ size_t da_sizeof_elem(void* darr);
 
 ## LIBRARY GOALS
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
-Every C programmer has at some point in their career written this snippit of code:
+Every C programmer has at some point in their career written this snippet of code:
 ```C
 size_t curr_len = 10;
 int* arr = malloc(curr_len*sizeof(int));
@@ -165,7 +166,7 @@ for (int i = 0; i < N; ++i)
     arr[i] = foo();
 }
 ```
-The code is lengthy, space-inefficient, prone to copy-paste errors, and requires the use two separate variables for what is at its core a single data structure (at least in the abstract sense). A lot of programmers have mixed opionions about the C++ STL, but I think we can all admit that the following code is a lot nicer on the eyes and is a lot clearer at first glance:
+The code is lengthy, space-inefficient, prone to copy-paste errors, and requires the use of two separate variables for what is at its core a single data structure (at least in the abstract sense). A lot of programmers have mixed opinions about the C++ STL, but I think we can all admit that the following code is a lot nicer on the eyes and is a lot clearer at first glance:
 ```C++
 std::vector<int> vec;
 for (int i = 0; i < N; ++i)
@@ -173,7 +174,7 @@ for (int i = 0; i < N; ++i)
     vec.push_back(foo());
 }
 ```
-The darray library aims to eliminate the code seen first example and replace it with something more like what we saw in the second example. That same code snippit written with a darray would look like:
+The darray library aims to eliminate the code seen first example and replace it with something more like what we saw in the second example. That same code snippet written with a darray would look like:
 ```C
 int* darr = da_alloc(10, sizeof(int));
 for (int i = 0; i < N; ++i)
@@ -184,13 +185,15 @@ for (int i = 0; i < N; ++i)
 The code still looks like a C program, but gets rid of the jankiness found in the first example. Darrays give the user a set of tools that perform dynamic array operations the right way, eliminating the need for copy-pasting of potentially harmful boilerplate.
 
 ### (✿ ♥‿♥) **A E S T H E T I C S** (♥‿♥ ✿)
-Clean readable code makes us happy programmers. Darrays and their associated functions/macros to provide all the functionality of a generic random access container while still looking b-e-a-utiful.
+Clean code makes us happy programmers. Darrays and their associated functions/macros aim to provide all the functionality of a generic random access container while still looking b-e-a-utiful.
 
 Most dynamic array implementations use something along the lines of
 ```C
 #define arr_t(T) struct{size_t capacity, length; T* data}
 ```
 where the container is a struct, you have to use that weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages, but it doesn't look or feel like the random access data structure we are used to as C programmers.
+
+Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** we get to use functions that let us, push, resize, get length, etc. like our C++ companions get to.
 
 ### Speed (づ ￣ ³￣)づ
 Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays is automatically pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
