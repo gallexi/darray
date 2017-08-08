@@ -1,9 +1,7 @@
 # Dynamic C Arrays
 
-**NOTE: THIS README IS UNDER CONSTRUCTION. DO NOT TAKE IT AT FACE VALUE**
-
 ## INTRO
-This library provides an implementation of dynamic arrays in C with similar in feel and functionality to C++'s std::vector.
+This library provides an implementation of dynamic arrays in C with similar functionality to C++'s std::vector.
 
 Darrays are implemented much like std::vector where a buffer of some size is allocated for a user requested N element array, expanding to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is passed a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
@@ -31,12 +29,12 @@ void da_free(void* darr);
 ```
 The function signature of `da_alloc` is identical to that of calloc and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element.
 ```C
-// create a darray with an initial length of 15
+// Allocate a darray on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
 ````
 Be aware that the `size` parameter is stored internally by the darray and is used
 throughout the library for pointer math. If the `size` parameter doesn't match
-the `sizeof` the base element many darray functions **will** have undefined behavior.
+the `sizeof` the contained element many darray functions will have undefined behavior.
 ```C
 // This will result in undefined behavior even though alignment may be valid.
 int* bad_idea = da_alloc(24, 1);
@@ -50,14 +48,14 @@ Due to the fact that the handle to a darray is not actually the start of the dar
 #### Resizing
 If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time.
 ```C
-// Returns pointer the the newly resized darray.
+// Returns pointer the newly resized darray.
 void* da_resize(void* darr, size_t nelem);
 ```
 ```C
-// Returns pointer the the new darray with reserved space.
+// Returns pointer the new darray with reserved space.
 void* da_reserve(void* darr, size_t nelem);
 ```
-Resizeing a darray will set the length of the darray to `nelem`, reallocating memory if neccesary. Downsizeing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray may contain garbage values.
+Resizeing a darray will set its length to `nelem`, reallocating memory if neccesary. Downsizeing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray may contain garbage values.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
