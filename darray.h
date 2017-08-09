@@ -219,7 +219,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Set every element of `darr` to `value`.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param value : const value to fill the array with.
+ * @param value : constant expression to fill the array with.
  */
 #define /* void */da_fill(/* void* */darr, /* ELEM TYPE */value)               \
                                                            _da_fill(darr, value)

@@ -151,19 +151,20 @@ size_t da_sizeof_elem(void* darr);
 ```
 
 ### Additional Functions
-In addition to the functions above the darray library ships with the following utility functions.
+In addition to the functions above the darray library ships with the following utility functions:
 
 ----
 
-`da_fill` fills all elements in a darray with a specified value.
+#### da_fill
+`da_fill` sets all elements in a darray to a specified value.
 ```C
-// Fill all elements in the range [0:da_length(darr)-1] with 15.
+// Set all elements in the range [0:da_length(darr)-1] with 15.
 da_fill(da, 12 + 3);
 ```
 Note that due to the macro implimentation of `da_fill` the `value` parameter will produce unexpected results if it is not a constant expression.
 ```C
 da_fill(da, sqrt(2) + 5); // Works fine.
-da_fill(da, rand()); // BEWARE! Every value of da will be different.
+da_fill(da, rand()); // BEWARE! Every value in da will be different.
 ```
 
 ## Library Goals
