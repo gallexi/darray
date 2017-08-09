@@ -2,6 +2,7 @@
 #   define _EMU_ENABLE_COLOR_
 #endif
 #include <EMUtest.h>
+#include <time.h>
 #include "../darray.h"
 
 #define INITIAL_NUM_ELEMS 10
@@ -272,6 +273,25 @@ EMU_TEST(da_remove)
     EMU_END_TEST();
 }
 
+EMU_TEST(da_fill)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        da[i] = i;
+    }
+
+    da_fill(da, 12 + 3);
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], 15);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
 EMU_GROUP(all_tests)
 {
     EMU_ADD(alloc_and_free_functions);
@@ -286,10 +306,13 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_insert);
     EMU_ADD(da_sinsert);
     EMU_ADD(da_remove);
+    EMU_ADD(da_fill);
     EMU_END_GROUP();
 }
 
 int main(void)
 {
+    time_t seed = time(NULL);
+    printf("random seed: %ld\n\n", seed);
     return EMU_RUN(all_tests);
 }

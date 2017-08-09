@@ -12,4 +12,4 @@ perf_tests:
 	$(CPPC) $(CPPFLAGS) -operf_tests ./test/perf.test.cpp
 
 clean:
-	rm *o unit_tests perf_tests
+	rm *.o unit_tests perf_tests

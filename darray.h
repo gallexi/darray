@@ -215,6 +215,15 @@ static inline void* da_reserve(void* darr, size_t nelem);
 #define /* ELEM TYPE */da_remove(/* void* */darr, /* size_t */index)           \
                                                          _da_remove(darr, index)
 
+/**@macro
+ * @brief Set every element of `darr` to `value`.
+ *
+ * @param darr : const lvalue pointing to the target darray.
+ * @param value : const value to fill the array with.
+ */
+#define /* void */da_fill(/* void* */darr, /* ELEM TYPE */value)               \
+                                                           _da_fill(darr, value)
+
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
 #define DA_LENGTH_OFFSET      (1*sizeof(size_t))
@@ -404,7 +413,7 @@ static inline int _da_remove_mem_mov(
 )
 {
     register void* tmp = malloc(elsz); // TODO: avoid memory allocation
-    assert(tmp != NULL); // TODO: avoid using assert
+    assert(tmp != NULL);               // TODO: avoid using assert
     memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
     memmove(
         (char*)darr + target_index*elsz,
@@ -416,7 +425,7 @@ static inline int _da_remove_mem_mov(
 }
 #pragma GCC diagnostic pop
 
-#define /* ELEM TYPE */_da_remove(/* void* */darr, /* size_t */index)         \
+#define /* ELEM TYPE */_da_remove(/* void* */darr, /* size_t */index)          \
 (                                                                              \
     (/* "then" paren(s) */                                                     \
     /* move element to be removed to the back of the array */                  \
@@ -429,5 +438,15 @@ static inline int _da_remove_mem_mov(
     /* return darr[--length] (i.e the removed element) */                      \
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
+
+#define /* void */_da_fill(/* void* */darr, /* ELEM TYPE */value)              \
+do                                                                             \
+{                                                                              \
+    register size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                    \
+    for (size_t __i = 0; __i < __len; ++__i)                                   \
+    {                                                                          \
+        (darr)[__i] = (value);                                                 \
+    }                                                                          \
+}while(0)
 
 #endif // !_DARRAY_H_

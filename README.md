@@ -1,6 +1,6 @@
 # Dynamic C Arrays
 
-## INTRO
+## Intro
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s std::vector.
 
 Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array, and it expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
@@ -12,13 +12,13 @@ Darrays are implemented much like std::vector. A buffer of some size is allocate
          Handle to the darray points to the first
          element of the array.
 ```
-Because a handle to the darray is a pointer directly to the array data segment, random access of elements within the array uses the same syntax as built-in arrays.
+Because a handle to the darray is a pointer directly to the array data segment, random access of elements within a darray comes with the same syntax and speed as built-in arrays.
 ```C
 foo* my_arr = da_alloc(10, sizeof(foo));
 foo some_element = my_arr[4]; // works as expected
 ```
 
-## USE
+## Use
 ### Creation and Deletion
 Allocation and freeing of darrays is performed using the `da_alloc` and `da_free` functions.
 ```C
@@ -72,7 +72,7 @@ Note that the pointers returned `da_alloc` and `da_reserve` may or may not point
 
 Also note that if reallocation fails both `da_alloc` and `da_reserve` will return `NULL`, and the original darray will be left untouched.
 
-### Value Insertion
+### Insertion
 There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and increment the darray's length.
 ```C
 // Insert value into the darray at the specified index.
@@ -124,7 +124,7 @@ for (size_t i = 0; i < 1000000; ++i) // push back a million random values
 
 ```
 
-### Value Removal
+### Removal
 Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the darray.
 ```C
 // Remove/return the value at the specified index from darr.
@@ -150,7 +150,23 @@ size_t da_capacity(void* darr);
 size_t da_sizeof_elem(void* darr);
 ```
 
-## LIBRARY GOALS
+### Additional Functions
+In addition to the functions above the darray library ships with the following utility functions.
+
+----
+
+`da_fill` fills all elements in a darray with a specified value.
+```C
+// Fill all elements in the range [0:da_length(darr)-1] with 15.
+da_fill(da, 12 + 3);
+```
+Note that due to the macro implimentation of `da_fill` the `value` parameter will produce unexpected results if it is not a constant expression.
+```C
+da_fill(da, sqrt(2) + 5); // Works fine.
+da_fill(da, rand()); // BEWARE! Every value of da will be different.
+```
+
+## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
 Every C programmer has at some point in their career written this snippet of code:
 ```C
