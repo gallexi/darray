@@ -282,10 +282,16 @@ EMU_TEST(da_fill)
         da[i] = i;
     }
 
-    da_fill(da, 12 + 3);
+    da_fill(da, int, 12 + 3);
     for (size_t i = 0; i < da_length(da); ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], 15);
+    }
+
+    da_fill(da, int, rand());
+    for (size_t i = 1; i < da_length(da); ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], da[i-1]);
     }
 
     da_free(da);

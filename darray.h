@@ -126,7 +126,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  cause your program to blow up as reallocs are always reassigned back to
  *  `darr`. With this version of push, the user sacrifices safety for speed.
  */
-#define /* void */da_push(/* void* */darr, /* ELEM TYPE */value)               \
+#define /* void */da_push(/* void* */darr, /* ELEM_TYPE */value)               \
                                                            _da_push(darr, value)
 
 /**@macro
@@ -143,7 +143,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  a backup of the darray will be saved to `backup` and `darr` will be
  *  set to NULL.
  */
-#define /* void* */da_spush(/* void* */darr, /* ELEM TYPE */value,            \
+#define /* void* */da_spush(/* void* */darr, /* ELEM_TYPE */value,            \
     /* void* */backup)                                                         \
                                               _da_safe_push(darr, value, backup)
 
@@ -158,7 +158,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note da_pop will never reallocate memory, so popping is always
  *  allocation-safe.
  */
-#define /* ELEM TYPE */da_pop(/* void* */darr)                                 \
+#define /* ELEM_TYPE */da_pop(/* void* */darr)                                 \
                                                                    _da_pop(darr)
 
 /**@macro
@@ -177,7 +177,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  speed.
  */
 #define /* void */da_insert(/* void* */darr, /* size_t */index,                \
-    /* ELEM TYPE */value)                                                      \
+    /* ELEM_TYPE */value)                                                      \
                                                   _da_insert(darr, index, value)
 
 /**@macro
@@ -196,7 +196,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  NULL.
  */
 #define /* void* */da_sinsert(/* void* */darr, /* size_t */index,              \
-    /* ELEM TYPE */value, /* void* */backup)                                   \
+    /* ELEM_TYPE */value, /* void* */backup)                                   \
                                      _da_safe_insert(darr, index, value, backup)
 
 /**@macro
@@ -212,17 +212,18 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note da_remove will never reallocate memory, so removing is always
  *  allocation-safe.
  */
-#define /* ELEM TYPE */da_remove(/* void* */darr, /* size_t */index)           \
+#define /* ELEM_TYPE */da_remove(/* void* */darr, /* size_t */index)           \
                                                          _da_remove(darr, index)
 
 /**@macro
  * @brief Set every element of `darr` to `value`.
  *
  * @param darr : const lvalue pointing to the target darray.
+ * @param VALUE_TYPE: type of value.
  * @param value : constant expression to fill the array with.
  */
-#define /* void */da_fill(/* void* */darr, /* ELEM TYPE */value)               \
-                                                           _da_fill(darr, value)
+#define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value)  \
+                                            _da_fill(darr, VALUE_TYPE, value)
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
@@ -313,7 +314,7 @@ static inline void* da_reserve(void* darr, size_t nelem)
     return (char*)ptr + DA_HANDLE_OFFSET;
 }
 
-#define /* void* */_da_push(/* void* */darr, /* ELEM TYPE */value)             \
+#define /* void* */_da_push(/* void* */darr, /* ELEM_TYPE */value)             \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                  \
@@ -325,7 +326,7 @@ do                                                                             \
     (darr)[(*__p_len)++] = (value);                                            \
 }while(0)
 
-#define /* void* */_da_safe_push(/* void* */darr, /* ELEM TYPE */value,        \
+#define /* void* */_da_safe_push(/* void* */darr, /* ELEM_TYPE */value,        \
     /* void* */backup)                                                         \
 do                                                                             \
 {                                                                              \
@@ -346,13 +347,13 @@ do                                                                             \
     (darr)[(*__p_len)++] = (value);                                            \
 }while(0)
 
-#define /* ELEM TYPE */_da_pop(/* void* */darr)                                \
+#define /* ELEM_TYPE */_da_pop(/* void* */darr)                                \
 (                                                                              \
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
 #define /* void */_da_insert(/* void* */darr, /* size_t */index,               \
-    /* ELEM TYPE */value)                                                      \
+    /* ELEM_TYPE */value)                                                      \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
@@ -372,7 +373,7 @@ do                                                                             \
 }while(0)
 
 #define _da_safe_insert(/* void* */darr, /* size_t */index,                    \
-    /* ELEM TYPE*/value, /* void* */backup)                                    \
+    /* ELEM_TYPE*/value, /* void* */backup)                                    \
 do                                                                             \
 {                                                                              \
     register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
@@ -425,7 +426,7 @@ static inline int _da_remove_mem_mov(
 }
 #pragma GCC diagnostic pop
 
-#define /* ELEM TYPE */_da_remove(/* void* */darr, /* size_t */index)          \
+#define /* ELEM_TYPE */_da_remove(/* void* */darr, /* size_t */index)          \
 (                                                                              \
     (/* "then" paren(s) */                                                     \
     /* move element to be removed to the back of the array */                  \
@@ -439,13 +440,14 @@ static inline int _da_remove_mem_mov(
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
-#define /* void */_da_fill(/* void* */darr, /* ELEM TYPE */value)              \
+#define /* void */_da_fill(/* void* */darr, VALUE_TYPE, /* ELEM_TYPE */value)  \
 do                                                                             \
 {                                                                              \
     register size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                    \
+    register VALUE_TYPE __value = (value);                                     \
     for (size_t __i = 0; __i < __len; ++__i)                                   \
     {                                                                          \
-        (darr)[__i] = (value);                                                 \
+        (darr)[__i] = (__value);                                               \
     }                                                                          \
 }while(0)
 
