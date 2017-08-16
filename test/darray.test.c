@@ -298,6 +298,28 @@ EMU_TEST(da_fill)
     EMU_END_TEST();
 }
 
+EMU_TEST(da_foreach)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        da[i] = i;
+    }
+
+    da_foreach(da, int, i)
+    {
+        *i += 1;
+    }
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], i + 1);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
 EMU_GROUP(all_tests)
 {
     EMU_ADD(alloc_and_free_functions);
@@ -313,6 +335,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_sinsert);
     EMU_ADD(da_remove);
     EMU_ADD(da_fill);
+    EMU_ADD(da_foreach);
     EMU_END_GROUP();
 }
 

@@ -219,11 +219,24 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Set every element of `darr` to `value`.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param VALUE_TYPE: type of value.
+ * @param VALUE_TYPE : type of `value`.
  * @param value : constant expression to fill the array with.
  */
 #define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value)  \
-                                            _da_fill(darr, VALUE_TYPE, value)
+                                               _da_fill(darr, VALUE_TYPE, value)
+
+/**@macro
+ * @brief `da_foreach` acts as a loop-block that iterates through all elements
+ *  of darr. In each iteration a variable with identifier itername will point to
+ *  an element of darr starting at index zero and ending at index
+ *  da_length(darr)-1.
+ *
+ * @param darr : const lvalue pointing to the target darray.
+ * @param ELEM_TYPE : type of the elements of darr.
+ * @param itername : identifier for the iterator within the foreach block.
+ */
+#define da_foreach(/* void* */darr, ELEM_TYPE, itername)                       \
+                                          _da_foreach(darr, ELEM_TYPE, itername)
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
@@ -440,7 +453,7 @@ static inline int _da_remove_mem_mov(
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
 )
 
-#define /* void */_da_fill(/* void* */darr, VALUE_TYPE, /* ELEM_TYPE */value)  \
+#define /* void */_da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value) \
 do                                                                             \
 {                                                                              \
     register size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                    \
@@ -450,5 +463,10 @@ do                                                                             \
         (darr)[__i] = (__value);                                               \
     }                                                                          \
 }while(0)
+
+#define _da_foreach(/* void* */darr, ELEM_TYPE, itername)                      \
+for (ELEM_TYPE* itername = darr;                                               \
+    itername < (darr) + da_length(darr);                                       \
+    itername++)                                                                \
 
 #endif // !_DARRAY_H_

@@ -150,8 +150,8 @@ size_t da_capacity(void* darr);
 size_t da_sizeof_elem(void* darr);
 ```
 
-### Additional Functions
-In addition to the functions above the darray library ships with the following utility functions:
+### Additional Utilities
+In addition to the functions/macros above the darray library ships with the following utilities:
 
 ----
 
@@ -163,9 +163,26 @@ In addition to the functions above the darray library ships with the following u
 ```
 ```C
 // Set all elements in the range [0:da_length(darr)-1] with 15.
-da_fill(da, int, 12 + 3);
+da_fill(darr, int, 12 + 3);
 ```
-Due to the macro implimentation of `da_fill` the type of `value` must be specified by `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(da, rand())` would assign a different number to every element.
+Due to the macro implimentation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element. Since `da_fill` is usually written close to the declaration of a darray, the `VALUE_TYPE` parameter is less of an inconvenience here.
+
+----
+
+#### da_foreach
+`da_foreach` acts as a loop-block that iterates through all elements of darr. In each iteration a variable with identifier itername will point to an element of darr starting at index `0` and ending at index `da_length(darr)-1`.
+```C
+#define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
+    /* ...macro implementation */
+```
+```C
+// Add one to each element in darr.
+da_foreach(darr, int, iter)
+{
+    *iter += 1;
+}
+```
+Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
 
 ## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
@@ -196,7 +213,7 @@ The darray library aims to eliminate the code seen first example and replace it 
 int* darr = da_alloc(10, sizeof(int));
 for (int i = 0; i < N; ++i)
 {
-    da_push(da, foo());
+    da_push(darr, foo());
 }
 ```
 The code still looks like a C program, but gets rid of the jankiness found in the first example. Darrays give the user a set of tools that perform dynamic array operations the right way, eliminating the need for copy-pasting of potentially harmful boilerplate.
