@@ -186,7 +186,7 @@ Due to the macro implimentation of `da_foreach` the type of elements in the darr
 
 ## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
-Every C programmer has at some point in their career written this snippet of code:
+Every C programmer has written this snippet of code at some point in their career:
 ```C
 size_t curr_len = 10;
 int* arr = malloc(curr_len*sizeof(int));
@@ -200,7 +200,7 @@ for (int i = 0; i < N; ++i)
     arr[i] = foo();
 }
 ```
-The code is lengthy, space-inefficient, prone to copy-paste errors, and requires the use of two separate variables for what is at its core a single data structure (at least in the abstract sense). A lot of programmers have mixed opinions about the C++ STL, but I think we can all admit that the following code is a lot nicer on the eyes and is a lot clearer at first glance:
+The code is lengthy, space-inefficient, prone to copy-paste errors, and requires the use of two separate variables for what is really a single data structure (at least in the abstract sense). A lot of programmers have mixed opinions about the C++ STL, but I think we can all admit that the following code is a lot nicer on the eyes and is a lot clearer at first glance:
 ```C++
 std::vector<int> vec;
 for (int i = 0; i < N; ++i)
@@ -227,7 +227,7 @@ Most dynamic array implementations use something along the lines of
 ```
 where the container is a struct, you have to use that weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages, but it doesn't look or feel like the random access data structure we are used to as C programmers.
 
-Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** we get to use functions that let us, push, resize, get length, etc. like our C++ companions get to.
+Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** we get to use functions that let us, push, resize, get the container length, etc. like our C++ brothers get to.
 
 ### Speed (づ ￣ ³￣)づ
 Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays is automatically pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
