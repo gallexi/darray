@@ -162,7 +162,7 @@ In addition to the functions/macros above the darray library ships with the foll
     /* ...macro implementation */
 ```
 ```C
-// Set all elements in the range [0:da_length(darr)-1] with 15.
+// Set all elements in the range [0:da_length(darr)-1] to 15.
 da_fill(darr, int, 12 + 3);
 ```
 Due to the macro implimentation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element. Since `da_fill` is usually written close to the declaration of a darray, the `VALUE_TYPE` parameter is less of an inconvenience here.
@@ -170,7 +170,7 @@ Due to the macro implimentation of `da_fill` the type of `value` must be specifi
 ----
 
 #### da_foreach
-`da_foreach` acts as a loop-block that iterates through all elements of darr. In each iteration a variable with identifier itername will point to an element of darr starting at index `0` and ending at index `da_length(darr)-1`.
+`da_foreach` acts as a loop-block that iterates through all elements of darr. In each iteration a variable with identifier `itername` will point to an element of `darr` starting at index `0` and ending at index `da_length(darr)-1`.
 ```C
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */

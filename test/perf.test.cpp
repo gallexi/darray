@@ -23,7 +23,7 @@ void remove_rand(void);
 int main(void)
 {
     time_t seed = time(NULL);
-    printf("random seed: %ld\n\n", seed);
+    printf("seed: %ld\n\n", seed);
     srand(seed);
     fill_pre_sized(); putchar('\n');
     fill_push_back(); putchar('\n');

@@ -342,6 +342,7 @@ EMU_GROUP(all_tests)
 int main(void)
 {
     time_t seed = time(NULL);
-    printf("random seed: %ld\n\n", seed);
+    printf("seed: %ld\n", seed);
+    srand(seed);
     return EMU_RUN(all_tests);
 }
