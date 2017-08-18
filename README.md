@@ -171,6 +171,8 @@ Due to the macro implimentation of `da_fill` the type of `value` must be specifi
 
 #### da_foreach
 `da_foreach` acts as a loop-block that forward iterates through all elements of a darray. In each iteration a variable with identifier `itername` will point to an element of the darray starting at its first element.
+
+Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
 ```C
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */
