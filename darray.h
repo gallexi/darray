@@ -249,6 +249,15 @@ static inline void* da_reserve(void* darr, size_t nelem);
 #define da_foreachr(/* void* */darr, ELEM_TYPE, itername)                      \
                                          _da_foreachr(darr, ELEM_TYPE, itername)
 
+/**@function
+ * @brief Swap the values of the two specified elements of `darr`.
+ *
+ * @param darr : Target darray.
+ * @param index_a : Index of the first element.
+ * @param index_b : Index of the second element.
+ */
+static inline void da_swap(void* darr, size_t index_a, size_t index_b);
+
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
 #define DA_LENGTH_OFFSET      (1*sizeof(size_t))
@@ -268,6 +277,42 @@ static inline void* da_reserve(void* darr, size_t nelem);
 #define DA_CAPACITY_MIN 10
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) \
     (length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
+
+static inline void _da_xor_swap(char* x, char* y, size_t elsz)
+{
+    for (size_t i = 0; i < elsz; ++i)
+    {
+        x[i] ^= y[i];
+        y[i] ^= x[i];
+        x[i] ^= y[i];
+    }
+}
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
+// Performes the following transform:
+// [0][1][2][3][rest...] => [0][2][3][1][rest...]
+//     ^                              ^
+//     target index                   target moved to back
+static inline int _da_remove_mem_mov(
+    void* darr,
+    size_t target_index,
+    size_t length,
+    size_t elsz
+)
+{
+    register void* tmp = malloc(elsz); // TODO: avoid memory allocation
+    assert(tmp != NULL);               // TODO: avoid using assert
+    memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
+    memmove(
+        (char*)darr + target_index*elsz,
+        (char*)darr + (target_index+1)*elsz,
+        elsz*(length-target_index-1)
+    );
+    memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
+    free(tmp);
+}
+#pragma GCC diagnostic pop
 
 static inline void* da_alloc(size_t nelem, size_t size)
 {
@@ -424,32 +469,6 @@ do                                                                             \
     (*__p_len)++;                                                              \
 }while(0)
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wreturn-type"
-// Performes the following transform:
-// [0][1][2][3][rest...] => [0][2][3][1][rest...]
-//     ^                              ^
-//     target index                   target moved to back
-static inline int _da_remove_mem_mov(
-    void* darr,
-    size_t target_index,
-    size_t length,
-    size_t elsz
-)
-{
-    register void* tmp = malloc(elsz); // TODO: avoid memory allocation
-    assert(tmp != NULL);               // TODO: avoid using assert
-    memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
-    memmove(
-        (char*)darr + target_index*elsz,
-        (char*)darr + (target_index+1)*elsz,
-        elsz*(length-target_index-1)
-    );
-    memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
-    free(tmp);
-}
-#pragma GCC diagnostic pop
-
 #define /* ELEM_TYPE */_da_remove(/* void* */darr, /* size_t */index)          \
 (                                                                              \
     (/* "then" paren(s) */                                                     \
@@ -486,3 +505,13 @@ for (ELEM_TYPE* itername = &(darr)[da_length(darr)-1];                         \
     itername--)                                                                \
 
 #endif // !_DARRAY_H_
+
+static inline void da_swap(void* darr, size_t index_a, size_t index_b)
+{
+    register size_t size = da_sizeof_elem(darr);
+    _da_xor_swap(
+        ((char*)darr) + (index_a * size),
+        ((char*)darr) + (index_b * size),
+        size
+    );
+}
