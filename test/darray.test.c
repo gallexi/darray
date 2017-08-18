@@ -302,18 +302,58 @@ EMU_TEST(da_foreach)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
 
-    for (size_t i = 0; i < da_length(da); ++i)
+    // test general iteration through all elements
+    for (size_t i = 0; i < da_length(da); ++i){da[i] = i;}
+    da_foreach(da, int, iter)
     {
-        da[i] = i;
-    }
-
-    da_foreach(da, int, i)
-    {
-        *i += 1;
+        *iter += 1;
     }
     for (size_t i = 0; i < da_length(da); ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], i + 1);
+    }
+
+    // test forward iteration
+    for (size_t i = 0; i < da_length(da); ++i){da[i] = 0;}
+    da_foreach(da, int, iter)
+    {
+        if (iter != da)
+            *iter = *(iter-1) + 1;
+    }
+    for (size_t i = 1; i < da_length(da); ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], da[i-1] + 1);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_foreachr)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    // test general iteration through all elements
+    for (size_t i = 0; i < da_length(da); ++i){da[i] = i;}
+    da_foreachr(da, int, iter)
+    {
+        *iter += 1;
+    }
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], i + 1);
+    }
+
+    // test reverse iteration
+    for (size_t i = 0; i < da_length(da); ++i){da[i] = 0;}
+    da_foreachr(da, int, iter)
+    {
+        if (iter != da + da_length(da))
+            *iter = *(iter+1) + 1;
+    }
+    for (int i = da_length(da)-1; i >= 0; --i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], da[i+1] + 1);
     }
 
     da_free(da);
@@ -336,6 +376,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_remove);
     EMU_ADD(da_fill);
     EMU_ADD(da_foreach);
+    EMU_ADD(da_foreachr);
     EMU_END_GROUP();
 }
 

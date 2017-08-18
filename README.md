@@ -170,7 +170,7 @@ Due to the macro implimentation of `da_fill` the type of `value` must be specifi
 ----
 
 #### da_foreach
-`da_foreach` acts as a loop-block that iterates through all elements of darr. In each iteration a variable with identifier `itername` will point to an element of `darr` starting at index `0` and ending at index `da_length(darr)-1`.
+`da_foreach` acts as a loop-block that forward iterates through all elements of a darray. In each iteration a variable with identifier `itername` will point to an element of the darray starting at its first element.
 ```C
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */
@@ -182,7 +182,17 @@ da_foreach(darr, int, iter)
     *iter += 1;
 }
 ```
-Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
+
+----
+
+#### da_foreachr
+Reverse for-each loop-block. `da_foreachr` is simmilar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
+
+Due to the macro implimentation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
+```C
+#define da_foreachr(/* void* */darr, ELEM_TYPE, itername) \
+    /* ...macro implementation */
+```
 
 ## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
@@ -227,7 +237,7 @@ Most dynamic array implementations use something along the lines of
 ```
 where the container is a struct, you have to use that weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages, but it doesn't look or feel like the random access data structure we are used to as C programmers.
 
-Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** we get to use functions that let us, push, resize, get the container length, etc. like our C++ brothers get to.
+Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** get to use functions that let us, push, resize, get the container length, etc. like our C++ brothers get to.
 
 ### Speed (づ ￣ ³￣)づ
 Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays is automatically pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
