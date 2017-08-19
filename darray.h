@@ -327,7 +327,6 @@ static inline int _da_remove_mem_mov(
     {
         register char* p_curr = (char*)darr + (target_index * elsz);
         register char* p_last = (char*)darr + ((length-1) * elsz);
-        // for (int i = 0; i < length; ++i) printf("%d ", ((int*)darr)[i]); putchar('\n');
         // Swap target and last elements.
         // [0][1][2][3][4][rest...] => [0][4][2][3][1][rest...]
         _da_xor_swap(p_curr, p_last, elsz);
