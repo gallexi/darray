@@ -26,7 +26,6 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 
 /* DARRAY MEMORY LAYOUT
  * ====================
