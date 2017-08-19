@@ -262,9 +262,6 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 #define DA_LENGTH_OFFSET   (1*sizeof(size_t))
 #define DA_CAPACITY_OFFSET (2*sizeof(size_t))
 #define DA_HANDLE_OFFSET   (3*sizeof(size_t))
-#ifndef DA_TMP_BUFF_SIZE // Allow user to overwrite tmp buff size.
-#    define DA_TMP_BUFF_SIZE 512
-#endif
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
     (((char*)(darr_h)) - DA_HANDLE_OFFSET)
