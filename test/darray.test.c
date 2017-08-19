@@ -246,6 +246,8 @@ EMU_TEST(da_sinsert)
     EMU_END_TEST();
 }
 
+struct bigstruct {int A[500];};
+
 EMU_TEST(da_remove)
 {
     int* da = da_alloc(4, sizeof(int));
@@ -268,6 +270,12 @@ EMU_TEST(da_remove)
     EMU_EXPECT_EQ_INT(da_remove(da, 1), 9);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 1);
+
+    struct bigstruct* bda = da_alloc(4, sizeof(struct bigstruct));
+    da_remove(bda, 1); // remove from middle
+    da_remove(bda, 0); // remove from front
+    da_remove(bda, 1); // remove from back
+
 
     da_free(da);
     EMU_END_TEST();
@@ -372,6 +380,11 @@ EMU_TEST(da_swap)
     EMU_EXPECT_EQ_INT(da[5], 12);
 
     da_swap(da, 3, 5);
+    EMU_EXPECT_EQ_INT(da[3], 12);
+    EMU_EXPECT_EQ_INT(da[5], 99);
+
+    // swap element with itself
+    da_swap(da, 3, 3);
     EMU_EXPECT_EQ_INT(da[3], 12);
     EMU_EXPECT_EQ_INT(da[5], 99);
 

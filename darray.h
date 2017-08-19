@@ -260,9 +260,12 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
-#define DA_LENGTH_OFFSET      (1*sizeof(size_t))
-#define DA_CAPACITY_OFFSET    (2*sizeof(size_t))
-#define DA_HANDLE_OFFSET      (3*sizeof(size_t))
+#define DA_LENGTH_OFFSET   (1*sizeof(size_t))
+#define DA_CAPACITY_OFFSET (2*sizeof(size_t))
+#define DA_HANDLE_OFFSET   (3*sizeof(size_t))
+#ifndef DA_TMP_BUFF_SIZE // Allow user to overwrite tmp buff size.
+#    define DA_TMP_BUFF_SIZE 512
+#endif
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
     (((char*)(darr_h)) - DA_HANDLE_OFFSET)
@@ -280,6 +283,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 
 static inline void _da_xor_swap(char* x, char* y, size_t elsz)
 {
+    if (x == y) return; // XOR swap requires x and y to be be distinct.
     for (size_t i = 0; i < elsz; ++i)
     {
         x[i] ^= y[i];
@@ -296,21 +300,49 @@ static inline void _da_xor_swap(char* x, char* y, size_t elsz)
 //     target index                   target moved to back
 static inline int _da_remove_mem_mov(
     void* darr,
-    size_t target_index,
-    size_t length,
-    size_t elsz
+    size_t target_index
 )
 {
-    register void* tmp = malloc(elsz); // TODO: avoid memory allocation
-    assert(tmp != NULL);               // TODO: avoid using assert
-    memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
-    memmove(
-        (char*)darr + target_index*elsz,
-        (char*)darr + (target_index+1)*elsz,
-        elsz*(length-target_index-1)
-    );
-    memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
-    free(tmp);
+    register size_t length = da_length(darr);
+    register size_t elsz = da_sizeof_elem(darr);
+
+    // Try and use a temporary bit of memory for storage.
+    register void* tmp = malloc(elsz);
+    // If the memory is avaliable then run the fast version of the algorithm
+    // using memcpy and memmove.
+    if (tmp != NULL)
+    {
+        memcpy(tmp, (char*)darr + target_index*elsz, elsz); // tmp = arr[target]
+        memmove(
+            (char*)darr + target_index*elsz,
+            (char*)darr + (target_index+1)*elsz,
+            elsz*(length-target_index-1)
+        );
+        memcpy((char*)darr + (length-1)*elsz, tmp, elsz); // arr[length-1] = tmp
+        free(tmp);
+    }
+    // If the memory is NOT avaliable then run the slow, but alloc-free version
+    // of the algorithm using XOR swapping.
+    else
+    {
+        register char* p_curr = (char*)darr + (target_index * elsz);
+        register char* p_last = (char*)darr + ((length-1) * elsz);
+        // for (int i = 0; i < length; ++i) printf("%d ", ((int*)darr)[i]); putchar('\n');
+        // Swap target and last elements.
+        // [0][1][2][3][4][rest...] => [0][4][2][3][1][rest...]
+        _da_xor_swap(p_curr, p_last, elsz);
+        // Bubble the "new" target element (previously last element) to the back.
+        // [0][4][2][3][1][rest...] => [0][3][2][4][1][rest...]
+        // [0][3][2][4][1][rest...] => [0][2][3][4][1][rest...]
+        while ((p_curr += elsz) < p_last)
+        {
+            _da_xor_swap(
+                p_curr,
+                p_curr - elsz, // element before curr
+                elsz
+            );
+        }
+    }
 }
 #pragma GCC diagnostic pop
 
@@ -473,11 +505,7 @@ do                                                                             \
 (                                                                              \
     (/* "then" paren(s) */                                                     \
     /* move element to be removed to the back of the array */                  \
-    _da_remove_mem_mov(                                                        \
-        (darr),                                                                \
-        index,                                                                 \
-        *DA_P_LENGTH_FROM_HANDLE(darr),                                        \
-        *DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))                                   \
+    _da_remove_mem_mov(darr, index)                                            \
     ), /* then */                                                              \
     /* return darr[--length] (i.e the removed element) */                      \
     (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
