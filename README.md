@@ -95,7 +95,7 @@ But of course there are times when memory allocation can and will fail, so users
     /* ...macro implementation */
 ```
 ```C
-#define /* void* */da_spush(/* void* */darr, /* ARRAY TYPE */value, /* void* */backup) \
+#define /* void* */da_spush(/* void* */darr, /* ELEM TYPE */value, /* void* */backup) \
     /* ...macro implementation */
 ```
 These macros are identical to their unsafe counterparts save for an additional parameter `backup`. The safe macros work as such:
@@ -129,12 +129,12 @@ Removing values from a darray is a much more straightforward process, because th
 ```C
 // Remove/return the value at the specified index from darr.
 // All following elements are moved forward one index.
-#define /* ARRAY TYPE */da_remove(/* void* */darr, /* size_t */index) \
+#define /* ELEM TYPE */da_remove(/* void* */darr, /* size_t */index) \
     /* ...macro implementation */
 ```
 ```C
 // Remove/return the value at the back of darr.
-#define /* ARRAY TYPE */da_pop(/* void* */darr) \
+#define /* ELEM TYPE */da_pop(/* void* */darr) \
     /* ...macro implementation */
 ```
 
@@ -172,9 +172,9 @@ Due to the macro implimentation of `da_fill` the type of `value` must be specifi
 #### da_foreach
 `da_foreach` acts as a loop-block that forward iterates through all elements of a darray. In each iteration a variable with identifier `itername` will point to an element of the darray starting at its first element.
 
-Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
+Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM TYPE` to ensure correct iterator assignment internal to `da_foreach`.
 ```C
-#define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
+#define da_foreach(/* void* */darr, ELEM TYPE, itername) \
     /* ...macro implementation */
 ```
 ```C
@@ -190,9 +190,9 @@ da_foreach(darr, int, iter)
 #### da_foreachr
 Reverse for-each loop-block. `da_foreachr` is simmilar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
 
-Due to the macro implimentation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
+Due to the macro implimentation of `da_foreachr` the type of elements in the darray must be specified with `ELEM TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
 ```C
-#define da_foreachr(/* void* */darr, ELEM_TYPE, itername) \
+#define da_foreachr(/* void* */darr, ELEM TYPE, itername) \
     /* ...macro implementation */
 ```
 
