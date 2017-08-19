@@ -196,6 +196,14 @@ Due to the macro implimentation of `da_foreachr` the type of elements in the dar
     /* ...macro implementation */
 ```
 
+----
+
+#### da_swap
+Swap the contents of two elements in a darray.
+```C
+void da_swap(void* darr, size_t index_a, size_t index_b);
+```
+
 ## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
 Every C programmer has written this snippet of code at some point in their career:
