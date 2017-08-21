@@ -27,12 +27,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#ifdef __GNUC__
-#   pragma GCC system_header   // GCC
-#elif __clang__
-#   pragma clang system_header // CLANG
-#endif
-
 /* DARRAY MEMORY LAYOUT
  * ====================
  * +--------+---------+---------+-----+------------------+
@@ -329,7 +323,7 @@ static inline int _da_remove_mem_mov(void* darr, size_t target_index)
         // Swap target and last elements.
         // [0][1][2][3][4][rest...] => [0][4][2][3][1][rest...]
         _da_memswap(p_curr, p_last, elsz);
-        // Bubble the "new" target element (previously last element) to the back.
+        // Bubble the "new" target element (previously last element) to the back
         // [0][4][2][3][1][rest...] => [0][3][2][4][1][rest...]
         // [0][3][2][4][1][rest...] => [0][2][3][4][1][rest...]
         while ((p_curr += elsz) < p_last)
