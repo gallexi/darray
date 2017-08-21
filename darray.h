@@ -27,6 +27,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef __GNUC__
+#   pragma GCC system_header   // GCC
+#elif __clang__
+#   pragma clang system_header // CLANG
+#endif
+
 /* DARRAY MEMORY LAYOUT
  * ====================
  * +--------+---------+---------+-----+------------------+
@@ -277,7 +283,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) \
     (length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
 
-void _da_memswap(void* p1, void* p2, size_t sz)
+static inline void _da_memswap(void* p1, void* p2, size_t sz)
 {
     char tmp, *a = p1, *b = p2;
     for (size_t i = 0; i < sz; ++i)
