@@ -315,11 +315,11 @@ static inline void _da_memswap(void* p1, void* p2, size_t sz)
 //     target index                   target moved to back
 static inline int _da_remove_mem_mov(void* darr, size_t target_index)
 {
-    register size_t length = da_length(darr);
-    register size_t elsz = da_sizeof_elem(darr);
+    size_t length = da_length(darr);
+    size_t elsz = da_sizeof_elem(darr);
 
     // Try and use a temporary bit of memory for storage.
-    register void* tmp = malloc(elsz);
+    void* tmp = malloc(elsz);
     // If the memory is avaliable then run the fast version of the algorithm
     // using memcpy and memmove.
     if (tmp != NULL)
@@ -337,8 +337,8 @@ static inline int _da_remove_mem_mov(void* darr, size_t target_index)
     // of the algorithm using memory swapping.
     else
     {
-        register char* p_curr = (char*)darr + (target_index * elsz);
-        register char* p_last = (char*)darr + ((length-1) * elsz);
+        char* p_curr = (char*)darr + (target_index * elsz);
+        char* p_last = (char*)darr + ((length-1) * elsz);
         // Swap target and last elements.
         // [0][1][2][3][4][rest...] => [0][4][2][3][1][rest...]
         _da_memswap(p_curr, p_last, elsz);
@@ -429,7 +429,7 @@ static inline void* da_reserve(void* darr, size_t nelem)
 #define /* void* */_da_push(/* void* */darr, /* ELEM_TYPE */value)             \
 do                                                                             \
 {                                                                              \
-    register size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                  \
+    size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                           \
     if (*__p_len == *DA_P_CAPACITY_FROM_HANDLE(darr))                          \
     {                                                                          \
         (darr) = da_resize((darr), *__p_len);                                  \
@@ -442,7 +442,7 @@ do                                                                             \
     /* void* */backup)                                                         \
 do                                                                             \
 {                                                                              \
-    register size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                  \
+    size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                           \
     if (*__p_len == *DA_P_CAPACITY_FROM_HANDLE(darr))                          \
     {                                                                          \
         (backup) = (darr);                                                     \
@@ -468,8 +468,8 @@ do                                                                             \
     /* ELEM_TYPE */value)                                                      \
 do                                                                             \
 {                                                                              \
-    register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
-    register size_t __index = (index);                                         \
+    size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                          \
+    size_t __index = (index);                                                  \
     if ((*__p_len) == (*DA_P_CAPACITY_FROM_HANDLE(darr)))                      \
     {                                                                          \
         (darr) = da_resize((darr), *__p_len);                                  \
@@ -488,8 +488,8 @@ do                                                                             \
     /* ELEM_TYPE*/value, /* void* */backup)                                    \
 do                                                                             \
 {                                                                              \
-    register size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
-    register size_t __index = (index);                                         \
+    size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
+    size_t __index = (index);                                         \
     if ((*__p_len) == (*DA_P_CAPACITY_FROM_HANDLE(darr)))                      \
     {                                                                          \
         (backup) = (darr);                                                     \
@@ -525,8 +525,8 @@ do                                                                             \
 #define /* void */_da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value) \
 do                                                                             \
 {                                                                              \
-    register size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                    \
-    register VALUE_TYPE __value = (value);                                     \
+    size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                             \
+    VALUE_TYPE __value = (value);                                              \
     for (size_t __i = 0; __i < __len; ++__i)                                   \
     {                                                                          \
         (darr)[__i] = (__value);                                               \
@@ -547,7 +547,7 @@ for (ELEM_TYPE* itername = &(darr)[da_length(darr)-1];                         \
 
 static inline void da_swap(void* darr, size_t index_a, size_t index_b)
 {
-    register size_t size = da_sizeof_elem(darr);
+    size_t size = da_sizeof_elem(darr);
     _da_memswap(
         ((char*)darr) + (index_a * size),
         ((char*)darr) + (index_b * size),
