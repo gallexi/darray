@@ -392,6 +392,15 @@ EMU_TEST(da_swap)
     EMU_END_TEST();
 }
 
+EMU_TEST(container_style_type)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+    darray(int) da2 = da; // check for no comiler warnings
+
+    da_free(da2);
+    EMU_END_TEST();
+}
+
 EMU_GROUP(all_tests)
 {
     EMU_ADD(alloc_and_free_functions);
@@ -410,6 +419,7 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_foreach);
     EMU_ADD(da_foreachr);
     EMU_ADD(da_swap);
+    EMU_ADD(container_style_type);
     EMU_END_GROUP();
 }
 

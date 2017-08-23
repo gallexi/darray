@@ -204,6 +204,24 @@ Swap the contents of two elements in a darray.
 void da_swap(void* darr, size_t index_a, size_t index_b);
 ```
 
+----
+
+#### container-style type
+The container-style type provides a way to explicitly state that an array is a darray.
+```C
+#define darray(type) type*
+```
+Notice that saying `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no suprise.
+
+
+This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
+```C
+// darray(bar) can be used instead of bar* to let a user know that darray
+// operations will be used on arr somewhere in my_func, so if a normal bar*
+// is passed in the program will crash.
+void my_func(int i, darray(bar) arr, char* str);
+```
+
 ## Library Goals
 ### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
 Every C programmer has written this snippet of code at some point in their career:
