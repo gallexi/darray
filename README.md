@@ -27,7 +27,7 @@ void* da_alloc(size_t nelem, size_t size);
 ```C
 void da_free(void* darr);
 ```
-The function signature of `da_alloc` is identical to that of calloc and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element.
+The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element.
 ```C
 // Allocate a darray on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
@@ -39,6 +39,13 @@ the `sizeof` the contained element many darray functions will have undefined beh
 // This will result in undefined behavior even though alignment may be valid.
 int* bad_idea = da_alloc(24, 1);
 ```
+Something to note is that unlike `calloc`, `da_alloc` can be called with `nelem` equal to `0`. You will simply be left with a darray of zero elements. The function call
+```C
+foo* mystack = da_alloc(0, sizeof(foo));
+```
+can be used to declare an empty array-based stack of `foo`.
+
+
 Freeing memory is done by calling `da_free` on a darray.
 ```C
 da_free(my_arr);
@@ -56,7 +63,7 @@ void* da_resize(void* darr, size_t nelem);
 // Returns pointer the new darray with reserved space.
 void* da_reserve(void* darr, size_t nelem);
 ```
-Resizing a darray will set the length of the darray to `nelem`, reallocating memory if neccesary. Downsizing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray may contain garbage values.
+Resizing a darray will set the length of the darray to `nelem`, reallocating memory if neccesary. Downsizing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray will contain garbage values.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
@@ -68,7 +75,7 @@ my_arr = da_reserve(my_arr, 50);
 // Length is still 15, but you can now insert/push
 // up to 50 values without reallocation.
 ```
-Note that the pointers returned `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
+Note that the pointers returned by `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
 
 Also note that if reallocation fails both `da_alloc` and `da_reserve` will return `NULL`, and the original darray will be left untouched.
 
@@ -87,7 +94,7 @@ There are two main insertion functions `da_insert` and `da_push`, implemented as
 ```
 Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
 
-So what if allocation fails inside `da_insert` or `da_push`? Well unlike the rest of the library, these functions sacrifice safety for speed. If reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting to a vector without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
+So what if allocation fails inside `da_insert` or `da_push`? Well unlike the rest of the library, these functions sacrifice safety for speed. If reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a vector without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
 
 But of course there are times when memory allocation can and will fail, so users **need** a way to guard against that. Both macros have separate versions that sacrifice speed for safety.
 ```C
