@@ -64,6 +64,7 @@ static inline void da_free(void* darr);
  * @brief Returns the number of elements in the darray.
  *
  * @param darr : Target darray.
+ *
  * @return Number of elements in the darray.
  */
 static inline size_t da_length(void* darr);
@@ -73,6 +74,7 @@ static inline size_t da_length(void* darr);
  *  requiring resizing.
  *
  * @param darr : Target darray.
+ *
  * @return Total number of allocated elements in the darray.
  */
 static inline size_t da_capacity(void* darr);
@@ -81,6 +83,7 @@ static inline size_t da_capacity(void* darr);
  * @brief Returns the `sizeof` contained elements in the darray.
  *
  * @param darr : Target darray.
+ *
  * @return `sizeof` elements in the darray.
  */
 static inline size_t da_sizeof_elem(void* darr);
@@ -91,6 +94,7 @@ static inline size_t da_sizeof_elem(void* darr);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.
+ *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_resize` returns `NULL`, allocation failed and `darr` is
  *  left untouched.
@@ -105,6 +109,7 @@ static inline void* da_resize(void* darr, size_t nelem);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.
+ *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_reserve` returns `NULL`, allocation failed and `darr` is
  *  left untouched.
@@ -194,7 +199,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  a backup of the darray will be saved to `backup` and `darr` will be set to
  *  `NULL`.
  */
-#define /* void* */da_sinsert(/* void* */darr, /* size_t */index,              \
+#define /* void */da_sinsert(/* void* */darr, /* size_t */index,               \
     /* ELEM_TYPE */value, /* void* */backup)                                   \
                                      _da_safe_insert(darr, index, value, backup)
 
@@ -218,7 +223,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Set every element of `darr` to `value`.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param VALUE_TYPE : type of `value`.
+ * @param VALUE_TYPE : Type of `value`.
  * @param value : Value to fill the array with.
  */
 #define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value)  \
@@ -230,8 +235,8 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  will point to an element of `darr` starting at at its first element.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param ELEM_TYPE : type of the elements of darr.
- * @param itername : identifier for the iterator within the foreach block.
+ * @param ELEM_TYPE : Type of the elements of darr.
+ * @param itername : Identifier for the iterator within the foreach block.
  */
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername)                       \
                                           _da_foreach(darr, ELEM_TYPE, itername)
@@ -242,8 +247,8 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  will point to an element of `darr` starting at its last element.
  *
  * @param darr : const lvalue pointing to the target darray.
- * @param ELEM_TYPE : type of the elements of darr.
- * @param itername : identifier for the iterator within the foreachr block.
+ * @param ELEM_TYPE : Type of the elements of darr.
+ * @param itername : Identifier for the iterator within the foreachr block.
  */
 #define da_foreachr(/* void* */darr, ELEM_TYPE, itername)                      \
                                          _da_foreachr(darr, ELEM_TYPE, itername)
@@ -426,7 +431,7 @@ static inline void* da_reserve(void* darr, size_t nelem)
     return (char*)ptr + DA_HANDLE_OFFSET;
 }
 
-#define /* void* */_da_push(/* void* */darr, /* ELEM_TYPE */value)             \
+#define /* void */_da_push(/* void* */darr, /* ELEM_TYPE */value)              \
 do                                                                             \
 {                                                                              \
     size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                           \
@@ -438,7 +443,7 @@ do                                                                             \
     (darr)[(*__p_len)++] = (value);                                            \
 }while(0)
 
-#define /* void* */_da_safe_push(/* void* */darr, /* ELEM_TYPE */value,        \
+#define /* void */_da_safe_push(/* void* */darr, /* ELEM_TYPE */value,         \
     /* void* */backup)                                                         \
 do                                                                             \
 {                                                                              \
@@ -484,7 +489,7 @@ do                                                                             \
     (*__p_len)++;                                                              \
 }while(0)
 
-#define _da_safe_insert(/* void* */darr, /* size_t */index,                    \
+#define _da_safe_insert(/* void */darr, /* size_t */index,                     \
     /* ELEM_TYPE*/value, /* void* */backup)                                    \
 do                                                                             \
 {                                                                              \
