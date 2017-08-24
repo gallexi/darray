@@ -543,8 +543,6 @@ for (ELEM_TYPE* itername = &(darr)[da_length(darr)-1];                         \
     itername >= (darr);                                                        \
     itername--)                                                                \
 
-#endif // !_DARRAY_H_
-
 static inline void da_swap(void* darr, size_t index_a, size_t index_b)
 {
     size_t size = da_sizeof_elem(darr);
@@ -554,3 +552,5 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b)
         size
     );
 }
+
+#endif // !_DARRAY_H_
