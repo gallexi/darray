@@ -98,9 +98,9 @@ void fill_pre_sized_helper(size_t max_sz)
     printf(VECTOR_RF);
     vec = std::vector<int>(max_sz);
     begin = clock();
-    for (i : vec)
+    for (int& e : vec)
     {
-        vec[i] = rand();
+        e = rand();
     }
     end = clock();
     print_elapsed_time(begin, end);

@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-g -Wall -Wextra -std=c11 -I${EMU_ROOT}
 CPPC=g++
-CPPFLAGS=-g -w -fpermissive
+CPPFLAGS=-g -w -fpermissive -std=c++11
 
 all: clean unit_tests perf_tests
 
