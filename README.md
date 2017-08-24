@@ -277,5 +277,10 @@ Being able to allocate a darray and use it just like a built-in array comes with
 ### Speed (づ ￣ ³￣)づ
 Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays is automatically pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
 
+## Building Unit/Performance Tests
+The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. By default all tests compile using gcc with default optimization.
+
+The `unit_tests` target requires the environment variable `EMU_ROOT` to be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU), the testing framework used for the darray library. The `perf_tests` target has no additional dependencies.
+
 ## LICENSE
 MIT

@@ -488,8 +488,8 @@ do                                                                             \
     /* ELEM_TYPE*/value, /* void* */backup)                                    \
 do                                                                             \
 {                                                                              \
-    size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                 \
-    size_t __index = (index);                                         \
+    size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                          \
+    size_t __index = (index);                                                  \
     if ((*__p_len) == (*DA_P_CAPACITY_FROM_HANDLE(darr)))                      \
     {                                                                          \
         (backup) = (darr);                                                     \
