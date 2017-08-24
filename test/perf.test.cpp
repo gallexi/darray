@@ -49,7 +49,12 @@ void print_elapsed_time(clock_t begin, clock_t end)
 
 void print_numelem(size_t n)
 {
-    printf("vvv %d ELEMENTS vvv\n", n);
+    printf("vvv %zu ELEMENTS vvv\n", n);
+}
+
+void print_swaps(size_t n)
+{
+    printf("vvv %zu SWAPS vvv\n", n);
 }
 
 // FILL ////////////////////////////////////////////////////////////////////////
@@ -419,33 +424,51 @@ void remove_rand(void)
 }
 
 // SWAP RAND ///////////////////////////////////////////////////////////////////
-void swap_rand_helper(size_t max_sz)
+void swap_rand_helper(size_t array_len, size_t num_swaps)
 {
     clock_t begin;
     clock_t end;
+    int* arr;
     int* darr;
     std::vector<int> vec;
     size_t index;
 
-    print_numelem(max_sz);
+    print_swaps(num_swaps);
+
+    printf(CARR);
+    arr = (int*)malloc(array_len*sizeof(int));
+    begin = clock();
+    int tmp;
+    size_t a, b;
+    for (size_t i = 0; i < num_swaps; ++i)
+    {
+        a = rand() % array_len;
+        b = rand() % array_len;
+        tmp = arr[a];
+        arr[a] = arr[b];
+        arr[b] = tmp;
+    }
+    end = clock();
+    free(arr);
+    print_elapsed_time(begin, end);
 
     printf(DARR);
     begin = clock();
-    darr = da_alloc(max_sz, sizeof(int));
-    for (size_t i = 0; i < max_sz; ++i)
+    darr = da_alloc(array_len, sizeof(int));
+    for (size_t i = 0; i < num_swaps; ++i)
     {
-        da_swap(darr, rand() % max_sz, rand() % max_sz);
+        da_swap(darr, rand() % array_len, rand() % array_len);
     }
     end = clock();
     da_free(darr);
     print_elapsed_time(begin, end);
 
     printf(VECTOR);
-    vec = std::vector<int>(max_sz);
+    vec = std::vector<int>(array_len);
     begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
+    for (size_t i = 0; i < num_swaps; ++i)
     {
-        std::swap(vec[rand() % max_sz], vec[rand() % max_sz]);
+        std::swap(vec[rand() % array_len], vec[rand() % array_len]);
     }
     end = clock();
     print_elapsed_time(begin, end);
@@ -453,8 +476,10 @@ void swap_rand_helper(size_t max_sz)
 
 void swap_rand(void)
 {
-    puts("SWAP RANDOM ELEMENTS");
-    swap_rand_helper(SMALL_SIZE);
-    swap_rand_helper(MED_SIZE);
-    swap_rand_helper(LARGE_SIZE);
+
+    const size_t nelem = 10000;
+    printf("SWAP RANDOM ELEMENTS IN A %zu LEGNTH ARRAY\n", nelem);
+    swap_rand_helper(nelem, SMALL_SIZE);
+    swap_rand_helper(nelem, MED_SIZE);
+    swap_rand_helper(nelem, LARGE_SIZE);
 }
