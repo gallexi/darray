@@ -1,14 +1,15 @@
 #include "../darray.h"
-
 #include <stdio.h>
 #include <time.h>
 #include <vector>
+#include <algorithm>
 
 #define CARR      "built in array         : "
 #define DARR      "dynamic array          : "
 #define DARR_S    "dynamic array (safe)   : "
 #define VECTOR    "std::vector            : "
 #define VECTOR_RF "std::vector (range-for): "
+#define RESULTS_MAY_VARY "*results may vary significantly from run to run"
 #define SMALL_SIZE 100
 #define MED_SIZE   100000
 #define LARGE_SIZE 100000000
@@ -19,6 +20,7 @@ void insert_front(void);
 void insert_rand(void);
 void remove_front(void);
 void remove_rand(void);
+void swap_rand(void);
 
 int main(void)
 {
@@ -30,7 +32,8 @@ int main(void)
     insert_front();   putchar('\n');
     insert_rand();    putchar('\n');
     remove_front();   putchar('\n');
-    remove_rand();
+    remove_rand();    putchar('\n');
+    swap_rand();
 }
 
 int clock_to_msec(clock_t c)
@@ -299,7 +302,7 @@ void insert_rand_helper(size_t max_sz)
 void insert_rand(void)
 {
     puts("INSERT AT RANDOM INDEXES");
-    puts("*results may vary significantly from run to run");
+    puts(RESULTS_MAY_VARY);
     insert_rand_helper(MED_SIZE);
 }
 
@@ -411,6 +414,47 @@ void remove_rand_helper(size_t max_sz)
 void remove_rand(void)
 {
     puts("REMOVE AT RANDOM INDEXES");
-    puts("*results may vary significantly from run to run");
+    puts(RESULTS_MAY_VARY);
     remove_rand_helper(MED_SIZE);
+}
+
+// SWAP RAND ///////////////////////////////////////////////////////////////////
+void swap_rand_helper(size_t max_sz)
+{
+    clock_t begin;
+    clock_t end;
+    int* darr;
+    std::vector<int> vec;
+    size_t index;
+
+    print_numelem(max_sz);
+
+    printf(DARR);
+    begin = clock();
+    darr = da_alloc(max_sz, sizeof(int));
+    for (size_t i = 0; i < max_sz; ++i)
+    {
+        da_swap(darr, rand() % max_sz, rand() % max_sz);
+    }
+    end = clock();
+    da_free(darr);
+    print_elapsed_time(begin, end);
+
+    printf(VECTOR);
+    vec = std::vector<int>(max_sz);
+    begin = clock();
+    for (size_t i = 0; i < max_sz; ++i)
+    {
+        std::swap(vec[rand() % max_sz], vec[rand() % max_sz]);
+    }
+    end = clock();
+    print_elapsed_time(begin, end);
+}
+
+void swap_rand(void)
+{
+    puts("SWAP RANDOM ELEMENTS");
+    swap_rand_helper(SMALL_SIZE);
+    swap_rand_helper(MED_SIZE);
+    swap_rand_helper(LARGE_SIZE);
 }
