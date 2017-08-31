@@ -23,6 +23,7 @@
 #ifndef _DARRAY_H_
 #define _DARRAY_H_
 
+#include <stdalign.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <string.h>
@@ -283,9 +284,11 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 #define DA_SIZEOF_ELEM_OFFSET 0
-#define DA_LENGTH_OFFSET   (1*sizeof(size_t))
-#define DA_CAPACITY_OFFSET (2*sizeof(size_t))
-#define DA_HANDLE_OFFSET   (3*sizeof(size_t))
+#define DA_LENGTH_OFFSET     (1*sizeof(size_t))
+#define DA_CAPACITY_OFFSET   (2*sizeof(size_t))
+#define DA_HEADER_END_OFFSET (3*sizeof(size_t))
+#define DA_HANDLE_OFFSET (((4*sizeof(size_t)) % alignof(max_align_t)) == 0 ? \
+    (4*sizeof(size_t)) : (3*alignof(max_align_t)))
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
     (((char*)(darr_h)) - DA_HANDLE_OFFSET)
