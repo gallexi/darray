@@ -3,7 +3,7 @@
 ## Intro
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s std::vector.
 
-Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array, and it expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
 +--------+---------+---------+-----+------------------+
 | header | elem[0] | elem[1] | ... | elem[capacity-1] |
@@ -27,7 +27,7 @@ void* da_alloc(size_t nelem, size_t size);
 ```C
 void da_free(void* darr);
 ```
-The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element.
+The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element. Elements of a darray initially contain garbage values.
 ```C
 // Allocate a darray on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
@@ -41,7 +41,7 @@ int* bad_idea = da_alloc(24, 1);
 ```
 Something to note is that unlike `calloc`, `da_alloc` can be called with `nelem` equal to `0`. You will simply be left with a darray of zero elements. The function call
 ```C
-foo* mystack = da_alloc(0, sizeof(foo));
+foo* my_stack = da_alloc(0, sizeof(foo));
 ```
 can be used to declare an empty array-based stack of `foo`.
 
@@ -72,8 +72,8 @@ Reserving space in a darray will reallocate memory as neccesary such that the da
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
-// Length is still 15, but you can now insert/push
-// up to 50 values without reallocation.
+// length is still 15, but you can now insert/push
+// up to 50 values without reallocation
 ```
 Note that the pointers returned by `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
 
@@ -185,6 +185,10 @@ Due to the macro implimentation of `da_foreach` the type of elements in the darr
     /* ...macro implementation */
 ```
 ```C
+int* darr = da_alloc(num_elems, sizeof(int));
+// do some stuff...
+// ...
+// then...
 // Add one to each element in darr.
 da_foreach(darr, int, iter)
 {
@@ -229,56 +233,8 @@ This method of typing is especially useful in function declarations and sparsely
 void my_func(int i, darray(bar) arr, char* str);
 ```
 
-## Library Goals
-### Halt propagation of bad boilerplate ლ(ಠ益ಠლ)
-Every C programmer has written this snippet of code at some point in their career:
-```C
-size_t curr_len = 10;
-int* arr = malloc(curr_len*sizeof(int));
-for (int i = 0; i < N; ++i)
-{
-    if (i == curr_len)
-    {
-        curr_len = curr_len*2;
-        arr = realloc(arr, curr_len*sizeof(int));
-    }
-    arr[i] = foo();
-}
-```
-The code is lengthy, space-inefficient, prone to copy-paste errors, and requires the use of two separate variables for what is really a single data structure (at least in the abstract sense). A lot of programmers have mixed opinions about the C++ STL, but I think we can all admit that the following code is a lot nicer on the eyes and is a lot clearer at first glance:
-```C++
-std::vector<int> vec;
-for (int i = 0; i < N; ++i)
-{
-    vec.push_back(foo());
-}
-```
-The darray library aims to eliminate the code seen first example and replace it with something more like what we saw in the second example. That same code snippet written with a darray would look like:
-```C
-int* darr = da_alloc(10, sizeof(int));
-for (int i = 0; i < N; ++i)
-{
-    da_push(darr, foo());
-}
-```
-The code still looks like a C program, but gets rid of the jankiness found in the first example. Darrays give the user a set of tools that perform dynamic array operations the right way, eliminating the need for copy-pasting of potentially harmful boilerplate.
-
-### (✿ ♥‿♥) **A E S T H E T I C S** (♥‿♥ ✿)
-Clean code makes us happy programmers. Darrays and their associated functions/macros aim to provide all the functionality of a generic random access container while still looking b-e-a-utiful.
-
-Most dynamic array implementations use something along the lines of
-```C
-#define arr_t(T) struct{size_t capacity, length; T* data}
-```
-where the container is a struct, you have to use that weird psudo-template `#define` statement, and data access requires typing out `arr.data[i]` and `p_arr->data[i]` everywhere. This implementation certainly has some advantages, but it doesn't look or feel like the random access data structure we are used to as C programmers.
-
-Being able to allocate a darray and use it just like a built-in array comes with **huge** benefits. We don't have to think about unfamiliar container syntax, so we can just focus on our data. With darrays, we C programmers get to keep our beautiful bracket operator syntax **and** get to use functions that let us, push, resize, get the container length, etc. like our C++ brothers get to.
-
-### Speed (づ ￣ ³￣)づ
-Arrays are great because they are lightning fast. Darrays are regular old arrays under the hood so all the optimization you get from built-in arrays is automatically pulled into darrays. The library ships with a set of performance tests so you can see how darrays perform in relation to built-in arrays and std::vector.
-
 ## Building Unit/Performance Tests
-The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. By default all tests compile using gcc with default optimization.
+The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. All tests compile using gcc with default optimization.
 
 The `unit_tests` target requires the environment variable `EMU_ROOT` to be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU), the testing framework used for the darray library. The `perf_tests` target has no additional dependencies.
 
