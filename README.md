@@ -3,7 +3,7 @@
 ## Intro
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
 
-Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
 +--------+---------+---------+-----+------------------+
 | header | elem[0] | elem[1] | ... | elem[capacity-1] |
@@ -68,7 +68,7 @@ Resizing a darray will set the length of the darray to `nelem`, reallocating mem
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
 ```
-Reserving space in a darray will reallocate memory as neccesary such that the darray can hold an additional `nelem` elements after insertion. It will thus change the capacity, but not the length.
+Reserving space in a darray will reallocate memory as neccesary such that the darray can hold an additional `nelem` elements after insertion, altering a darray's capacity, but not its length.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
@@ -94,9 +94,9 @@ There are two main insertion functions `da_insert` and `da_push`, implemented as
 ```
 Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance/convenience reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
 
-So what if allocation fails inside `da_insert` or `da_push`? Well unlike the rest of the library, these functions sacrifice safety for speed. If reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a vector without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
+So what if allocation fails inside `da_insert` or `da_push`? Well unlike the rest of the library if reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a vector without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
 
-But of course there are times when memory allocation can and will fail, so users **need** a way to guard against that. Both macros have separate versions that sacrifice speed for safety.
+Of course there are times when memory allocation can and will fail, and users **need** a way to guard against it. Both macros have separate versions that sacrifice speed/convenience for safety.
 ```C
 #define /* void* */da_sinsert(/* void* */darr, /* size_t */index, /* ELEM_TYPE */value, /* void* */backup) \
     /* ...macro implementation */
