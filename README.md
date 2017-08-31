@@ -1,7 +1,7 @@
 # Dynamic C Arrays
 
 ## Intro
-This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s std::vector.
+This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
 
 Darrays are implemented much like std::vector. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
@@ -92,7 +92,7 @@ There are two main insertion functions `da_insert` and `da_push`, implemented as
 #define /* void */da_push(/* void* */darr, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
-Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
+Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance/convenience reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
 
 So what if allocation fails inside `da_insert` or `da_push`? Well unlike the rest of the library, these functions sacrifice safety for speed. If reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a vector without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
 
@@ -172,7 +172,7 @@ In addition to the functions/macros above the darray library ships with the foll
 // Set all elements in the range [0:da_length(darr)-1] to 15.
 da_fill(darr, int, 12 + 3);
 ```
-Due to the macro implimentation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element. Since `da_fill` is usually written close to the declaration of a darray, the `VALUE_TYPE` parameter is less of an inconvenience here.
+Due to the macro implimentation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element.
 
 ----
 
@@ -189,7 +189,7 @@ int* darr = da_alloc(num_elems, sizeof(int));
 // do some stuff...
 // ...
 // then...
-// Add one to each element in darr.
+// add one to each element in darr
 da_foreach(darr, int, iter)
 {
     *iter += 1;
@@ -222,15 +222,15 @@ The container-style type provides a way to explicitly state that an array is a d
 ```C
 #define darray(type) type*
 ```
-Notice that saying `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no suprise.
+Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no suprise.
 
 
 This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
 ```C
-// darray(bar) can be used instead of bar* to let a user know that darray
-// operations will be used on arr somewhere in my_func, so if a normal bar*
-// is passed in the program will crash.
-void my_func(int i, darray(bar) arr, char* str);
+// darray(foo) can be used instead of foo* to let a user know that darray
+// operations will be used on arr somewhere in my_func, so if a normal foo*
+// is passed in the program will crash
+void my_func(int i, darray(foo) arr, char* str);
 ```
 
 ## Building Unit/Performance Tests

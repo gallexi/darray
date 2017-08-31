@@ -122,7 +122,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Insert a value at the back of `darr`.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the back of the darray.
  *
  * @note Affects the length of the darray.
@@ -138,7 +138,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Push a value to the back of `darr`. This is the safe version of
  *  `da_push`.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param value : Value to be pushed onto the back of the darray.
  * @param backup : lvalue that will store a backup of `darr` in in case of
  *  reallocation failure.
@@ -155,7 +155,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Remove a value from the back of `darr` and return it.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  *
  * @return Value popped off of the back of the darray.
  *
@@ -170,7 +170,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Insert a value into `darr` at the specified index, moving the values
  * beyond `index` back one element.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the darray.
  *
@@ -189,7 +189,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Insert a value into `darr` at the specified index, moving the values
  * beyond `index` back one element. This is the safe version of `da_insert`.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the array.
  * @param backup : lvalue that will store a backup of `darr` in in case of
@@ -208,7 +208,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Remove the value at index from `darr` and return it, moving the
  * values past `index` up one element.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param index : Array index of the value to be removed.
  *
  * @return Value removed from the darray.
@@ -223,7 +223,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Set every element of `darr` to `value`.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param VALUE_TYPE : Type of `value`.
  * @param value : Value to fill the array with.
  */
@@ -235,7 +235,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  elements of `darr`. In each iteration a variable with identifier `itername`
  *  will point to an element of `darr` starting at at its first element.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param ELEM_TYPE : Type of the elements of darr.
  * @param itername : Identifier for the iterator within the foreach block.
  */
@@ -247,7 +247,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  elements of `darr`. In each iteration a variable with identifier `itername`
  *  will point to an element of `darr` starting at its last element.
  *
- * @param darr : const lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue pointing to the target darray.
  * @param ELEM_TYPE : Type of the elements of darr.
  * @param itername : Identifier for the iterator within the foreachr block.
  */
@@ -283,12 +283,12 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 #define darray(type) type*
 
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
-#define DA_SIZEOF_ELEM_OFFSET 0
-#define DA_LENGTH_OFFSET     (1*sizeof(size_t))
-#define DA_CAPACITY_OFFSET   (2*sizeof(size_t))
-#define DA_HEADER_END_OFFSET (3*sizeof(size_t))
-#define DA_HANDLE_OFFSET (((4*sizeof(size_t)) % alignof(max_align_t)) == 0 ? \
-    (4*sizeof(size_t)) : (3*alignof(max_align_t)))
+static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
+static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
+static const size_t DA_CAPACITY_OFFSET = 2*sizeof(size_t);
+static const size_t DA_HANDLE_OFFSET = // 3 size_t plus any extra alignment
+    (4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
+    4*sizeof(size_t) : 3*alignof(max_align_t);
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
     (((char*)(darr_h)) - DA_HANDLE_OFFSET)
