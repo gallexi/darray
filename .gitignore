@@ -4,16 +4,6 @@
 *.obj
 *.a
 
-/.vscode/settings.json
+/.vscode
 unit_tests
 perf_tests
-
-CMakeCache.txt
-CMakeFiles
-CMakeScripts
-Testing
-Makefile
-cmake_install.cmake
-install_manifest.txt
-compile_commands.json
-CTestTestfile.cmake
