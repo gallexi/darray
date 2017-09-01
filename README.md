@@ -19,6 +19,19 @@ foo some_element = my_arr[4]; // works as expected
 ```
 
 ## Use
+### *A Note About Macros and Constant Expressions
+C lacks true generics, so the following "functions" in the darray library are implemented as macros to allow psudo-container-generics:
+
++ da_insert
++ da_sinsert
++ da_remove
++ da_sremove
++ da_push
++ da_pop
++ da_fill
+
+These macros suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of the `darr` parameter, which is unavoidable without either requiring the user to specify a darray's element type in every macro or using the non-ANSI [typeof](https://gcc.gnu.org/onlinedocs/gcc/Typeof.html) specifier. For convenience to the user and portability across compilers neither of these options have been chosen for the darray library. Instead the user is **required** to use a constant expression for the `darr` parameter in darray macro functions knowing that it may be double evaluated. This is the overwhelmingly common case and is not a problem 99% of the time, but the user should be aware of it for that 1% when something clever could potentially cause a bug.
+
 ### Creation and Deletion
 Allocation and freeing of darrays is performed using the `da_alloc` and `da_free` functions.
 ```C
@@ -53,7 +66,7 @@ da_free(my_arr);
 Due to the fact that the handle to a darray is not actually the start of the darray's memory block, using `free` from `stdlib.h` on a darray will cause a runtime error.
 
 ### Resizing
-If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundemental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
+If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
 ```C
 // Returns pointer the newly resized darray.
@@ -63,12 +76,12 @@ void* da_resize(void* darr, size_t nelem);
 // Returns pointer the new darray with reserved space.
 void* da_reserve(void* darr, size_t nelem);
 ```
-Resizing a darray will set the length of the darray to `nelem`, reallocating memory if neccesary. Downsizing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray will contain garbage values.
+Resizing a darray will set the length of the darray to `nelem`, reallocating memory if necessary. Downsizing from a larger length to a smaller length will not alter values in the range `[0:nelem-1]`. Upsizing from a smaller length to a larger length will preserve the values of all previous elements, though additional elements within the darray will contain garbage values.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
 ```
-Reserving space in a darray will reallocate memory as neccesary such that the darray can hold an additional `nelem` elements after insertion, altering a darray's capacity, but not its length.
+Reserving space in a darray will reallocate memory as necessary such that the darray can hold an additional `nelem` elements after insertion, altering a darray's capacity, but not its length.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
@@ -172,14 +185,14 @@ In addition to the functions/macros above the darray library ships with the foll
 // Set all elements in the range [0:da_length(darr)-1] to 15.
 da_fill(darr, int, 12 + 3);
 ```
-Due to the macro implimentation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element.
+Due to the macro implementation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element.
 
 ----
 
 #### da_foreach
 `da_foreach` acts as a loop-block that forward iterates through all elements of a darray. In each iteration a variable with identifier `itername` will point to an element of the darray starting at its first element.
 
-Due to the macro implimentation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
+Due to the macro implementation of `da_foreach` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreach`.
 ```C
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */
@@ -201,7 +214,7 @@ da_foreach(darr, int, iter)
 #### da_foreachr
 Reverse for-each loop-block. `da_foreachr` is simmilar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
 
-Due to the macro implimentation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
+Due to the macro implementation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
 ```C
 #define da_foreachr(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */
@@ -222,7 +235,7 @@ The container-style type provides a way to explicitly state that an array is a d
 ```C
 #define darray(type) type*
 ```
-Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no suprise.
+Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no surprise.
 
 
 This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
