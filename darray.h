@@ -95,6 +95,7 @@ static inline size_t da_sizeof_elem(void* darr);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.
+ * @param nelem : New length of the darray.
  *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_resize` returns `NULL`, allocation failed and `darr` is
@@ -110,6 +111,7 @@ static inline void* da_resize(void* darr, size_t nelem);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.
+ * @param nelem : Number of additional elements that may be inserted.
  *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_reserve` returns `NULL`, allocation failed and `darr` is
@@ -130,6 +132,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  rest of the API, failed allocations from resizing with `da_push` may
  *  cause your program to blow up as reallocs are always reassigned back to
  *  `darr`. With this version of push, the user sacrifices safety for speed.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* void */da_push(/* void* */darr, /* ELEM_TYPE */value)               \
                                                            _da_push(darr, value)
@@ -147,6 +150,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note If malloc fails to allocate memory during automatic array resizeing
  *  a backup of the darray will be saved to `backup` and `darr` will be
  *  set to `NULL`.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* void* */da_spush(/* void* */darr, /* ELEM_TYPE */value,             \
     /* void* */backup)                                                         \
@@ -162,6 +166,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note Affects the length of the darray.
  * @note `da_pop` will never reallocate memory, so popping is always
  *  allocation-safe.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* ELEM_TYPE */da_pop(/* void* */darr)                                 \
                                                                    _da_pop(darr)
@@ -180,6 +185,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  *  cause your program to blow up as reallocs are always reassigned back to
  *  `darr`. With this version of insert, the user sacrifices safety for
  *  speed.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* void */da_insert(/* void* */darr, /* size_t */index,                \
     /* ELEM_TYPE */value)                                                      \
@@ -199,6 +205,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note If malloc fails to allocate memory during automatic array resizeing
  *  a backup of the darray will be saved to `backup` and `darr` will be set to
  *  `NULL`.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* void */da_sinsert(/* void* */darr, /* size_t */index,               \
     /* ELEM_TYPE */value, /* void* */backup)                                   \
@@ -216,6 +223,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @note Affects the length of the darray.
  * @note `da_remove` will never reallocate memory, so removing is always
  *  allocation-safe.
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* ELEM_TYPE */da_remove(/* void* */darr, /* size_t */index)           \
                                                          _da_remove(darr, index)
@@ -226,6 +234,8 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @param darr : constexpr lvalue pointing to the target darray.
  * @param VALUE_TYPE : Type of `value`.
  * @param value : Value to fill the array with.
+ *
+ * @note `darr` may be evaluated multiple times.
  */
 #define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value)  \
                                                _da_fill(darr, VALUE_TYPE, value)

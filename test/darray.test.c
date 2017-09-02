@@ -406,7 +406,7 @@ EMU_TEST(container_style_type)
     EMU_END_TEST();
 }
 
-EMU_GROUP(all_tests)
+EMU_GROUP(darray_functions)
 {
     EMU_ADD(alloc_and_free_functions);
     EMU_ADD(da_length);
@@ -425,6 +425,56 @@ EMU_GROUP(all_tests)
     EMU_ADD(da_foreachr);
     EMU_ADD(da_swap);
     EMU_ADD(container_style_type);
+    EMU_END_GROUP();
+}
+
+struct foo
+{
+    int a;
+    char b;
+    double c;
+};
+
+EMU_TEST(small_struct)
+{
+    struct foo* da = da_alloc(2, sizeof(struct foo));
+    EMU_REQUIRE_NOT_NULL(da);
+
+    struct foo some_struct = {.a=3, .b='y', .c=3.14159};
+    da[0] = some_struct;
+    // da_push(da, (struct foo){.a=4, .b='z', .c=4.14159});
+    // ^^^ this will cause a compile time error since the commas in the
+    // declaration get parsed as separate arguments to the push macro.
+    da_push(da, some_struct);
+
+    struct foo bar = da_remove(da, 0);
+    EMU_EXPECT_EQ(some_struct.a, bar.a);
+    EMU_EXPECT_EQ(some_struct.b, bar.b);
+    EMU_EXPECT_EQ(some_struct.c, bar.c);
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(cstrings)
+{
+    char* da = da_alloc(strlen("some string")+1, 1);
+    memcpy(da, "some string", da_length(da));
+    EMU_PRINT_INDENT(); printf("%s\n", da);
+    EMU_END_TEST();
+}
+
+EMU_GROUP(testing_with_different_types)
+{
+    EMU_ADD(small_struct);
+    EMU_ADD(cstrings);
+    EMU_END_GROUP();
+}
+
+EMU_GROUP(all_tests)
+{
+    EMU_ADD(darray_functions);
+    EMU_ADD(testing_with_different_types);
     EMU_END_GROUP();
 }
 
