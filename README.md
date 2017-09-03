@@ -22,15 +22,17 @@ foo some_element = my_arr[4]; // works as expected
 ### *A Note About Macros and Constant Expressions
 C lacks true generics, so the following "functions" in the darray library are implemented as macros to allow psudo-container-generics:
 
++ da_push
++ da_spush
++ da_pop
 + da_insert
 + da_sinsert
 + da_remove
-+ da_sremove
-+ da_push
-+ da_pop
 + da_fill
 
 These macros suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter, which is unavoidable without either requiring the user to specify a darray's element type in every macro or using the non-portable [typeof](https://gcc.gnu.org/onlinedocs/gcc/Typeof.html) specifier. For convenience to the user and portability across compilers neither of these options have been chosen for the darray library. Instead the user is **required** to use a [constant expression](http://northstar-www.dartmouth.edu/doc/ibmcxx/en_US/doc/language/concepts/cuexpcon.htm) (not necessarily a const variable) for the `darr` parameter in darray macro functions knowing that it may be double evaluated. This is the overwhelmingly common case and is not a problem 99% of the time, but the user should be aware of it for that 1% when some clever bit of code could potentially cause a bug.
+
+For those who prefer explicit reminders that they are using macros with double evaluation ALL CAPITAL versons of each macro are defined. For example `da_push` and `DA_PUSH` will expand to the same macro.
 
 ### Creation and Deletion
 Allocation and freeing of darrays is performed using the `da_alloc` and `da_free` functions.

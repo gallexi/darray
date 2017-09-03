@@ -292,6 +292,15 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  */
 #define darray(type) type*
 
+// UPPER CASE versions of macro "functions"
+#define DA_PUSH    da_push
+#define DA_SPUSH   da_spush
+#define DA_POP     da_pop
+#define DA_INSERT  da_insert
+#define DA_SINSERT da_sinsert
+#define DA_REMOVE  da_remove
+#define DA_FILL    da_fill
+
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
 static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
