@@ -52,6 +52,8 @@ da_free(my_arr);
 ```
 Due to the fact that the handle to a darray is not actually the start of the darray's memory block, using `free` from `stdlib.h` on a darray will cause a runtime error.
 
+----
+
 ### Resizing
 If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
@@ -78,6 +80,8 @@ my_arr = da_reserve(my_arr, 50);
 Note that the pointers returned by `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
 
 Also note that if reallocation fails both `da_alloc` and `da_reserve` will return `NULL`, and the original darray will be left untouched.
+
+----
 
 ### Insertion
 There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and increment the darray's length.
