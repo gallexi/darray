@@ -131,6 +131,10 @@ for (size_t i = 0; i < 1000000; ++i) // push back a million random values
 
 ```
 
+Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_push`, `da_spush`, `da_insert` and `da_sinsert`.
+
+----
+
 ### Removal
 Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the darray.
 ```C
@@ -144,6 +148,10 @@ Removing values from a darray is a much more straightforward process, because th
 #define /* ELEM_TYPE */da_pop(/* void* */darr) \
     /* ...macro implementation */
 ```
+
+Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_pop` and `da_remove`.
+
+----
 
 ### Accessing Header Data
 Darrays know their own length, capacity, and `sizeof` their contained elements. All of this data lives in the darray header and can be accessed through the following functions:
@@ -174,6 +182,9 @@ da_fill(darr, int, 12 + 3);
 ```
 Due to the macro implementation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element.
 
+
+Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_fill`.
+
 ----
 
 #### da_foreach
@@ -196,6 +207,8 @@ da_foreach(darr, int, iter)
 }
 ```
 
+Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_foreach`.
+
 ----
 
 #### da_foreachr
@@ -206,6 +219,8 @@ Due to the macro implementation of `da_foreachr` the type of elements in the dar
 #define da_foreachr(/* void* */darr, ELEM_TYPE, itername) \
     /* ...macro implementation */
 ```
+
+Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_foreachr`.
 
 ----
 
@@ -235,7 +250,7 @@ void my_func(int i, darray(foo) arr, char* str);
 
 ----
 
-### *A Note About Macros and Constant Expressions
+### <a name="costexpr-note"></a> *A Note About Macros and Constant Expressions
 C lacks true generics, so the following "functions" in the darray library implemented as macros to allow psudo-container-generics and as a result suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter:
 
 + da_push
