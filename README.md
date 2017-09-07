@@ -271,7 +271,6 @@ This double evaluation is unavoidable without either requiring the user to speci
 
 For those who prefer explicit reminders that they are using macros with double evaluation ALL CAPITAL versons of each macro are defined. For example `da_push` and `DA_PUSH` will expand to the same macro.
 
-
 ## Building Unit/Performance Tests
 The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. All tests compile using gcc with default optimization.
 
