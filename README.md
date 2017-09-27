@@ -3,11 +3,11 @@
 ## Intro
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
 
-Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring expansion (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
-+--------+---------+---------+-----+------------------+
-| header | elem[0] | elem[1] | ... | elem[capacity-1] |
-+--------+---------+---------+-----+------------------+
++--------+--------+- ------+-----+-----------------+
+| header | arr[0] | arr[1] | ... | arr[capacity-1] |
++--------+--------+--------+-----+-----------------+
          ^
          Handle to the darray points to the first
          element of the array.
@@ -216,7 +216,7 @@ Note: see [a note about macros and contant expressions](#costexpr-note) below ab
 ----
 
 #### da_foreachr
-Reverse for-each loop-block. `da_foreachr` is simmilar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
+Reverse for-each loop-block. `da_foreachr` is similar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
 
 Due to the macro implementation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
 ```C
