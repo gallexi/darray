@@ -286,6 +286,64 @@ EMU_TEST(da_remove)
     EMU_END_TEST();
 }
 
+EMU_TEST(da_swap)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    da[3] = 12;
+    da[5] = 99;
+
+    da_swap(da, 3, 5);
+    EMU_EXPECT_EQ_INT(da[3], 99);
+    EMU_EXPECT_EQ_INT(da[5], 12);
+
+    da_swap(da, 3, 5);
+    EMU_EXPECT_EQ_INT(da[3], 12);
+    EMU_EXPECT_EQ_INT(da[5], 99);
+
+    // swap element with itself
+    da_swap(da, 3, 3);
+    EMU_EXPECT_EQ_INT(da[3], 12);
+    EMU_EXPECT_EQ_INT(da[5], 99);
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_cat)
+{
+    char* A = da_alloc(1, sizeof(char));
+    long* B = da_alloc(1, sizeof(long));
+    long* C = da_cat(B, A);
+    EMU_EXPECT_NULL(C);
+    EMU_EXPECT_NOT_NULL(A);
+    EMU_EXPECT_NOT_NULL(B);
+    da_free(A);
+    da_free(B);
+
+    int* src = da_alloc(2, sizeof(int));
+    int* dest = da_alloc(3, sizeof(int));
+
+    dest[0] = 0;
+    dest[1] = 1;
+    dest[2] = 2;
+
+    src[0] = 3;
+    src[1] = 4;
+
+    dest = da_cat(dest, src);
+    EMU_REQUIRE_NOT_NULL(dest);
+    EMU_REQUIRE_NOT_NULL(src);
+    for (size_t i = 0; i < 5; ++i)
+    {
+        EMU_EXPECT_EQ_INT(dest[i], i);
+    }
+
+    da_free(src);
+    da_free(dest);
+    EMU_END_TEST(); 
+}
+
 EMU_TEST(da_fill)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
@@ -373,30 +431,6 @@ EMU_TEST(da_foreachr)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_swap)
-{
-    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
-
-    da[3] = 12;
-    da[5] = 99;
-
-    da_swap(da, 3, 5);
-    EMU_EXPECT_EQ_INT(da[3], 99);
-    EMU_EXPECT_EQ_INT(da[5], 12);
-
-    da_swap(da, 3, 5);
-    EMU_EXPECT_EQ_INT(da[3], 12);
-    EMU_EXPECT_EQ_INT(da[5], 99);
-
-    // swap element with itself
-    da_swap(da, 3, 3);
-    EMU_EXPECT_EQ_INT(da[3], 12);
-    EMU_EXPECT_EQ_INT(da[5], 99);
-
-    da_free(da);
-    EMU_END_TEST();
-}
-
 EMU_TEST(container_style_type)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
@@ -420,10 +454,11 @@ EMU_GROUP(darray_functions)
     EMU_ADD(da_insert);
     EMU_ADD(da_sinsert);
     EMU_ADD(da_remove);
+    EMU_ADD(da_swap);
+    EMU_ADD(da_cat);
     EMU_ADD(da_fill);
     EMU_ADD(da_foreach);
     EMU_ADD(da_foreachr);
-    EMU_ADD(da_swap);
     EMU_ADD(container_style_type);
     EMU_END_GROUP();
 }

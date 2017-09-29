@@ -174,6 +174,28 @@ In addition to the functions/macros above the darray library ships with the foll
 
 ----
 
+#### da_swap
+Swap the contents of two elements in a darray.
+```C
+void da_swap(void* darr, size_t index_a, size_t index_b);
+```
+
+----
+
+#### da_cat
+Append `src` to the back of `dest` reallocating memory in `dest` if neccesary. `src` is preserved across the call. Returns the new location of dest after the call on success or `NULL` on failure;
+
+```C
+ static inline void* da_cat(void* dest, void* src);
+```
+
+Note: Unlike `strcat`, references to `dest` may be broken across a function call to `da_cat`. The return value of `da_cat` should be used as truth for the location of dest after function completion.
+
+```C
+dest = da_cat(dest, src);
+```
+----
+
 #### da_fill
 `da_fill` sets all elements in a darray to a specified value.
 ```C
@@ -225,14 +247,6 @@ Due to the macro implementation of `da_foreachr` the type of elements in the dar
 ```
 
 Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_foreachr`.
-
-----
-
-#### da_swap
-Swap the contents of two elements in a darray.
-```C
-void da_swap(void* darr, size_t index_a, size_t index_b);
-```
 
 ----
 
