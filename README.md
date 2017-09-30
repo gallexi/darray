@@ -261,7 +261,7 @@ void my_func(int i, darray(foo) arr, char* str);
 
 ----
 
-### <a name="costexpr-note"></a*A Note About Macros and Constant Expressions
+### <a name="costexpr-note"></a> *A Note About Macros and Constant Expressions
 C lacks true generics, so the following "functions" in the darray library implemented as macros to allow psudo-container-generics and as a result suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter:
 
 + da_push
