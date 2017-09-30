@@ -124,14 +124,10 @@ EMU_TEST(da_spush)
 {
     const int max_index = 15;
     int* da = da_alloc(0, sizeof(int));
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    int* bak;
-#pragma GCC diagnostic pop
 
     for (int i = 0; i <= max_index; ++i)
     {
-        da_spush(da, i, bak);
+        da = da_spush(da, &i);
         EMU_REQUIRE_NOT_NULL(da);
     }
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
@@ -207,21 +203,19 @@ EMU_TEST(da_insert)
 EMU_TEST(da_sinsert)
 {
     int* da = da_alloc(2, sizeof(int));
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-    int* bak;
-#pragma GCC diagnostic pop
     da[0] = 3;
     da[1] = 5;
 
-    da_sinsert(da, 0, 7, bak);
+    int val = 7;
+    da = da_sinsert(da, 0, &val);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 3);
     EMU_EXPECT_EQ_INT(da[0], 7);
     EMU_EXPECT_EQ_INT(da[1], 3);
     EMU_EXPECT_EQ_INT(da[2], 5);
 
-    da_sinsert(da, 1, 9, bak);
+    val = 9;
+    da = da_sinsert(da, 1, &val);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 4);
     EMU_EXPECT_EQ_INT(da[0], 7);
@@ -237,7 +231,7 @@ EMU_TEST(da_sinsert)
     // mimic push front
     for (int i = max_index; i >= 0; --i)
     {
-        da_sinsert(da, 0, i, bak);
+        da_sinsert(da, 0, &i);
         EMU_REQUIRE_NOT_NULL(da);
     }
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);

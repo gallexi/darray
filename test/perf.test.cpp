@@ -161,16 +161,17 @@ void fill_push_back_helper(size_t max_sz)
 
     printf(DARR_S);
     darr = (int*)da_alloc(init_elem, sizeof(int));
+    int val;
     begin = clock();
-    int* bak;
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_spush(darr, rand(), bak);
-        if (!darr)
+        val = rand();
+        if (!(darr = da_spush(darr, &val)))
         {
             printf("OH NO! %d %d\n", __FILE__, __LINE__);
             exit(EXIT_FAILURE);
         }
+
     }
     end = clock();
     da_free(darr);
@@ -220,12 +221,12 @@ void insert_front_helper(size_t max_sz)
 
     printf(DARR_S);
     darr = (int*)da_alloc(init_elem, sizeof(int));
+    int* val;
     begin = clock();
-    int* bak;
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_sinsert(darr, 0, rand(), bak);
-        if (!darr)
+        val = rand();
+        if (!(darr = da_sinsert(darr, 0, &val)))
         {
             printf("OH NO! %d %d", __FILE__, __LINE__);
             exit(EXIT_FAILURE);
@@ -278,11 +279,12 @@ void insert_rand_helper(size_t max_sz)
 
     printf(DARR_S);
     darr = (int*)da_alloc(init_elem, sizeof(int));
+    int* val;
     begin = clock();
-    int* bak;
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_sinsert(darr, rand() % da_length(darr), rand(), bak);
+        val = rand();
+        da_sinsert(darr, rand() % da_length(darr), &val);
         if (!darr)
         {
             printf("OH NO! %d %d", __FILE__, __LINE__);
