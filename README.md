@@ -188,11 +188,11 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
 ```
 
 #### da_cat
-Append darray `src` to the back of darray `dest` reallocating memory in `dest` if neccesary. `src` is preserved across the call.
+Append `nelem` array elements from `src` to the back of darray `dest` reallocating memory in `dest` if neccesary. `src` is preserved across the call. `src` may be a built in array or a darray.
 
-Returns pointer to `dest` after any reallocation in `da_cat`. Returns `NULL` if an error occured within `da_cat`, in which case `dest` will be left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_cat` returns `NULL`, reallocation failed and `darr` is left untouched.
 ```C
-void* da_cat(void* dest, void* src);
+void* da_cat(void* dest, void* src, size_t nelem)
 ```
 Unlike `strcat` in libc, references to `dest` may be broken across a function call to da_cat. The return value of `da_cat` should be used as truth for the location of dest after function completion.
 ```C

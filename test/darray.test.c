@@ -158,7 +158,7 @@ EMU_TEST(da_pop)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_insert)
+EMU_TEST(da_insert__basic)
 {
     int* da = da_alloc(2, sizeof(int));
     da[0] = 3;
@@ -180,11 +180,14 @@ EMU_TEST(da_insert)
     EMU_EXPECT_EQ_INT(da[3], 5);
 
     da_free(da);
+    EMU_END_TEST();
+}
 
-    da = da_alloc(0, sizeof(int));
+EMU_TEST(da_insert__mimic_push_front)
+{
     const int max_index = 15;
+    int* da = da_alloc(0, sizeof(int));
 
-    // mimic push front
     for (int i = max_index; i >= 0; --i)
     {
         da_insert(da, 0, i);
@@ -200,7 +203,14 @@ EMU_TEST(da_insert)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_sinsert)
+EMU_GROUP(da_insert)
+{
+    EMU_ADD(da_insert__basic);
+    EMU_ADD(da_insert__mimic_push_front);
+    EMU_END_GROUP();
+}
+
+EMU_TEST(da_sinsert__basic)
 {
     int* da = da_alloc(2, sizeof(int));
     da[0] = 3;
@@ -224,11 +234,14 @@ EMU_TEST(da_sinsert)
     EMU_EXPECT_EQ_INT(da[3], 5);
 
     da_free(da);
+    EMU_END_TEST();
+}
 
-    da = da_alloc(0, sizeof(int));
+EMU_TEST(da_sinsert__mimic_push_front)
+{
     const int max_index = 15;
+    int* da = da_alloc(0, sizeof(int));
 
-    // mimic push front
     for (int i = max_index; i >= 0; --i)
     {
         da_sinsert(da, 0, &i);
@@ -242,6 +255,13 @@ EMU_TEST(da_sinsert)
 
     da_free(da);
     EMU_END_TEST();
+}
+
+EMU_GROUP(da_sinsert)
+{
+    EMU_ADD(da_sinsert__basic);
+    EMU_ADD(da_sinsert__mimic_push_front);
+    EMU_END_GROUP();
 }
 
 struct bigstruct {int A[500];};
@@ -273,7 +293,6 @@ EMU_TEST(da_remove)
     da_remove(bda, 1); // remove from middle
     da_remove(bda, 0); // remove from front
     da_remove(bda, 1); // remove from back
-
 
     da_free(da);
     da_free(bda);
