@@ -241,9 +241,9 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 
 /**@macro
  *
- * @brief Append nelem array elements from `src` to the back of darray `dest`
+ * @brief Append `nelem` array elements from `src` to the back of darray `dest`
  *  reallocating memory in `dest` if neccesary. `src` is preserved across the
- *  call. `src` may be a built in array or a darray.
+ *  call. `src` may be a built-in array or a darray.
  *
  * @param dest : Darray that will be appended to. Upon function completion,
  *  `dest` may or may not point to its previous block on the heap, potentially
@@ -251,9 +251,9 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  * @param src : Array to append to dest.
  * @param nelem : Number of elements from src to append to dest.
  *
- * @return pointer to `dest` after any reallocation in `da_cat`. Returns `NULL`
- *  if an error occured within `da_cat`, in which case `dest` will be left
- *  untouched.
+ * @return Pointer to the new location of the darray upon successful function
+ *  completion. If `da_cat` returns `NULL`, reallocation failed and `darr`
+ *  is left untouched.
  *
  * @note Unlike `strcat` in libc, references to `dest` may be broken across
  *  a function call to da_cat. The return value of `da_cat` should be used as
@@ -315,6 +315,14 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 #define DA_FOREACH  da_foreach
 #define DA_FOREACHR da_foreachr
 
+// Change this section to overwrite default allocators
+#ifndef DA_MALLOC
+#   define DA_MALLOC malloc
+#endif
+#ifndef DA_REALLOC
+#   define DA_REALLOC realloc
+#endif
+
 ///////////////////////////////// DEFINITIONS //////////////////////////////////
 static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
 static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
@@ -360,7 +368,7 @@ static inline int _da_remove_mem_mov(void* darr, size_t target_index)
     size_t elsz = da_sizeof_elem(darr);
 
     // Try and use a temporary bit of memory for storage.
-    void* tmp = malloc(elsz);
+    void* tmp = DA_MALLOC(elsz);
     // If the memory is avaliable then run the fast version of the algorithm
     // using memcpy and memmove.
     if (tmp != NULL)
@@ -401,7 +409,7 @@ static inline int _da_remove_mem_mov(void* darr, size_t target_index)
 static inline void* da_alloc(size_t nelem, size_t size)
 {
     size_t capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    void* mem = malloc(capacity*size + DA_HANDLE_OFFSET);
+    void* mem = DA_MALLOC(capacity*size + DA_HANDLE_OFFSET);
     if (mem == NULL)
     {
         return mem;
@@ -436,7 +444,7 @@ static inline void* da_resize(void* darr, size_t nelem)
 {
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
     size_t new_arr_size = new_capacity*da_sizeof_elem(darr)+DA_HANDLE_OFFSET;
-    void* ptr = realloc(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
+    void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
     {
         return NULL;
@@ -456,7 +464,7 @@ static inline void* da_reserve(void* darr, size_t nelem)
         return darr;
     }
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
-    void* ptr = realloc(DA_HEAD_FROM_HANDLE(darr),
+    void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr),
         new_capacity*da_sizeof_elem(darr) + DA_HANDLE_OFFSET);
     if (ptr == NULL)
     {
