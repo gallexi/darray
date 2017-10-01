@@ -315,35 +315,34 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 #define DA_FOREACH  da_foreach
 #define DA_FOREACHR da_foreachr
 
-// Change this section to overwrite default allocators
+///////////////////////////////// DEFINITIONS //////////////////////////////////
+static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
+static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
+static const size_t DA_CAPACITY_OFFSET = 2*sizeof(size_t);
+static const size_t DA_HANDLE_OFFSET = // 3 size_t plus any extra alignment
+(4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
+4*sizeof(size_t) : 3*alignof(max_align_t);
+
+#define DA_HEAD_FROM_HANDLE(darr_h) \
+(((char*)(darr_h)) - DA_HANDLE_OFFSET)
+#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
+((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
+#define DA_P_LENGTH_FROM_HANDLE(darr_h) \
+((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
+#define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
+((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
+
+#define DA_CAPACITY_FACTOR 1.3
+#define DA_CAPACITY_MIN 10
+#define DA_NEW_CAPACITY_FROM_LENGTH(length) \
+(length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
+
 #ifndef DA_MALLOC
 #   define DA_MALLOC malloc
 #endif
 #ifndef DA_REALLOC
 #   define DA_REALLOC realloc
 #endif
-
-///////////////////////////////// DEFINITIONS //////////////////////////////////
-static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
-static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
-static const size_t DA_CAPACITY_OFFSET = 2*sizeof(size_t);
-static const size_t DA_HANDLE_OFFSET = // 3 size_t plus any extra alignment
-    (4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
-    4*sizeof(size_t) : 3*alignof(max_align_t);
-
-#define DA_HEAD_FROM_HANDLE(darr_h) \
-    (((char*)(darr_h)) - DA_HANDLE_OFFSET)
-#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
-#define DA_P_LENGTH_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
-#define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
-
-#define DA_CAPACITY_FACTOR 1.3
-#define DA_CAPACITY_MIN 10
-#define DA_NEW_CAPACITY_FROM_LENGTH(length) \
-    (length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
 
 static inline void _da_memswap(void* p1, void* p2, size_t sz)
 {
