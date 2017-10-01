@@ -1,39 +1,39 @@
 # Darray - Dynamic C Arrays
 
 ## Table of contents
-1. [Introduction](#introduction) 
-2. [API](#api)
-    + [Creation and Deletion](#alloc-free)
-        + [da_alloc](#da_alloc)
-        + [da_free](#da_free)
-    + [Resizing](#resizing)
-        + [da_resize](#da_resize)
-        + [da_reserve](#da_reserve)
-    + [Insertion](#insertion)
-        + [da_insert](#da_insert)
-        + [da_push](#da_push)
-        + [da_sinsert](#da_sinsert)
-        + [da_spush](#da_spush)
-    + [Removal](#Removal)
-        + [da_remove](#da_remove)
-        + [da_pop](#da_pop)
-    + [Accessing Header Data](#header-data)
-        + [da_length](#da_length)
-        + [da_capacity](#da_capacity)
-        + [da_sizeof_elem](#da_sizeof_elem)
-    + [Misc. Utilities](#misc-utilities)
-        + [da_swap](#da_swap)
-        + [da_cat](#da_cat)
-        + [da_fill](#da_fill)
-        + [da_foreach](#da_foreach)
-        + [da_foreachr](#da_foreachr)
-        + [container-style type](#container-type)
-3. [*A Note About Macros and Constant Expressions](#costexpr-note)
-4. [Building Unit/Performance Tests](#tests)
-5. [License](#license)
+1. [Introduction](#introduction_) 
+2. [API](#api_)
+    + [Creation and Deletion](#alloc-free_)
+        + [da_alloc](#da_alloc_)
+        + [da_free](#da_free_)
+    + [Resizing](#resizing_)
+        + [da_resize](#da_resize_)
+        + [da_reserve](#da_reserve_)
+    + [Insertion](#insertion_)
+        + [da_insert](#da_insert_)
+        + [da_push](#da_push_)
+        + [da_sinsert](#da_sinsert_)
+        + [da_spush](#da_spush_)
+    + [Removal](#Removal_)
+        + [da_remove](#da_remove_)
+        + [da_pop](#da_pop_)
+    + [Accessing Header Data](#header-data_)
+        + [da_length](#da_length_)
+        + [da_capacity](#da_capacity_)
+        + [da_sizeof_elem](#da_sizeof_elem_)
+    + [Misc. Utilities](#misc-utilities_)
+        + [da_swap](#da_swap_)
+        + [da_cat](#da_cat_)
+        + [da_fill](#da_fill_)
+        + [da_foreach](#da_foreach_)
+        + [da_foreachr](#da_foreachr_)
+        + [container-style type](#container-type_)
+3. [*A Note About Macros and Constant Expressions](#costexpr-note_)
+4. [Building Unit/Performance Tests](#tests_)
+5. [License](#license_)
 
 
-## <a name="introduction"></a> Introduction
+## <a name="introduction_"></a> Introduction
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
 
 Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
@@ -51,9 +51,9 @@ foo* my_arr = da_alloc(10, sizeof(foo));
 foo some_element = my_arr[4]; // works as expected
 ```
 
-## <a name="api"></a> API
-### <a name="#alloc-free"></a> Creation and Deletion
-#### <a name="#da_alloc"></a> da_alloc
+## <a name="api_"></a> API
+### <a name="#alloc-free_"></a> Creation and Deletion
+#### <a name="#da_alloc_"></a> da_alloc
 Allocate a darray of `nelem` elements each of size `size`.
 
 Returns a pointer to a new darray.
@@ -75,7 +75,7 @@ foo* my_stack = da_alloc(0, sizeof(foo));
 ```
 can be used to declare an empty array-based stack of `foo`.
 
-#### <a name="#da_free"></a> da_free
+#### <a name="#da_free_"></a> da_free
 Free a darray.
 ```C
 void da_free(void* darr);
@@ -84,12 +84,12 @@ Due to the fact that the handle to a darray is not actually the start of the dar
 
 ----
 
-### <a name="#resizing"></a> Resizing
+### <a name="#resizing_"></a> Resizing
 If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
 Pointers returned by `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
 
-#### <a name="#da_resize"></a> da_resize
+#### <a name="#da_resize_"></a> da_resize
 Change the length of a darray to `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_resize` returns `NULL`, allocation failed and `darr` is left untouched.
@@ -101,7 +101,7 @@ foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
 ```
 
-#### <a name="#da_reserve"></a> da_reserve
+#### <a name="#da_reserve_"></a> da_reserve
 Guarantee that at least `nelem` elements beyond the current length of a darray can be inserted/pushed without requiring resizing.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_reserve` returns `NULL`, allocation failed and `darr` is left untouched.
@@ -118,32 +118,32 @@ my_arr = da_reserve(my_arr, 50);
 
 ----
 
-### <a name="#insertion"></a> Insertion
+### <a name="#insertion_"></a> Insertion
 There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and increment the darray's length. Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance/convenience reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
 
 Unlike the rest of the library if reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a `std::vector` without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
 
 Of course there are times when memory allocation can and will fail, and users **need** a way to guard against it. Both macros have separate implimentations as functions that sacrifice speed/convenience for memory/double-macro-evaluation safety.
 
-#### <a name="#da_insert"></a> da_insert
+#### <a name="#da_insert_"></a> da_insert
 Insert a value into `darr` at the specified index, moving the values beyond `index` back one element.
 ```C
 #define /* void */da_insert(/* void* */darr, /* size_t */index, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_insert`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_insert`.
 
-#### <a name="#da_push"></a> da_push
+#### <a name="#da_push_"></a> da_push
 Insert a value at the back of `darr`.
 ```C
 #define /* void */da_push(/* void* */darr, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_push`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_push`.
 
-#### <a name="#da_sinsert"></a> da_sinsert
+#### <a name="#da_sinsert_"></a> da_sinsert
 Insert a value into `darr` at the specified index, moving the values beyond `index` back one element. This is the safe version of `da_insert`.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_sinsert` returns `NULL`, reallocation failed and `darr` is left untouched.
@@ -151,7 +151,7 @@ Returns a pointer to the new location of the darray upon successful function com
 void* da_sinsert(void* darr, size_t index, void* p_value);
 ```
 
-#### <a name="#da_spush"></a> da_spush
+#### <a name="#da_spush_"></a> da_spush
 Push a value to the back of `darr`. This is the safe version of `da_push`.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_spush` returns `NULL`, reallocation failed and `darr` is left untouched.
@@ -161,10 +161,10 @@ void* da_spush(void* darr, void* p_value);
 
 ----
 
-### <a name="#removal"></a> Removal
+### <a name="#removal_"></a> Removal
 Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the darray.
 
-#### <a name="#da_remove"></a> da_remove
+#### <a name="#da_remove_"></a> da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
 
 Returns the value removed from the darray.
@@ -173,9 +173,9 @@ Returns the value removed from the darray.
     /*
 ```
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_remove`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_remove`.
 
-#### <a name="#da_pop"></a> da_pop
+#### <a name="#da_pop_"></a> da_pop
 Remove a value from the back of `darr` and return it.
 
 Returns the value removed from the darray.
@@ -184,26 +184,26 @@ Returns the value removed from the darray.
     /* ...macro implementation */
 ```
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_pop`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_pop`.
 
 ----
 
-### <a name="#header-data"></a> Accessing Header Data
+### <a name="#header-data_"></a> Accessing Header Data
 Darrays know their own length, capacity, and `sizeof` their contained elements. All of this data lives in the darray header and can be accessed through the following functions:
 
-#### <a name="#da_length"></a> da_length
+#### <a name="#da_length_"></a> da_length
 Returns the number of elements in `darr`.
 ```C
 size_t da_length(void* darr);
 ```
 
-#### <a name="#da_capacity"></a> da_capacity
+#### <a name="#da_capacity_"></a> da_capacity
 Returns the maximum number of elements `darr` can hold without requiring resizing.
 ```C
 size_t da_capacity(void* darr);
 ```
 
-#### <a name="#da_sizeof_elem"></a> da_sizeof_elem
+#### <a name="#da_sizeof_elem_"></a> da_sizeof_elem
 Returns the `sizeof` contained elements in a `darr`.
 ```C
 size_t da_sizeof_elem(void* darr);
@@ -211,16 +211,16 @@ size_t da_sizeof_elem(void* darr);
 
 ----
 
-### <a name="#misc-utilities"></a> Misc. Utilities
+### <a name="#misc-utilities_"></a> Misc. Utilities
 In addition to the functions/macros above the darray library ships with the following utilities:
 
-#### <a name="#da_swap"></a> da_swap
+#### <a name="#da_swap_"></a> da_swap
 Swap the values of the two specified elements of `darr`.
 ```C
 void da_swap(void* darr, size_t index_a, size_t index_b);
 ```
 
-#### <a name="#da_cat"></a> da_cat
+#### <a name="#da_cat_"></a> da_cat
 Append `nelem` array elements from `src` to the back of darray `dest` reallocating memory in `dest` if neccesary. `src` is preserved across the call. `src` may be a built in array or a darray.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_cat` returns `NULL`, reallocation failed and `darr` is left untouched.
@@ -232,7 +232,7 @@ Unlike `strcat` in libc, references to `dest` may be broken across a function ca
 dest = da_cat(dest, src);
 ```
 
-#### <a name="#da_fill"></a> da_fill
+#### <a name="#da_fill_"></a> da_fill
 Set every element of `darr` to `value`.
 ```C
 #define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value) \
@@ -244,9 +244,9 @@ da_fill(darr, int, 12+3);
 ```
 Due to the macro implementation of `da_fill` the type of `value` must be specified with `VALUE_TYPE` to ensure the same value is assigned to every element of the array. Without this, a call to `da_fill` written as `da_fill(darr, rand())` would assign a different number to every element.
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_fill`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_fill`.
 
-#### <a name="#da_foreach"></a> da_foreach
+#### <a name="#da_foreach_"></a> da_foreach
 Acts as a loop-block that forward iterates through all elements of a darray. In each iteration a variable with identifier `itername` will point to an element of the darray starting at its first element.
 ```C
 #define da_foreach(/* void* */darr, ELEM_TYPE, itername) \
@@ -265,9 +265,9 @@ da_foreach(darr, int, iter)
 }
 ```
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_foreach`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_foreach`.
 
-#### <a name="#da_foreachr"></a> da_foreachr
+#### <a name="#da_foreachr_"></a> da_foreachr
 Reverse for-each loop-block. `da_foreachr` is similar to `da_foreach` but uses reverse iteration (from the last element to the first) rather than forward iteration through the darray.
 ```C
 #define da_foreachr(/* void* */darr, ELEM_TYPE, itername) \
@@ -275,9 +275,9 @@ Reverse for-each loop-block. `da_foreachr` is similar to `da_foreach` but uses r
 ```
 Due to the macro implementation of `da_foreachr` the type of elements in the darray must be specified with `ELEM_TYPE` to ensure correct iterator assignment internal to `da_foreachr`.
 
-Note: see [a note about macros and contant expressions](#costexpr-note) below about required constant expression for `darr` in `da_foreachr`.
+Note: see [a note about macros and contant expressions](#costexpr-note_) below about required constant expression for `darr` in `da_foreachr`.
 
-#### <a name="#container-type"></a> container-style type
+#### <a name="#container-type_"></a> container-style type
 The container-style type provides a way to explicitly state that an array is a darray.
 ```C
 #define darray(type) type*
@@ -294,7 +294,7 @@ void my_func(int i, darray(foo) arr, char* str);
 
 ----
 
-### <a name="costexpr-note"></a> *A Note About Macros and Constant Expressions
+### <a name="costexpr-note_"></a> *A Note About Macros and Constant Expressions
 C lacks true generics, so the following "functions" in the darray library implemented as macros to allow psudo-container-generics and as a result suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter:
 
 + da_push
@@ -309,10 +309,10 @@ This double evaluation is unavoidable without either requiring the user to speci
 
 For those who prefer explicit reminders that they are using macros with double evaluation ALL CAPITAL versons of each macro are defined. For example `da_push` and `DA_PUSH` will expand to the same macro.
 
-## <a name="#tests"></a> Building Unit/Performance Tests
+## <a name="#tests_"></a> Building Unit/Performance Tests
 The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. All tests compile using gcc with default optimization.
 
 The `unit_tests` target requires the environment variable `EMU_ROOT` to be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU), the testing framework used for the darray library. The `perf_tests` target has no additional dependencies.
 
-## <a name="#license"></a> License
+## <a name="#license_"></a> License
 MIT
