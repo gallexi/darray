@@ -241,13 +241,15 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 
 /**@macro
  *
- * @brief Append darray `src` to the back of darray `dest` reallocating memory
- *  in `dest` if neccesary. `src` is preserved across the call.
+ * @brief Append nelem array elements from `src` to the back of darray `dest`
+ *  reallocating memory in `dest` if neccesary. `src` is preserved across the
+ *  call. `src` may be a built in array or a darray.
  *
- * @param dest : Darray that will have src appended to. Upon function
- *  completion, `dest` may or may not point to its previous block on the heap,
- *  potentially breaking references.
- * @param src : Darray to append to dest.
+ * @param dest : Darray that will be appended to. Upon function completion,
+ *  `dest` may or may not point to its previous block on the heap, potentially
+ *  breaking references.
+ * @param src : Array to append to dest.
+ * @param nelem : Number of elements from src to append to dest.
  *
  * @return pointer to `dest` after any reallocation in `da_cat`. Returns `NULL`
  *  if an error occured within `da_cat`, in which case `dest` will be left
@@ -257,7 +259,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  *  a function call to da_cat. The return value of `da_cat` should be used as
  *  truth for the location of dest after function completion.
  */
- static inline void* da_cat(void* dest, void* src);
+ static inline void* da_cat(void* dest, void* src, size_t nelem);
 
 /**@macro
  * @brief Set every element of `darr` to `value`.
@@ -558,19 +560,13 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b)
     );
 }
 
-static inline void* da_cat(void* dest, void* src)
+static inline void* da_cat(void* dest, void* src, size_t nelem)
 {
-    if (da_sizeof_elem(dest) != da_sizeof_elem(src))
-    {
-        return NULL;
-    }
     char* cpy_dest = (char*)dest + da_length(dest)*da_sizeof_elem(dest);
-    dest = da_resize(dest, da_length(dest)+da_length(src));
+    dest = da_resize(dest, da_length(dest)+nelem);
     if (dest == NULL)
-    {
         return NULL;
-    }
-    memcpy(cpy_dest, src, da_length(src)*da_sizeof_elem(src));
+    memcpy(cpy_dest, src, nelem*da_sizeof_elem(dest));
     return dest;
 }
 

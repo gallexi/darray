@@ -306,15 +306,6 @@ EMU_TEST(da_swap)
 
 EMU_TEST(da_cat)
 {
-    char* A = da_alloc(1, sizeof(char));
-    long* B = da_alloc(1, sizeof(long));
-    long* C = da_cat(B, A);
-    EMU_EXPECT_NULL(C);
-    EMU_EXPECT_NOT_NULL(A);
-    EMU_EXPECT_NOT_NULL(B);
-    da_free(A);
-    da_free(B);
-
     int* src = da_alloc(2, sizeof(int));
     int* dest = da_alloc(3, sizeof(int));
 
@@ -325,7 +316,7 @@ EMU_TEST(da_cat)
     src[0] = 3;
     src[1] = 4;
 
-    dest = da_cat(dest, src);
+    dest = da_cat(dest, src, 2);
     EMU_REQUIRE_NOT_NULL(dest);
     EMU_REQUIRE_NOT_NULL(src);
     for (size_t i = 0; i < 5; ++i)
