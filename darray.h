@@ -62,35 +62,35 @@ static inline void* da_alloc(size_t nelem, size_t size);
 static inline void da_free(void* darr);
 
 /**@function
- * @brief Returns the number of elements in the darray.
+ * @brief Returns the number of elements in a darray.
  *
  * @param darr : Target darray.
  *
- * @return Number of elements in the darray.
+ * @return Number of elements in the `darr`.
  */
 static inline size_t da_length(void* darr);
 
 /**@function
- * @brief Returns the maximum number of elements the darray can hold without
+ * @brief Returns the maximum number of elements a darray can hold without
  *  requiring resizing.
  *
  * @param darr : Target darray.
  *
- * @return Total number of allocated elements in the darray.
+ * @return Total number of allocated elements in `darr`.
  */
 static inline size_t da_capacity(void* darr);
 
 /**@function
- * @brief Returns the `sizeof` contained elements in the darray.
+ * @brief Returns the `sizeof` contained elements in a darray.
  *
  * @param darr : Target darray.
  *
- * @return `sizeof` elements in the darray.
+ * @return `sizeof` elements in `darr`.
  */
 static inline size_t da_sizeof_elem(void* darr);
 
 /**@function
- * @brief Change the length of the darray to `nelem`. Data in elements with
+ * @brief Change the length of a darray to `nelem`. Data in elements with
  *  indices >= `nelem` may be lost when downsizing.
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
@@ -107,7 +107,7 @@ static inline void* da_resize(void* darr, size_t nelem);
 
 /**@function
  * @brief Guarantee that at least `nelem` elements beyond the current length of
- *  the darray can be inserted/pushed without requiring resizing.
+ *  a darray can be inserted/pushed without requiring resizing.
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.
@@ -115,7 +115,7 @@ static inline void* da_resize(void* darr, size_t nelem);
  *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_reserve` returns `NULL`, reallocation failed and `darr`
- * is left untouched.
+ *  is left untouched.
  *
  * @note Does NOT affect the length attribute of the darray.
  */
@@ -124,7 +124,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Insert a value at the back of `darr`.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param value : Value to be pushed onto the back of the darray.
  *
  * @note Affects the length of the darray.
@@ -156,7 +156,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
 /**@macro
  * @brief Remove a value from the back of `darr` and return it.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  *
  * @return Value popped off of the back of the darray.
  *
@@ -172,7 +172,7 @@ static inline void* da_reserve(void* darr, size_t nelem);
  * @brief Insert a value into `darr` at the specified index, moving the values
  * beyond `index` back one element.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the darray.
  *
@@ -207,7 +207,7 @@ static inline void* da_sinsert(void* darr, size_t index, void* p_value);
  * @brief Remove the value at `index` from `darr` and return it, moving the
  * values beyond `index` forward one element.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param index : Array index of the value to be removed.
  *
  * @return Value removed from the darray.
@@ -264,7 +264,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 /**@macro
  * @brief Set every element of `darr` to `value`.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param VALUE_TYPE : Type of `value`.
  * @param value : Value to fill the array with.
  *
@@ -278,7 +278,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  *  elements of `darr`. In each iteration a variable with identifier `itername`
  *  will point to an element of `darr` starting at at its first element.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param ELEM_TYPE : Type of the elements of darr.
  * @param itername : Identifier for the iterator within the foreach block.
  */
@@ -290,7 +290,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  *  elements of `darr`. In each iteration a variable with identifier `itername`
  *  will point to an element of `darr` starting at its last element.
  *
- * @param darr : constexpr lvalue pointing to the target darray.
+ * @param darr : constexpr lvalue darray.
  * @param ELEM_TYPE : Type of the elements of darr.
  * @param itername : Identifier for the iterator within the foreachr block.
  */
@@ -298,7 +298,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
                                          _da_foreachr(darr, ELEM_TYPE, itername)
 
 /**@macro
- *  @brief Type of a darray that contains elements of `type`. This should be
+ * @brief Type of a darray that contains elements of `type`. This should be
  *  used for function parameters/return values that explicitly require a darray,
  *  or for segments of code where it must be stated that a darray is being used.
  *
@@ -597,4 +597,5 @@ for (ELEM_TYPE* itername = darr;                                               \
 for (ELEM_TYPE* itername = &(darr)[da_length(darr)-1];                         \
     itername >= (darr);                                                        \
     itername--)
+
 #endif // !_DARRAY_H_
