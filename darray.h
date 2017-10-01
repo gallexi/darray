@@ -319,23 +319,23 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
 static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
 static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
 static const size_t DA_CAPACITY_OFFSET = 2*sizeof(size_t);
-static const size_t DA_HANDLE_OFFSET = // 3 size_t plus any extra alignment
-(4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
-4*sizeof(size_t) : 3*alignof(max_align_t);
+static const size_t DA_HANDLE_OFFSET = \
+    (4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
+    4*sizeof(size_t) : 3*alignof(max_align_t);
 
 #define DA_HEAD_FROM_HANDLE(darr_h) \
-(((char*)(darr_h)) - DA_HANDLE_OFFSET)
+    (((char*)(darr_h)) - DA_HANDLE_OFFSET)
 #define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
-((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
 #define DA_P_LENGTH_FROM_HANDLE(darr_h) \
-((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
 #define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
-((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
+    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
 
 #define DA_CAPACITY_FACTOR 1.3
 #define DA_CAPACITY_MIN 10
-#define DA_NEW_CAPACITY_FROM_LENGTH(length) \
-(length < DA_CAPACITY_MIN ? DA_CAPACITY_MIN : (length*DA_CAPACITY_FACTOR))
+#define DA_NEW_CAPACITY_FROM_LENGTH(length) ((length) < DA_CAPACITY_MIN ? \
+    DA_CAPACITY_MIN : ((length)*DA_CAPACITY_FACTOR))
 
 #ifndef DA_MALLOC
 #   define DA_MALLOC malloc
@@ -366,7 +366,7 @@ static inline int _da_remove_mem_mov(void* darr, size_t target_index)
     size_t length = da_length(darr);
     size_t elsz = da_sizeof_elem(darr);
 
-    // Try and use a temporary bit of memory for storage.
+    // Try and use a temporary amount of memory for storage.
     void* tmp = DA_MALLOC(elsz);
     // If the memory is avaliable then run the fast version of the algorithm
     // using memcpy and memmove.
@@ -410,9 +410,7 @@ static inline void* da_alloc(size_t nelem, size_t size)
     size_t capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
     void* mem = DA_MALLOC(capacity*size + DA_HANDLE_OFFSET);
     if (mem == NULL)
-    {
         return mem;
-    }
     (*(size_t*)((char*)mem + DA_SIZEOF_ELEM_OFFSET)) = size;
     (*(size_t*)((char*)mem + DA_LENGTH_OFFSET))      = nelem;
     (*(size_t*)((char*)mem + DA_CAPACITY_OFFSET))    = capacity;
@@ -445,9 +443,7 @@ static inline void* da_resize(void* darr, size_t nelem)
     size_t new_arr_size = new_capacity*da_sizeof_elem(darr)+DA_HANDLE_OFFSET;
     void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
-    {
         return NULL;
-    }
     darr = ptr;
     *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
     *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
@@ -459,16 +455,12 @@ static inline void* da_reserve(void* darr, size_t nelem)
     size_t curr_capacity = da_capacity(darr);
     size_t min_capacity = da_length(darr) + nelem;
     if (curr_capacity >= min_capacity)
-    {
         return darr;
-    }
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
     void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr),
         new_capacity*da_sizeof_elem(darr) + DA_HANDLE_OFFSET);
     if (ptr == NULL)
-    {
         return NULL;
-    }
     *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
     return (char*)ptr + DA_HANDLE_OFFSET;
 }
