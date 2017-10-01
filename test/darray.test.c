@@ -323,21 +323,21 @@ EMU_TEST(da_swap)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_cat)
+EMU_TEST(da_cat__darray_cat)
 {
     int* src = da_alloc(2, sizeof(int));
-    int* dest = da_alloc(3, sizeof(int));
+    src[0] = 3;
+    src[1] = 4;
 
+    int* dest = da_alloc(3, sizeof(int));
     dest[0] = 0;
     dest[1] = 1;
     dest[2] = 2;
 
-    src[0] = 3;
-    src[1] = 4;
-
     dest = da_cat(dest, src, 2);
     EMU_REQUIRE_NOT_NULL(dest);
     EMU_REQUIRE_NOT_NULL(src);
+    EMU_EXPECT_EQ_UINT(da_length(dest), 5);
     for (size_t i = 0; i < 5; ++i)
     {
         EMU_EXPECT_EQ_INT(dest[i], i);
@@ -345,7 +345,64 @@ EMU_TEST(da_cat)
 
     da_free(src);
     da_free(dest);
-    EMU_END_TEST(); 
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_cat__array_cat)
+{
+    int src[] = {3, 4};
+
+    int* dest = da_alloc(3, sizeof(int));
+    dest[0] = 0;
+    dest[1] = 1;
+    dest[2] = 2;
+
+    dest = da_cat(dest, src, 2);
+    EMU_REQUIRE_NOT_NULL(dest);
+    EMU_REQUIRE_NOT_NULL(src);
+    EMU_EXPECT_EQ_UINT(da_length(dest), 5);
+    for (size_t i = 0; i < 5; ++i)
+    {
+        EMU_EXPECT_EQ_INT(dest[i], i);
+    }
+
+    da_free(dest);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_cat__cstring_cat)
+{
+    char* src = "World!";
+
+    char* dest = da_alloc(strlen("Hello "), sizeof(char));
+    memcpy(dest, "Hello ", strlen("Hello "));
+
+    dest = da_cat(dest, src, strlen(src)+1);
+    EMU_PRINT_INDENT(); printf("%s\n", dest);
+    EMU_EXPECT_STREQ(dest, "Hello World!");
+    EMU_EXPECT_EQ_UINT(da_length(dest), strlen("Hello World!")+1);
+
+    #pragma GCC diagnostic push
+    #pragma GCC diagnostic ignored "-Wunused-value"
+    da_pop(dest); // remove null terminator
+    #pragma GCC diagnostic pop
+
+    char another[] = " Another one!";
+    dest = da_cat(dest, another, strlen(another)+1);
+    EMU_PRINT_INDENT(); printf("%s\n", dest);
+    EMU_EXPECT_STREQ(dest, "Hello World! Another one!");
+    EMU_EXPECT_EQ_UINT(da_length(dest), strlen("Hello World! Another one!")+1);
+
+    da_free(dest);
+    EMU_END_TEST();
+}
+
+EMU_GROUP(da_cat)
+{
+    EMU_ADD(da_cat__darray_cat);
+    EMU_ADD(da_cat__array_cat);
+    EMU_ADD(da_cat__cstring_cat);
+    EMU_END_GROUP();
 }
 
 EMU_TEST(da_fill)
@@ -500,6 +557,7 @@ EMU_TEST(cstrings)
     char* da = da_alloc(strlen("some string")+1, 1);
     memcpy(da, "some string", da_length(da));
     EMU_PRINT_INDENT(); printf("%s\n", da);
+    da_free(da);
     EMU_END_TEST();
 }
 

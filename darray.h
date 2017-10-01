@@ -561,11 +561,11 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b)
 
 static inline void* da_cat(void* dest, void* src, size_t nelem)
 {
-    char* cpy_dest = (char*)dest + da_length(dest)*da_sizeof_elem(dest);
+    size_t offset = da_length(dest)*da_sizeof_elem(dest);
     dest = da_resize(dest, da_length(dest)+nelem);
     if (dest == NULL)
         return NULL;
-    memcpy(cpy_dest, src, nelem*da_sizeof_elem(dest));
+    memcpy(dest+offset, src, nelem*da_sizeof_elem(dest));
     return dest;
 }
 
