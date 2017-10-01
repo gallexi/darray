@@ -27,7 +27,7 @@
         + [da_fill](#da_fill)
         + [da_foreach](#da_foreach)
         + [da_foreachr](#da_foreachr)
-        + [container-style type](#container_type)
+        + [container-style type](#container-style-type)
 3. [*A Note About Macros and Constant Expressions](#constexpr-note_)
 4. [Building Unit/Performance Tests](#building-unitperformance-tests)
 5. [License](#license)
