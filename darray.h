@@ -248,7 +248,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  * @param dest : Darray that will be appended to. Upon function completion,
  *  `dest` may or may not point to its previous block on the heap, potentially
  *  breaking references.
- * @param src : Array to append to dest.
+ * @param src : Start of elements to append to dest.
  * @param nelem : Number of elements from src to append to dest.
  *
  * @return Pointer to the new location of the darray upon successful function
@@ -256,8 +256,8 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  *  is left untouched.
  *
  * @note Unlike `strcat` in libc, references to `dest` may be broken across
- *  a function call to da_cat. The return value of `da_cat` should be used as
- *  truth for the location of dest after function completion.
+ *  a function call to `da_cat`. The return value of `da_cat` should be used as
+ *  truth for the location of `dest` after function completion.
  */
  static inline void* da_cat(void* dest, void* src, size_t nelem);
 
