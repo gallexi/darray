@@ -39,9 +39,10 @@
  *
  * HEADER DATA
  * ===========
- *  size_t : sizeof contained element
- *  size_t : length of the darray
- *  size_t : capacity of the darray
+ *  + size_t : sizeof contained element
+ *  + size_t : length of the darray
+ *  + size_t : capacity of the darray
+ *  + any extra padding to align the header with max_align_t
  */
 
 /**@function
@@ -330,7 +331,7 @@ static inline void da_swap(void* darr, size_t index_a, size_t index_b);
  *  used for function parameters/return values that explicitly require a darray,
  *  or for segments of code where it must be stated that a darray is being used.
  *
- *  @param type : Type of the contained element.
+ * @param type : Type of the contained element.
  */
 #define darray(type) type*
 
