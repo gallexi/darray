@@ -5,10 +5,10 @@
 #include <time.h>
 #include "../darray.h"
 
-#define INITIAL_NUM_ELEMS 10
+#define INITIAL_NUM_ELEMS 5
 #define RESIZE_NUM_ELEMS 100
 
-EMU_TEST(alloc_and_free_functions)
+EMU_TEST(da_alloc__and__da_free)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
     EMU_REQUIRE_NOT_NULL(da);
@@ -19,6 +19,29 @@ EMU_TEST(alloc_and_free_functions)
 
     da_free(da);
     EMU_END_TEST();
+}
+
+EMU_TEST(da_alloc_exact__and__da_free)
+{
+    int* da = da_alloc_exact(INITIAL_NUM_ELEMS, sizeof(int));
+    EMU_REQUIRE_NOT_NULL(da);
+    for (size_t i = 0; i < INITIAL_NUM_ELEMS; ++i) // writiable without crashing
+    {
+        da[i] = i;
+    }
+    EMU_EXPECT_EQ_UINT(da_length(da), INITIAL_NUM_ELEMS);
+    EMU_EXPECT_EQ_UINT(da_capacity(da), INITIAL_NUM_ELEMS);
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+
+EMU_GROUP(alloc_and_free_functions)
+{
+    EMU_ADD(da_alloc__and__da_free);
+    EMU_ADD(da_alloc_exact__and__da_free);
+    EMU_END_GROUP();
 }
 
 EMU_TEST(da_length)
@@ -73,6 +96,28 @@ EMU_TEST(da_resize)
     da = da_resize(da, RESIZE_NUM_ELEMS);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), RESIZE_NUM_ELEMS);
+    EMU_EXPECT_GE_UINT(da_capacity(da), RESIZE_NUM_ELEMS);
+    for (size_t i = 0; i < INITIAL_NUM_ELEMS; ++i)
+    {
+        EMU_EXPECT_EQ_INT(da[i], (int)i);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_resize_exact)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+    for (size_t i = 0; i < INITIAL_NUM_ELEMS; ++i)
+    {
+        da[i] = i;
+    }
+
+    da = da_resize_exact(da, RESIZE_NUM_ELEMS);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_EXPECT_EQ_UINT(da_length(da), RESIZE_NUM_ELEMS);
+    EMU_EXPECT_EQ_UINT(da_capacity(da), RESIZE_NUM_ELEMS);
     for (size_t i = 0; i < INITIAL_NUM_ELEMS; ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], (int)i);
@@ -508,6 +553,7 @@ EMU_GROUP(darray_functions)
     EMU_ADD(da_capacity);
     EMU_ADD(da_sizeof_elem);
     EMU_ADD(da_resize);
+    EMU_ADD(da_resize_exact);
     EMU_ADD(da_reserve);
     EMU_ADD(da_push);
     EMU_ADD(da_spush);

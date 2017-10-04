@@ -5,9 +5,11 @@
 2. [API](#api)
     + [Creation and Deletion](#creation-and-deletion)
         + [da_alloc](#da_alloc)
+        + [da_alloc_exact](#da_alloc_exact)
         + [da_free](#da_free)
     + [Resizing](#resizing)
         + [da_resize](#da_resize)
+        + [da_resize_exact](#da_resize_exact)
         + [da_reserve](#da_reserve)
     + [Insertion](#insertion)
         + [da_insert](#da_insert)
@@ -75,6 +77,15 @@ foo* my_stack = da_alloc(0, sizeof(foo));
 ```
 can be used to declare an empty array-based stack of `foo`.
 
+#### da_alloc_exact
+Allocate a darray of `nelem` elements each of size `size`. The capacity of the darray will be be exactly `nelem`.
+
+Returns a pointer to a new darray.
+```C
+void* da_alloc_exact(size_t nelem, size_t size);
+```
+This version of `da_alloc` is useful for fixed-size arrays and/or environments with tight memory constraints.
+
 #### da_free
 Free a darray.
 ```C
@@ -85,9 +96,9 @@ Due to the fact that the handle to a darray is not actually the start of the dar
 ----
 
 ### Resizing
-If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize` or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
+If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize`, `da_resize_exact`,or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` and `da_resize_exact` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
-Pointers returned by `da_alloc` and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether reallocation was required or not. **Always** assume pointer invalidation.
+Pointers returned by `da_resize`, `da_resize_exact`, and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether memory reallocation was required or not. **Always** assume pointer invalidation.
 
 #### da_resize
 Change the length of a darray to `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
@@ -100,6 +111,17 @@ void* da_resize(void* darr, size_t nelem);
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_resize(my_arr, 25); // new length of 25
 ```
+
+#### da_resize_exact
+Change the length of a darray to `nelem`. The new capacity of the darray will be be exactly `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
+
+Pointer to the new location of the darray upon successful function completion. If `da_resize_exact` returns `NULL`, reallocation failed and `darr` is left untouched.
+
+```C
+void* da_resize_exact(void* darr, size_t nelem);
+```
+
+This version of `da_resize` is useful for fixed-size arrays and/or environments with tight memory constraints.
 
 #### da_reserve
 Guarantee that at least `nelem` elements beyond the current length of a darray can be inserted/pushed without requiring memory reallocation.

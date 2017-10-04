@@ -55,6 +55,17 @@
 static inline void* da_alloc(size_t nelem, size_t size);
 
 /**@function
+ * @brief Allocate a darray of `nelem` elements each of size `size`. The
+ *  capacity of the darray will be be exactly `nelem`.
+ *
+ * @param nelem : Initial number of elements in the darray.
+ * @param size : `sizeof` each element.
+ *
+ * @return Pointer to a new darray.
+ */
+static inline void* da_alloc_exact(size_t nelem, size_t size);
+
+/**@function
  * @brief Free a darray.
  *
  * @param darr : Target darray to be freed.
@@ -104,6 +115,23 @@ static inline size_t da_sizeof_elem(void* darr);
  * @note Affects the length attribute of the darray.
  */
 static inline void* da_resize(void* darr, size_t nelem);
+
+/**@function
+ * @brief Change the length of a darray to `nelem`. The new capacity of the
+ *  darray will be be exactly `nelem`. Data in elements with indices >=
+ *  `nelem` may be lost when downsizing.
+ *
+ * @param darr : Target darray. Upon function completion, `darr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
+ * @param nelem : New length/capacity of the darray.
+ *
+ * @return Pointer to the new location of the darray upon successful function
+ *  completion. If `da_resize_exact` returns `NULL`, reallocation failed and
+ *  `darr` is left untouched.
+ *
+ * @note Affects the length attribute of the darray.
+ */
+static inline void* da_resize_exact(void* darr, size_t nelem);
 
 /**@function
  * @brief Guarantee that at least `nelem` elements beyond the current length of
@@ -417,6 +445,17 @@ static inline void* da_alloc(size_t nelem, size_t size)
     return (char*)mem + DA_HANDLE_OFFSET;
 }
 
+static inline void* da_alloc_exact(size_t nelem, size_t size)
+{
+    void* mem = DA_MALLOC(nelem*size + DA_HANDLE_OFFSET);
+    if (mem == NULL)
+        return mem;
+    (*(size_t*)((char*)mem + DA_SIZEOF_ELEM_OFFSET)) = size;
+    (*(size_t*)((char*)mem + DA_LENGTH_OFFSET))      = nelem;
+    (*(size_t*)((char*)mem + DA_CAPACITY_OFFSET))    = nelem;
+    return (char*)mem + DA_HANDLE_OFFSET;
+}
+
 static inline void da_free(void* darr)
 {
     free(DA_HEAD_FROM_HANDLE(darr));
@@ -444,9 +483,19 @@ static inline void* da_resize(void* darr, size_t nelem)
     void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    darr = ptr;
-    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
     *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
+    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
+    return (char*)ptr + DA_HANDLE_OFFSET;
+}
+
+static inline void* da_resize_exact(void* darr, size_t nelem)
+{
+    size_t new_arr_size = nelem*da_sizeof_elem(darr)+DA_HANDLE_OFFSET;
+    void* ptr = DA_REALLOC(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
+    if (ptr == NULL)
+        return NULL;
+    *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
+    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = nelem;
     return (char*)ptr + DA_HANDLE_OFFSET;
 }
 
