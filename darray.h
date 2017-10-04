@@ -72,7 +72,7 @@ static inline size_t da_length(void* darr);
 
 /**@function
  * @brief Returns the maximum number of elements a darray can hold without
- *  requiring resizing.
+ *  requiring memory reallocation.
  *
  * @param darr : Target darray.
  *
@@ -107,7 +107,7 @@ static inline void* da_resize(void* darr, size_t nelem);
 
 /**@function
  * @brief Guarantee that at least `nelem` elements beyond the current length of
- *  a darray can be inserted/pushed without requiring resizing.
+ *  a darray can be inserted/pushed without requiring memory reallocation.
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap, potentially breaking references.

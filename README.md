@@ -102,13 +102,12 @@ my_arr = da_resize(my_arr, 25); // new length of 25
 ```
 
 #### da_reserve
-Guarantee that at least `nelem` elements beyond the current length of a darray can be inserted/pushed without requiring resizing.
+Guarantee that at least `nelem` elements beyond the current length of a darray can be inserted/pushed without requiring memory reallocation.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_reserve` returns `NULL`, allocation failed and `darr` is left untouched.
 ```C
 void* da_reserve(void* darr, size_t nelem);
 ```
-Reserving space in a darray will reallocate memory as necessary such that the darray can hold an additional `nelem` elements after insertion, altering a darray's capacity, but not its length.
 ```C
 foo* my_arr = da_alloc(15, sizeof(foo)); // initial length of 15
 my_arr = da_reserve(my_arr, 50);
@@ -119,9 +118,9 @@ my_arr = da_reserve(my_arr, 50);
 ----
 
 ### Insertion
-There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into the darray and increment the darray's length. Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance/convenience reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
+There are two main insertion functions `da_insert` and `da_push`, implemented as macros, both of which will insert a value into a darray and increment the darray's length. Both macros may reassign memory behind the scenes, but unlike other functions in the library, assignment back to `darr` is automatic (for performance/convenience reasons). Again, always assume pointer invalidation (i.e. be weary of multiple references to the same darray).
 
-Unlike the rest of the library if reallocation fails during insertion, a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a `std::vector` without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
+Unlike the rest of the library if reallocation fails during insertion with `da_insert` or `da_push` a `NULL` pointer might get dereferenced and your program could blow up. That sounds pretty bad, but as it turns out in practice this almost never happens, so the library optimizes for it. In C++, pushing/inserting into a `std::vector` without catching a `std::bad_alloc` exception is more or less the same as these "unsafe" insertion macros. It is so rare for allocation to fail on modern systems that it's almost never worth thinking about.
 
 Of course there are times when memory allocation can and will fail, and users **need** a way to guard against it. Both macros have separate implimentations as functions that sacrifice speed/convenience for memory/double-macro-evaluation safety.
 
@@ -163,7 +162,7 @@ void* da_spush(void* darr, void* p_value);
 ----
 
 ### Removal
-Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the darray.
+Removing values from a darray is a much more straightforward process, because the library will never perform reallocation when removing a value. Two functions (again implemented as macros) `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the provided darray.
 
 #### da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
@@ -199,7 +198,7 @@ size_t da_length(void* darr);
 ```
 
 #### da_capacity
-Returns the maximum number of elements `darr` can hold without requiring resizing.
+Returns the maximum number of elements `darr` can hold without requiring memory reallocation.
 ```C
 size_t da_capacity(void* darr);
 ```
@@ -228,9 +227,16 @@ Returns a pointer to the new location of the darray upon successful function com
 ```C
 void* da_cat(void* dest, void* src, size_t nelem)
 ```
-Unlike `strcat` and `strncat` in libc, references to `dest` may be broken across a function call to da_cat. The return value of `da_cat` should be used as truth for the location of dest after function completion.
+Unlike `strcat` and `strncat` in libc, references to `dest` may be broken across a function call to `da_cat`. The return value of `da_cat` should be used as truth for the location of `dest` after function completion.
 ```C
-dest = da_cat(dest, src);
+// cat darray src to the back of darray dest
+dest = da_cat(dest, src, da_length(src));
+```
+
+An easy way to create a darray from a built-in array is to cat the built-in array onto a zero-length darray.
+```C
+foo* my_darr = da_alloc(0, sizeof(foo));
+my_darr = da_cat(my_darr, foo_array, length_of_foo_array);
 ```
 
 #### da_fill
@@ -260,7 +266,7 @@ int* darr = da_alloc(num_elems, sizeof(int));
 // ...
 // then...
 // add one to each element in darr
-da_foreach(darr, int, iter)
+da_foreach(darr, int, iter) // reads "for each int *iter in darr"
 {
     *iter += 1;
 }
@@ -290,7 +296,7 @@ This method of typing is especially useful in function declarations and sparsely
 // darray(foo) can be used instead of foo* to let a user know that darray
 // operations will be used on arr somewhere in my_func, so if a normal foo*
 // is passed in the program will crash
-void my_func(int i, darray(foo) arr, char* str);
+void some_func(int i, darray(foo) arr, char* str);
 ```
 
 ----
@@ -298,7 +304,7 @@ void my_func(int i, darray(foo) arr, char* str);
 <a name="constexpr-note_"> </a>
 
 ### *A Note About Macros and Constant Expressions
-C lacks true generics, so the following "functions" in the darray library implemented as macros to allow psudo-container-generics and as a result suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter:
+C lacks true generics, so the following "functions" in the darray library implemented as macros to allow psudo-container-generics. As a result these macros suffer from [double evaluation](https://dustri.org/b/min-and-max-macro-considered-harmful.html) of their `darr` parameter:
 
 + da_push
 + da_pop
@@ -308,7 +314,7 @@ C lacks true generics, so the following "functions" in the darray library implem
 + da_foreach
 + da_foreachr
 
-This double evaluation is unavoidable without either requiring the user to specify a darray's element type in every macro or using the non-portable [typeof](https://gcc.gnu.org/onlinedocs/gcc/Typeof.html) specifier. For convenience to the user and portability across compilers neither of these options have been chosen for the darray library. Instead the user is **required** to use a [constant expression](http://northstar-www.dartmouth.edu/doc/ibmcxx/en_US/doc/language/concepts/cuexpcon.htm) (not necessarily a const variable) for the `darr` parameter in darray macro functions knowing that it may be double evaluated. This is the overwhelmingly common case and is not a problem 99% of the time, but the user should be aware of it for that 1% when some clever bit of code could potentially cause a bug.
+This double evaluation is unavoidable without either requiring the user to specify a darray's element type in every macro or using the non-portable [typeof](https://gcc.gnu.org/onlinedocs/gcc/Typeof.html) specifier. For convenience to the user and portability across compilers neither of these options have been chosen for the darray library. Instead the user is **required** to use a [constant expression](http://northstar-www.dartmouth.edu/doc/ibmcxx/en_US/doc/language/concepts/cuexpcon.htm) (not necessarily a const variable) for the `darr` parameter in darray macro functions knowing that it may be double evaluated. This is the overwhelmingly common case and is not a problem most of the time, but the user should be aware of it for the case where some clever bit of code may potentially cause a bug.
 
 For those who prefer explicit reminders that they are using macros with double evaluation ALL CAPITAL versons of each macro are defined. For example `da_push` and `DA_PUSH` will expand to the same macro.
 
