@@ -1,9 +1,7 @@
 /build
+/.vscode
 *.exe
 *.out
+*.o
 *.obj
 *.a
-
-/.vscode
-unit_tests
-perf_tests

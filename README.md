@@ -2,7 +2,8 @@
 
 ## Table of contents
 1. [Introduction](#introduction) 
-2. [API](#api)
+2. [Building](#building)
+3. [API](#api)
     + [Creation and Deletion](#creation-and-deletion)
         + [da_alloc](#da_alloc)
         + [da_alloc_exact](#da_alloc_exact)
@@ -30,8 +31,7 @@
         + [da_foreach](#da_foreach)
         + [da_foreachr](#da_foreachr)
         + [container-style type](#container-style-type)
-3. [*A Note About Macros and Constant Expressions](#constexpr-note_)
-4. [Building Unit/Performance Tests](#building-unitperformance-tests)
+4. [*A Note About Macros and Constant Expressions](#constexpr-note_)
 5. [License](#license)
 
 ## Introduction
@@ -51,6 +51,15 @@ Because a handle to the darray is a pointer directly to the array data segment, 
 foo* my_arr = da_alloc(10, sizeof(foo));
 foo some_element = my_arr[4]; // works as expected
 ```
+
+## Building
+The `makefile` included with the darray library contains four targets. All targets (except install) output to the `build` directory.
+
++ `make build` - Build the darray static library.
++ `make install` - Install the darray header and lib files locally.
++ `make unit_tests` - Build unit tests for the darray library. The environment variable `EMU_ROOT` must be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU) (the testing framework used for the darray library) for this target to build.
++ `make perf_tests` - Build performance tests comparing the darray library against both built-in arrays and `std::vector` all at `-O3` optimization.
+
 ## API
 
 ### Creation and Deletion
@@ -340,10 +349,5 @@ This double evaluation is unavoidable without either requiring the user to speci
 
 For those who prefer explicit reminders that they are using macros with double evaluation ALL CAPITAL versons of each macro are defined. For example `da_push` and `DA_PUSH` will expand to the same macro.
 
-## Building Unit/Performance Tests
-The `makefile` included with the darray library contains two targets `unit_tests` and `perf_tests` that will build executables for the library's unit tests and performance tests respectively. All tests compile using gcc with default optimization.
-
-The `unit_tests` target requires the environment variable `EMU_ROOT` to be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU), the testing framework used for the darray library. The `perf_tests` target has no additional dependencies.
-
 ## License
-MIT
+MIT (contributers welcomed)
