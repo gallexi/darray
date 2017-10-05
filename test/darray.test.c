@@ -1,4 +1,4 @@
-#if __linux__
+#if __unix__
 #   define _EMU_ENABLE_COLOR_
 #endif
 #include <EMUtest.h>
