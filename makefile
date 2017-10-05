@@ -16,7 +16,7 @@ DARRAY_LIB_OUT=lib$(DARRAY_LIB).a
 all: build
 
 build: clean
-	mkdir -p $(BUILD_DIR)
+	mkdir -p $(BUILD_DIR) --mode=755
 	gcc -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c -O3
 	ar rcs $(BUILD_DIR)$(DARRAY_LIB_OUT) $(BUILD_DIR)$(DARRAY_OBJ)
 
