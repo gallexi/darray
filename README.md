@@ -53,6 +53,7 @@ The `makefile` included with the darray library contains four targets. All targe
 
 + `make build` - Build the darray static library.
 + `make install` - Install the darray header and lib files locally (will likely require elevated permissions).
+    + After installing, the library can be used by including the darray header with `#include <darray.h>` and linking to the darray library with `-ldarray`
 + `make unit_tests` - Build unit tests for the darray library. The environment variable `EMU_ROOT` must be set to the root directory of [EMU](https://github.com/VictorSCushman/EMU) (the testing framework used for the darray library) for this target to build.
 + `make perf_tests` - Build performance tests comparing the darray library against both built-in arrays and `std::vector` all at `-O3` optimization.
 
