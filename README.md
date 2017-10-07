@@ -33,7 +33,7 @@
 ## Introduction
 This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
 
-Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element type is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
 +--------+--------+- ------+-----+-----------------+
 | header | arr[0] | arr[1] | ... | arr[capacity-1] |
@@ -49,7 +49,7 @@ foo some_element = my_arr[4]; // works as expected
 ```
 
 ## Building
-The `makefile` included with the darray library contains four targets. All targets (except install) output to the `build` directory.
+The `makefile` included with the darray library contains four targets. All targets output to the `build` directory.
 
 + `make build` - Build the darray static library.
 + `make install` - Install the darray header and lib files locally (will likely require elevated permissions).
@@ -59,7 +59,7 @@ The `makefile` included with the darray library contains four targets. All targe
 
 ## API
 
-Note: The type `ELEM_TYPE` used throughout the API documentation referes towhatever the `typeof` the contained element is for a particular darray.
+Note: The type `ELEM_TYPE` used throughout the API documentation referes to the `typeof` contained elements for a particular darray (i.e. `ELEM_TYPE` is `int` for an `int*` darray.
 
 ### Creation and Deletion
 
@@ -73,17 +73,17 @@ void* da_alloc(size_t nelem, size_t size);
 The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element. Elements of a darray initially contain garbage values.
 
 ```C
-// Allocate a darray on the heap with an initial length of 15.
+// Allocate a darray of foo on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
 ```
-
-Be aware that the `size` parameter is stored internally by the darray and is used throughout the library for pointer math. If the `size` parameter doesn't match the `sizeof` the contained element many darray functions will have undefined behavior.
 
 Unlike `calloc`, `da_alloc` can be called with `nelem` equal to `0`. You will simply be left with a darray of zero elements. The function call
 ```C
 foo* my_stack = da_alloc(0, sizeof(foo));
 ```
 can be used to declare an empty array-based stack of `foo`.
+
+Be aware that the `size` parameter is stored internally by the darray and is used throughout the library for pointer math. If the `size` parameter doesn't match the `sizeof` contained elements many darray functions will have undefined behavior.
 
 #### da_alloc_exact
 Allocate a darray of `nelem` elements each of size `size`. The capacity of the darray will be be exactly `nelem`.
@@ -106,7 +106,7 @@ Due to the fact that the handle to a darray is not actually the start of the dar
 ### Resizing
 If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize`, `da_resize_exact`,or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` and `da_resize_exact` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
-Pointers returned by `da_resize`, `da_resize_exact`, and `da_reserve` may or may not point to the same location in memory as before function execution, depending on whether memory reallocation was required or not. **Always** assume pointer invalidation.
+Pointers returned by `da_resize`, `da_resize_exact`, and `da_reserve` for the location of the darray after resizing may or may not point to the same location in memory as before function execution depending on whether memory reallocation was required or not. **Always** assume pointer invalidation.
 
 #### da_resize
 Change the length of a darray to `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
@@ -123,7 +123,7 @@ my_arr = da_resize(my_arr, 25); // new length of 25
 #### da_resize_exact
 Change the length of a darray to `nelem`. The new capacity of the darray will be be exactly `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
 
-Pointer to the new location of the darray upon successful function completion. If `da_resize_exact` returns `NULL`, reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_resize_exact` returns `NULL`, reallocation failed and `darr` is left untouched.
 
 ```C
 void* da_resize_exact(void* darr, size_t nelem);
@@ -157,7 +157,7 @@ Returns `true` on success, `false` on failure. If `da_insert` returns `false`, r
 #define /* bool */da_insert(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
-Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to darr may be invalidated.
+Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
 
 #### da_push
 Insert a value at the back of `darr`. Assignment back to the provided `darr` lvalue parameter is automatic.
@@ -167,7 +167,7 @@ Returns `true` on success, `false` on failure. If `da_insert` returns `false`, r
 #define /* bool */da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
-Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to darr may be invalidated.
+Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
 
 ----
 
@@ -268,7 +268,7 @@ int* darr = da_alloc(num_elems, sizeof(int));
 // ...
 // then...
 // add one to each element in darr
-da_foreach(darr, iter) // reads "for each *iter in darr"
+da_foreach(darr, iter)
 {
     *iter += 1;
 }
@@ -284,8 +284,7 @@ Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like ho
 This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
 ```C
 // darray(foo) can be used instead of foo* to let a user know that darray
-// operations will be used on arr somewhere in my_func, so if a normal foo*
-// is passed in the program will crash
+// operations will be used on arr in some_func.
 void some_func(int i, darray(foo) arr, char* str);
 ```
 

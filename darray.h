@@ -161,7 +161,8 @@ void* da_reserve(void* darr, size_t nelem);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap. Assignment back to the provided
- *  `darr` lvalue is automatic, but other references to darr may be invalidated.
+ *  `darr` lvalue is automatic, but other references to `darr` may be
+ *  invalidated.
  * @param value : Value to be pushed onto the back of the darray.
  *
  * @return `true` on success, `false` on failure. If `da_push` returns `false`,
@@ -193,7 +194,8 @@ void* da_reserve(void* darr, size_t nelem);
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap. Assignment back to the provided
- *  `darr` lvalue is automatic, but other references to darr may be invalidated.
+ *  `darr` lvalue is automatic, but other references to `darr` may be
+ *  invalidated.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the darray.
  *
