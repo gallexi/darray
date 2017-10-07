@@ -26,6 +26,7 @@
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdlib.h>
+#include <stdbool.h>
 #include <string.h>
 
 #ifdef __cplusplus
@@ -155,92 +156,61 @@ void* da_resize_exact(void* darr, size_t nelem);
 void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
- * @brief Insert a value at the back of `darr`.
- *
- * @param darr : constexpr lvalue darray.
- * @param value : Value to be pushed onto the back of the darray.
- *
- * @note Affects the length of the darray.
- * @note This macro implimentation is the fast version of `da_spush`. Unlike the
- *  rest of the API, failed allocations from resizing with `da_push` may
- *  cause your program to blow up as reallocs are always reassigned back to
- *  `darr`. With this version of push, the user sacrifices safety for speed.
- * @note `darr` may be evaluated multiple times.
- */
-#define /* void */da_push(/* void* */darr, /* ELEM_TYPE */value)               \
-                                                           _da_push(darr, value)
-
-/**@function
- * @brief Push a value to the back of `darr`. This is the safe version of
- *  `da_push`.
+ * @brief Insert a value at the back of `darr`. Assignment back to the provided 
+ *  `darr` lvalue parameter is automatic.
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
- *  point to its previous block on the heap, potentially breaking references.
- * @param p_value : Pointer to the value to be pushed onto the back of the
- *  darray.
+ *  point to its previous block on the heap. Assignment back to the provided
+ *  `darr` lvalue is automatic, but other references to darr may be invalidated.
+ * @param value : Value to be pushed onto the back of the darray.
  *
- * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_spush` returns `NULL`, reallocation failed and `darr` is
- *  left untouched.
+ * @return `true` on success, `false` on failure. If `da_push` returns `false`,
+ *  reallocation failed and `darr` is left untouched.
+ *
  * @note Affects the length of the darray.
  */
-void* da_spush(void* darr, void* p_value);
+#define /* bool */da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)          \
+                                                           _da_push(darr, value)
 
 /**@macro
  * @brief Remove a value from the back of `darr` and return it.
  *
- * @param darr : constexpr lvalue darray.
+ * @param darr : Target darray.
  *
  * @return Value popped off of the back of the darray.
  *
  * @note Affects the length of the darray.
  * @note `da_pop` will never reallocate memory, so popping is always
  *  allocation-safe.
- * @note `darr` may be evaluated multiple times.
  */
-#define /* ELEM_TYPE */da_pop(/* void* */darr)                                 \
+#define /* ELEM_TYPE */da_pop(/* ELEM_TYPE* */darr)                            \
                                                                    _da_pop(darr)
 
 /**@macro
  * @brief Insert a value into `darr` at the specified index, moving the values
- * beyond `index` back one element.
+ *  beyond `index` back one element. Assignment back to the provided `darr`
+ *  lvalue parameter is automatic.
  *
- * @param darr : constexpr lvalue darray.
+ * @param darr : Target darray. Upon function completion, `darr` may or may not
+ *  point to its previous block on the heap. Assignment back to the provided
+ *  `darr` lvalue is automatic, but other references to darr may be invalidated.
  * @param index : Array index where the new value will appear.
  * @param value : Value to be inserted onto the darray.
  *
+ * @return `true` on success, `false` on failure. If `da_insert` returns
+ * `false`, reallocation failed and `darr` is left untouched.
+ *
  * @note Affects the length of the darray.
- * @note This macro implimentation is the fast version of `da_sinsert`. Unlike
- *  the rest of the API, failed allocations from resizing with `da_insert` may
- *  cause your program to blow up as reallocs are always reassigned back to
- *  `darr`. With this version of insert, the user sacrifices safety for
- *  speed.
- * @note `darr` may be evaluated multiple times.
  */
-#define /* void */da_insert(/* void* */darr, /* size_t */index,                \
+#define /* bool */da_insert(/* ELEM_TYPE* */darr, /* size_t */index,          \
     /* ELEM_TYPE */value)                                                      \
                                                   _da_insert(darr, index, value)
 
- /**@function
- * @brief Insert a value into `darr` at the specified index, moving the values
- * beyond `index` back one element. This is the safe version of `da_insert`.
- *
- * @param darr : Target darray. Upon function completion, `darr` may or may not
- *  point to its previous block on the heap, potentially breaking references.
- * @param p_value : Pointer to the value to be inserted into the darray.
- *
- * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_sinsert` returns `NULL`, reallocation failed and `darr`
- *  is left untouched.
- * @note Affects the length of the darray.
- */
-void* da_sinsert(void* darr, size_t index, void* p_value);
-
 /**@macro
  * @brief Remove the value at `index` from `darr` and return it, moving the
- * values beyond `index` forward one element.
+ *  values beyond `index` forward one element.
  *
- * @param darr : constexpr lvalue darray.
+ * @param darr : Target darray.
  * @param index : Array index of the value to be removed.
  *
  * @return Value removed from the darray.
@@ -248,9 +218,8 @@ void* da_sinsert(void* darr, size_t index, void* p_value);
  * @note Affects the length of the darray.
  * @note `da_remove` will never reallocate memory, so removing is always
  *  allocation-safe.
- * @note `darr` may be evaluated multiple times.
  */
-#define /* ELEM_TYPE */da_remove(/* void* */darr, /* size_t */index)           \
+#define /* ELEM_TYPE */da_remove(/* ELEM_TYPE* */darr, /* size_t */index)      \
                                                          _da_remove(darr, index)
 
 /**@function
@@ -273,7 +242,6 @@ void* da_sinsert(void* darr, size_t index, void* p_value);
 void da_swap(void* darr, size_t index_a, size_t index_b);
 
 /**@macro
- *
  * @brief Append `nelem` array elements from `src` to the back of darray `dest`
  *  reallocating memory in `dest` if neccesary. `src` is preserved across the
  *  call. `src` may be a built-in array or a darray.
@@ -282,7 +250,7 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
  *  `dest` may or may not point to its previous block on the heap, potentially
  *  breaking references.
  * @param src : Start of elements to append to dest.
- * @param nelem : Number of elements from src to append to dest.
+ * @param nelem : Number of elements from `src` to append to `dest`.
  *
  * @return Pointer to the new location of the darray upon successful function
  *  completion. If `da_cat` returns `NULL`, reallocation failed and `darr`
@@ -297,38 +265,22 @@ void* da_cat(void* dest, void* src, size_t nelem);
 /**@macro
  * @brief Set every element of `darr` to `value`.
  *
- * @param darr : constexpr lvalue darray.
- * @param VALUE_TYPE : Type of `value`.
+ * @param darr : Target darray.
  * @param value : Value to fill the array with.
- *
- * @note `darr` may be evaluated multiple times.
  */
-#define /* void */da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value)  \
-                                               _da_fill(darr, VALUE_TYPE, value)
+#define /* void */da_fill(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)          \
+                                                           _da_fill(darr, value)
 
 /**@macro
  * @brief `da_foreach` acts as a loop-block that forward iterates through all
  *  elements of `darr`. In each iteration a variable with identifier `itername`
  *  will point to an element of `darr` starting at at its first element.
  *
- * @param darr : constexpr lvalue darray.
- * @param ELEM_TYPE : Type of the elements of darr.
+ * @param darr : Target darray.
  * @param itername : Identifier for the iterator within the foreach block.
  */
-#define da_foreach(/* void* */darr, ELEM_TYPE, itername)                       \
-                                          _da_foreach(darr, ELEM_TYPE, itername)
-
-/**@macro
- * @brief `da_foreachr` acts as a loop-block that reverse iterates through all
- *  elements of `darr`. In each iteration a variable with identifier `itername`
- *  will point to an element of `darr` starting at its last element.
- *
- * @param darr : constexpr lvalue darray.
- * @param ELEM_TYPE : Type of the elements of darr.
- * @param itername : Identifier for the iterator within the foreachr block.
- */
-#define da_foreachr(/* void* */darr, ELEM_TYPE, itername)                      \
-                                         _da_foreachr(darr, ELEM_TYPE, itername)
+#define da_foreach(/* ELEM_TYPE* */darr, itername)                             \
+                                                     _da_foreach(darr, itername)
 
 /**@macro
  * @brief Type of a darray that contains elements of `type`. This should be
@@ -338,15 +290,6 @@ void* da_cat(void* dest, void* src, size_t nelem);
  * @param type : Type of the contained element.
  */
 #define darray(type) type*
-
-// UPPER CASE versions of macro "functions"
-#define DA_PUSH     da_push
-#define DA_POP      da_pop
-#define DA_INSERT   da_insert
-#define DA_REMOVE   da_remove
-#define DA_FILL     da_fill
-#define DA_FOREACH  da_foreach
-#define DA_FOREACHR da_foreachr
 
 /////////////////////////////////// INTERNAL ///////////////////////////////////
 static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
@@ -370,76 +313,125 @@ static const size_t DA_HANDLE_OFFSET = \
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) ((length) < DA_CAPACITY_MIN ? \
     DA_CAPACITY_MIN : ((length)*DA_CAPACITY_FACTOR))
 
-int _da_remove_mem_mov(void* darr, size_t target_index);
+// The following macros use GNU C and are only avaliable for compatible vendors.
+#if defined(__GNUC__) || defined(__clang__) // GNU C compilers
 
-#define /* void */_da_push(/* void* */darr, /* ELEM_TYPE */value)              \
-do                                                                             \
-{                                                                              \
-    size_t* __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                           \
-    if (*__p_len == *DA_P_CAPACITY_FROM_HANDLE(darr))                          \
+#ifdef __cplusplus
+#   define DA_AUTO_TYPE auto
+#else
+#   define DA_AUTO_TYPE __auto_type
+#endif // !__cplusplus
+
+#define /* bool */_da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
+({                                                                             \
+    bool _rtn_val = true;                                                      \
+    DA_AUTO_TYPE _p_darr = &darr;                                              \
+    DA_AUTO_TYPE _value = value;                                               \
+    if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr) ==                                  \
+        *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
     {                                                                          \
-        (darr) = da_resize((darr), *__p_len);                                  \
-        __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                              \
+        void* _tmp = (__typeof__(*_p_darr))da_reserve(*_p_darr, 1);            \
+        if (_tmp)                                                              \
+        {                                                                      \
+            *_p_darr = (__typeof__(*_p_darr))_tmp;                             \
+            (*_p_darr)[(*DA_P_LENGTH_FROM_HANDLE(*_p_darr))++] = _value;       \
+        }                                                                      \
+        else /* allocation failure */                                          \
+        {                                                                      \
+            _rtn_val = false;                                                  \
+        }                                                                      \
     }                                                                          \
-    (darr)[(*__p_len)++] = (value);                                            \
-}while(0)
+    else                                                                       \
+    {                                                                          \
+        (*_p_darr)[(*DA_P_LENGTH_FROM_HANDLE(*_p_darr))++] = _value;           \
+    }                                                                          \
+    /* return */_rtn_val;                                                      \
+})
 
-#define /* ELEM_TYPE */_da_pop(/* void* */darr)                                \
-(                                                                              \
-    (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
-)
+#define /* ELEM_TYPE */_da_pop(/* ELEM_TYPE* */darr)                           \
+({                                                                             \
+    DA_AUTO_TYPE _darr = darr;                                                 \
+    /* return */(_darr)[--(*DA_P_LENGTH_FROM_HANDLE(_darr))];                  \
+})
 
-#define /* void */_da_insert(/* void* */darr, /* size_t */index,               \
+#define _da_move_and_insert(p_darr, index, value)                              \
+memmove(                                                                       \
+    (*p_darr)+index+1,                                                         \
+    (*p_darr)+index,                                                           \
+    (*DA_P_SIZEOF_ELEM_FROM_HANDLE(*p_darr)) *                                 \
+        ((*DA_P_LENGTH_FROM_HANDLE(*p_darr))-index)                            \
+);                                                                             \
+(*p_darr)[index] = value;                                                      \
+(*DA_P_LENGTH_FROM_HANDLE(*p_darr))++;                                         \
+
+#define /* bool */_da_insert(/* ELEM_TYPE* */darr, /* size_t */index,          \
     /* ELEM_TYPE */value)                                                      \
-do                                                                             \
-{                                                                              \
-    size_t* __p_len  = DA_P_LENGTH_FROM_HANDLE(darr);                          \
-    size_t __index = (index);                                                  \
-    if ((*__p_len) == (*DA_P_CAPACITY_FROM_HANDLE(darr)))                      \
+({                                                                             \
+    bool _rtn_val = true;                                                      \
+    DA_AUTO_TYPE _p_darr = &darr;                                              \
+    DA_AUTO_TYPE _value = value;                                               \
+    size_t _index = index;                                                     \
+    if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr) ==                                  \
+        *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
     {                                                                          \
-        (darr) = da_resize((darr), *__p_len);                                  \
-        __p_len = DA_P_LENGTH_FROM_HANDLE(darr);                               \
+        void* _tmp = (__typeof__(*_p_darr))da_reserve(*_p_darr, 1);            \
+        if (_tmp)                                                              \
+        {                                                                      \
+            *_p_darr = (__typeof__(*_p_darr))_tmp;                             \
+            _da_move_and_insert(_p_darr, _index, _value);                      \
+        }                                                                      \
+        else /* allocation failure */                                          \
+        {                                                                      \
+            _rtn_val = false;                                                  \
+        }                                                                      \
     }                                                                          \
+    else                                                                       \
+    {                                                                          \
+        _da_move_and_insert(_p_darr, _index, _value);                          \
+    }                                                                          \
+    /* return */_rtn_val;                                                      \
+})
+
+#define /* ELEM_TYPE */_da_remove(/* ELEM_TYPE* */darr, /* size_t */index)     \
+({                                                                             \
+    DA_AUTO_TYPE _darr = darr;                                                 \
+    size_t _index = index;                                                     \
+    DA_AUTO_TYPE _rtn_val = _darr[_index];                                     \
     memmove(                                                                   \
-        (darr)+(__index)+1,                                                    \
-        (darr)+(__index),                                                      \
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*((*__p_len)-(__index))           \
+        _darr+_index,                                                          \
+        _darr+_index+1,                                                        \
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(_darr)) *                               \
+            ((*DA_P_LENGTH_FROM_HANDLE(_darr))-_index-1)                       \
     );                                                                         \
-    (darr)[__index] = (value);                                                 \
-    (*__p_len)++;                                                              \
-}while(0)
+    (*DA_P_LENGTH_FROM_HANDLE(_darr))--;                                       \
+    /* return */_rtn_val;                                                      \
+})
 
-#define /* ELEM_TYPE */_da_remove(/* void* */darr, /* size_t */index)          \
-(                                                                              \
-    (/* "then" paren(s) */                                                     \
-    /* move element to be removed to the back of the array */                  \
-    _da_remove_mem_mov(darr, index)                                            \
-    ), /* then */                                                              \
-    /* return darr[--length] (i.e the removed element) */                      \
-    (darr)[--(*DA_P_LENGTH_FROM_HANDLE(darr))]                                 \
-)
-
-#define /* void */_da_fill(/* void* */darr, VALUE_TYPE, /* VALUE_TYPE */value) \
+#define /* void */_da_fill(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
 do                                                                             \
 {                                                                              \
-    size_t __len = *DA_P_LENGTH_FROM_HANDLE(darr);                             \
-    VALUE_TYPE __value = (value);                                              \
-    for (size_t __i = 0; __i < __len; ++__i)                                   \
+    DA_AUTO_TYPE _darr = darr;                                                 \
+    DA_AUTO_TYPE _value = value;                                               \
+    size_t _len = *DA_P_LENGTH_FROM_HANDLE(_darr);                             \
+    for (size_t _indx = 0; _indx < _len; ++_indx)                              \
     {                                                                          \
-        (darr)[__i] = (__value);                                               \
+        _darr[_indx] = _value;                                                 \
     }                                                                          \
 }while(0)
 
-#define _da_foreach(/* void* */darr, ELEM_TYPE, itername)                      \
-for (ELEM_TYPE* itername = darr;                                               \
-    itername < (darr) + da_length(darr);                                       \
-    itername++)
+static __thread void* __attribute__ ((unused)) _da_local_stop;
+static __thread bool  __attribute__ ((unused)) _da_first_iteration;
 
-#define _da_foreachr(/* void* */darr, ELEM_TYPE, itername)                     \
-for (ELEM_TYPE* itername = &(darr)[da_length(darr)-1];                         \
-    itername >= (darr);                                                        \
-    itername--)
+#define _da_foreach(/* ELEM_TYPE* */darr, itername)                            \
+_da_first_iteration = true;                                                    \
+for (DA_AUTO_TYPE itername = darr;                                             \
+    ({                                                                         \
+        if (_da_first_iteration) _da_local_stop = itername+da_length(itername);\
+        _da_first_iteration = false;                                           \
+    }), (char*)itername < (char*)_da_local_stop;                               \
+    ++itername)
 
+#endif // !GNU C compilers
 #ifdef __cplusplus
 } // !extern "C"
 #endif // !__cplusplus

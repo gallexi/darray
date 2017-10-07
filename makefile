@@ -1,7 +1,7 @@
 CC=gcc
 CFLAGS=-Wall -Wextra -std=c11
 CPPC=g++
-CPPFLAGS=-g -w -fpermissive -std=c++11
+CPPFLAGS=-Wall -Wextra -std=c++11
 
 BUILD_DIR=build/
 TEST_DIR=test/
@@ -13,11 +13,11 @@ DARRAY_OBJ=darray.o
 DARRAY_LIB=darray
 DARRAY_LIB_OUT=lib$(DARRAY_LIB).a
 
-all: build
+all: build unit_tests perf_tests
 
 build: clean
 	mkdir -p $(BUILD_DIR) --mode=755
-	gcc -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c -O3
+	gcc $(CFLAGS) -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c -O3
 	ar rcs $(BUILD_DIR)$(DARRAY_LIB_OUT) $(BUILD_DIR)$(DARRAY_OBJ)
 
 install: build

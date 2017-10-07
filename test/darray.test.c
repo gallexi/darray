@@ -2,7 +2,6 @@
 #   define _EMU_ENABLE_COLOR_
 #endif
 #include <EMUtest.h>
-#include <time.h>
 #include "../darray.h"
 
 #define INITIAL_NUM_ELEMS 5
@@ -152,29 +151,9 @@ EMU_TEST(da_push)
 
     for (int i = 0; i <= max_index; ++i)
     {
-        da_push(da, i);
+        EMU_EXPECT_TRUE(da_push(da, i));
     }
     EMU_REQUIRE_NOT_NULL(da);
-    EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
-    for (int i = 0; i <= max_index; ++i)
-    {
-        EMU_EXPECT_EQ_INT(da[i], i);
-    }
-
-    da_free(da);
-    EMU_END_TEST();
-}
-
-EMU_TEST(da_spush)
-{
-    const int max_index = 15;
-    int* da = da_alloc(0, sizeof(int));
-
-    for (int i = 0; i <= max_index; ++i)
-    {
-        da = da_spush(da, &i);
-        EMU_REQUIRE_NOT_NULL(da);
-    }
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
     for (int i = 0; i <= max_index; ++i)
     {
@@ -209,14 +188,14 @@ EMU_TEST(da_insert__basic)
     da[0] = 3;
     da[1] = 5;
 
-    da_insert(da, 0, 7);
+    EMU_EXPECT_TRUE(da_insert(da, 0, 7));
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 3);
     EMU_EXPECT_EQ_INT(da[0], 7);
     EMU_EXPECT_EQ_INT(da[1], 3);
     EMU_EXPECT_EQ_INT(da[2], 5);
 
-    da_insert(da, 1, 9);
+    EMU_EXPECT_TRUE(da_insert(da, 1, 9));
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), 4);
     EMU_EXPECT_EQ_INT(da[0], 7);
@@ -235,7 +214,7 @@ EMU_TEST(da_insert__mimic_push_front)
 
     for (int i = max_index; i >= 0; --i)
     {
-        da_insert(da, 0, i);
+        EMU_EXPECT_TRUE(da_insert(da, 0, i));
         EMU_REQUIRE_NOT_NULL(da);
     }
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
@@ -252,60 +231,6 @@ EMU_GROUP(da_insert)
 {
     EMU_ADD(da_insert__basic);
     EMU_ADD(da_insert__mimic_push_front);
-    EMU_END_GROUP();
-}
-
-EMU_TEST(da_sinsert__basic)
-{
-    int* da = da_alloc(2, sizeof(int));
-    da[0] = 3;
-    da[1] = 5;
-
-    int val = 7;
-    da = da_sinsert(da, 0, &val);
-    EMU_REQUIRE_NOT_NULL(da);
-    EMU_EXPECT_EQ_UINT(da_length(da), 3);
-    EMU_EXPECT_EQ_INT(da[0], 7);
-    EMU_EXPECT_EQ_INT(da[1], 3);
-    EMU_EXPECT_EQ_INT(da[2], 5);
-
-    val = 9;
-    da = da_sinsert(da, 1, &val);
-    EMU_REQUIRE_NOT_NULL(da);
-    EMU_EXPECT_EQ_UINT(da_length(da), 4);
-    EMU_EXPECT_EQ_INT(da[0], 7);
-    EMU_EXPECT_EQ_INT(da[1], 9);
-    EMU_EXPECT_EQ_INT(da[2], 3);
-    EMU_EXPECT_EQ_INT(da[3], 5);
-
-    da_free(da);
-    EMU_END_TEST();
-}
-
-EMU_TEST(da_sinsert__mimic_push_front)
-{
-    const int max_index = 15;
-    int* da = da_alloc(0, sizeof(int));
-
-    for (int i = max_index; i >= 0; --i)
-    {
-        da_sinsert(da, 0, &i);
-        EMU_REQUIRE_NOT_NULL(da);
-    }
-    EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
-    for (int i = max_index; i >= 0; --i)
-    {
-        EMU_EXPECT_EQ_INT(da[i], i);
-    }
-
-    da_free(da);
-    EMU_END_TEST();
-}
-
-EMU_GROUP(da_sinsert)
-{
-    EMU_ADD(da_sinsert__basic);
-    EMU_ADD(da_sinsert__mimic_push_front);
     EMU_END_GROUP();
 }
 
@@ -459,13 +384,13 @@ EMU_TEST(da_fill)
         da[i] = i;
     }
 
-    da_fill(da, int, 12 + 3);
+    da_fill(da, 12 + 3);
     for (size_t i = 0; i < da_length(da); ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], 15);
     }
 
-    da_fill(da, int, rand());
+    da_fill(da, rand());
     for (size_t i = 1; i < da_length(da); ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], da[i-1]);
@@ -481,7 +406,7 @@ EMU_TEST(da_foreach)
 
     // test general iteration through all elements
     for (size_t i = 0; i < da_length(da); ++i){da[i] = i;}
-    da_foreach(da, int, iter)
+    da_foreach(da, iter)
     {
         *iter += 1;
     }
@@ -492,7 +417,7 @@ EMU_TEST(da_foreach)
 
     // test forward iteration
     for (size_t i = 0; i < da_length(da); ++i){da[i] = 0;}
-    da_foreach(da, int, iter)
+    da_foreach(da, iter)
     {
         if (iter != da)
             *iter = *(iter-1) + 1;
@@ -506,41 +431,10 @@ EMU_TEST(da_foreach)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_foreachr)
-{
-    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
-
-    // test general iteration through all elements
-    for (size_t i = 0; i < da_length(da); ++i){da[i] = i;}
-    da_foreachr(da, int, iter)
-    {
-        *iter += 1;
-    }
-    for (size_t i = 0; i < da_length(da); ++i)
-    {
-        EMU_EXPECT_EQ_INT(da[i], i + 1);
-    }
-
-    // test reverse iteration
-    for (size_t i = 0; i < da_length(da); ++i){da[i] = 0;}
-    da_foreachr(da, int, iter)
-    {
-        if (iter != da + da_length(da))
-            *iter = *(iter+1) + 1;
-    }
-    for (int i = da_length(da)-1; i >= 0; --i)
-    {
-        EMU_EXPECT_EQ_INT(da[i], da[i+1] + 1);
-    }
-
-    da_free(da);
-    EMU_END_TEST();
-}
-
 EMU_TEST(container_style_type)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
-    darray(int) da2 = da; // check for no comiler warnings
+    darray(int) da2 = da; // check for no compiler warnings
 
     da_free(da2);
     EMU_END_TEST();
@@ -556,16 +450,13 @@ EMU_GROUP(darray_functions)
     EMU_ADD(da_resize_exact);
     EMU_ADD(da_reserve);
     EMU_ADD(da_push);
-    EMU_ADD(da_spush);
     EMU_ADD(da_pop);
     EMU_ADD(da_insert);
-    EMU_ADD(da_sinsert);
     EMU_ADD(da_remove);
     EMU_ADD(da_swap);
     EMU_ADD(da_cat);
     EMU_ADD(da_fill);
     EMU_ADD(da_foreach);
-    EMU_ADD(da_foreachr);
     EMU_ADD(container_style_type);
     EMU_END_GROUP();
 }
