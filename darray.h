@@ -118,7 +118,7 @@ size_t da_sizeof_elem(void* darr);
  *  completion. If `da_resize` returns `NULL`, reallocation failed and `darr` is
  *  left untouched.
  *
- * @note Affects the length attribute of the darray.
+ * @note Affects the length of the darray.
  */
 void* da_resize(void* darr, size_t nelem);
 
@@ -135,7 +135,7 @@ void* da_resize(void* darr, size_t nelem);
  *  completion. If `da_resize_exact` returns `NULL`, reallocation failed and
  *  `darr` is left untouched.
  *
- * @note Affects the length attribute of the darray.
+ * @note Affects the length of the darray.
  */
 void* da_resize_exact(void* darr, size_t nelem);
 
@@ -151,7 +151,7 @@ void* da_resize_exact(void* darr, size_t nelem);
  *  completion. If `da_reserve` returns `NULL`, reallocation failed and `darr`
  *  is left untouched.
  *
- * @note Does NOT affect the length attribute of the darray.
+ * @note Does NOT affect the length of the darray.
  */
 void* da_reserve(void* darr, size_t nelem);
 
