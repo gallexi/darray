@@ -307,11 +307,7 @@ struct _darray
 // The following macros use GNU C and are only avaliable for compatible vendors.
 #if defined(__GNUC__) || defined(__clang__) // GNU C compilers
 
-#ifdef __cplusplus
-#   define DA_AUTO_TYPE auto
-#else
-#   define DA_AUTO_TYPE __auto_type
-#endif // !__cplusplus
+#define DA_AUTO_TYPE __auto_type
 
 #define /* bool */_da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
 ({                                                                             \
