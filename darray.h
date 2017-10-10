@@ -29,10 +29,6 @@
 #include <stdbool.h>
 #include <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif // !__cplusplus
-
 /* DARRAY MEMORY LAYOUT
  * ====================
  * +--------+---------+---------+-----+------------------+
@@ -292,7 +288,7 @@ struct _darray
     size_t elemsz;
     size_t length;
     size_t capacity;
-    char data[];
+    alignas(alignof(max_align_t)) char data[];
 };
 
 #define DA_CAPACITY_FACTOR 1.3
@@ -434,7 +430,4 @@ for (DA_AUTO_TYPE itername = darr;                                             \
     ++itername)
 
 #endif // !GNU C compilers
-#ifdef __cplusplus
-} // !extern "C"
-#endif // !__cplusplus
 #endif // !_DARRAY_H_
