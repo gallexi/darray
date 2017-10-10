@@ -205,7 +205,7 @@ void* da_reserve(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  */
-#define /* bool */da_insert(/* ELEM_TYPE* */darr, /* size_t */index,          \
+#define /* bool */da_insert(/* ELEM_TYPE* */darr, /* size_t */index,           \
     /* ELEM_TYPE */value)                                                      \
                                                   _da_insert(darr, index, value)
 
@@ -414,16 +414,23 @@ do                                                                             \
     }                                                                          \
 }while(0)
 
-static __thread void* __attribute__ ((unused)) _da_local_stop;
-static __thread bool  __attribute__ ((unused)) _da_first_iteration;
+#define DA_MERGE_IDENTIFIER_HELPER(a, b) a##b
+#define DA_MERGE_IDENTIFIER(a, b) DA_MERGE_IDENTIFIER_HELPER(a, b)
 
 #define _da_foreach(/* ELEM_TYPE* */darr, itername)                            \
-_da_first_iteration = true;                                                    \
+bool __attribute__ ((unused))                                         \
+    DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__) = true;                 \
+void* __attribute__ ((unused))                                        \
+    DA_MERGE_IDENTIFIER(_da_stop, __LINE__);                                   \
 for (DA_AUTO_TYPE itername = darr;                                             \
     ({                                                                         \
-        if (_da_first_iteration) _da_local_stop = itername+da_length(itername);\
-        _da_first_iteration = false;                                           \
-    }), (char*)itername < (char*)_da_local_stop;                               \
+        if (DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__))                \
+        {                                                                      \
+            DA_MERGE_IDENTIFIER(_da_stop, __LINE__) =                          \
+                itername + da_length(itername);                                \
+            DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__) = false;        \
+        }                                                                      \
+    }), (char*)itername < (char*)DA_MERGE_IDENTIFIER(_da_stop, __LINE__);      \
     ++itername)
 
 #endif // !GNU C compilers

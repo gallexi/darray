@@ -154,6 +154,7 @@ EMU_TEST(da_push)
     }
     EMU_REQUIRE_NOT_NULL(da);
     EMU_EXPECT_EQ_UINT(da_length(da), max_index+1);
+    EMU_EXPECT_GE_UINT(da_capacity(da),da_length(da));
     for (int i = 0; i <= max_index; ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], i);
@@ -374,10 +375,11 @@ EMU_GROUP(da_cat)
     EMU_END_GROUP();
 }
 
-EMU_TEST(da_fill)
+EMU_TEST(da_fill__const_value)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
 
+    // fill with different values
     for (size_t i = 0; i < da_length(da); ++i)
     {
         da[i] = i;
@@ -387,6 +389,20 @@ EMU_TEST(da_fill)
     for (size_t i = 0; i < da_length(da); ++i)
     {
         EMU_EXPECT_EQ_INT(da[i], 15);
+    }
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_fill__rand_value)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    // fill with different values
+    for (size_t i = 0; i < da_length(da); ++i)
+    {
+        da[i] = i;
     }
 
     da_fill(da, rand());
@@ -399,11 +415,17 @@ EMU_TEST(da_fill)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_foreach)
+EMU_GROUP(da_fill)
+{
+    EMU_ADD(da_fill__const_value);
+    EMU_ADD(da_fill__rand_value);
+    EMU_END_GROUP();
+}
+
+EMU_TEST(da_foreach__iterates_through_all_elements)
 {
     int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
 
-    // test general iteration through all elements
     for (size_t i = 0; i < da_length(da); ++i){da[i] = i;}
     da_foreach(da, iter)
     {
@@ -414,7 +436,14 @@ EMU_TEST(da_foreach)
         EMU_EXPECT_EQ_INT(da[i], i + 1);
     }
 
-    // test forward iteration
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_foreach__iterates_forward)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
     for (size_t i = 0; i < da_length(da); ++i){da[i] = 0;}
     da_foreach(da, iter)
     {
@@ -428,6 +457,56 @@ EMU_TEST(da_foreach)
 
     da_free(da);
     EMU_END_TEST();
+}
+
+EMU_TEST(da_foreach__iterates_once_per_element)
+{
+    int* da = da_alloc(INITIAL_NUM_ELEMS, sizeof(int));
+
+    unsigned counter = 0;
+    da_foreach(da, iter)
+    {
+        counter += 1;
+    }
+    EMU_EXPECT_EQ_UINT(counter, INITIAL_NUM_ELEMS);
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_foreach__nested_darrays)
+{
+    int** nested = da_alloc_exact(INITIAL_NUM_ELEMS, sizeof(int*));
+    da_foreach(nested, iter)
+    {
+        *iter = da_alloc(INITIAL_NUM_ELEMS, sizeof(int*));
+    }
+
+    unsigned counter = 0;
+    da_foreach(nested, row)
+    {
+        da_foreach(*row, col)
+        {
+            counter += 1;
+        }
+    }
+    EMU_EXPECT_EQ_UINT(counter, INITIAL_NUM_ELEMS*INITIAL_NUM_ELEMS);
+
+    da_foreach(nested, iter)
+    {
+        da_free(*iter);
+    }
+    da_free(nested);
+    EMU_END_TEST();
+}
+
+EMU_GROUP(da_foreach)
+{
+    EMU_ADD(da_foreach__iterates_through_all_elements);
+    EMU_ADD(da_foreach__iterates_forward);
+    EMU_ADD(da_foreach__iterates_once_per_element);
+    EMU_ADD(da_foreach__nested_darrays);
+    EMU_END_GROUP();
 }
 
 EMU_TEST(container_style_type)
