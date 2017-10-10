@@ -36,19 +36,20 @@ extern "C" {
 /* DARRAY MEMORY LAYOUT
  * ====================
  * +--------+--------+- ------+-----+-----------------+
- * | header | arr[0] | arr[1] | ... | arr[capacity-1] |
+ * | header | data[0] | data[1] | ... | data[capacity-1] |
  * +--------+--------+--------+-----+-----------------+
  *          ^
  *          Handle to the darray points to the first
  *          element of the array.
- *
- * HEADER DATA
- * ===========
- *  + size_t : sizeof contained element
- *  + size_t : length of the darray
- *  + size_t : capacity of the darray
- *  + any extra padding to align the header with max_align_t
  */
+
+struct _darray
+{
+    size_t elemsz;
+    size_t length;
+    size_t capacity;
+    char data[];
+};
 
 /**@function
  * @brief Allocate a darray of `nelem` elements each of size `size`.
@@ -294,26 +295,18 @@ void* da_cat(void* dest, void* src, size_t nelem);
 #define darray(type) type*
 
 /////////////////////////////////// INTERNAL ///////////////////////////////////
-static const size_t DA_SIZEOF_ELEM_OFFSET  = 0;
-static const size_t DA_LENGTH_OFFSET   = 1*sizeof(size_t);
-static const size_t DA_CAPACITY_OFFSET = 2*sizeof(size_t);
-static const size_t DA_HANDLE_OFFSET = \
-    (4*sizeof(size_t)) % alignof(max_align_t) == 0 ? \
-    4*sizeof(size_t) : 3*alignof(max_align_t);
-
-#define DA_HEAD_FROM_HANDLE(darr_h) \
-    (((char*)(darr_h)) - DA_HANDLE_OFFSET)
-#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_SIZEOF_ELEM_OFFSET))
-#define DA_P_LENGTH_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_LENGTH_OFFSET))
-#define DA_P_CAPACITY_FROM_HANDLE(darr_h) \
-    ((size_t*)(DA_HEAD_FROM_HANDLE(darr_h) + DA_CAPACITY_OFFSET))
-
 #define DA_CAPACITY_FACTOR 1.3
 #define DA_CAPACITY_MIN 10
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) ((length) < DA_CAPACITY_MIN ? \
     DA_CAPACITY_MIN : ((length)*DA_CAPACITY_FACTOR))
+
+#define DA_P_HEAD_FROM_HANDLE(darr_h) (((char*)darr_h)-sizeof(struct _darray))
+#define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) ((size_t*) \
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, elemsz)))
+#define DA_P_LENGTH_FROM_HANDLE(darr_h) ((size_t*) \
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, length)))
+#define DA_P_CAPACITY_FROM_HANDLE(darr_h) ((size_t*) \
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, capacity)))
 
 // The following macros use GNU C and are only avaliable for compatible vendors.
 #if defined(__GNUC__) || defined(__clang__) // GNU C compilers

@@ -13,11 +13,13 @@ DARRAY_OBJ=darray.o
 DARRAY_LIB=darray
 DARRAY_LIB_OUT=lib$(DARRAY_LIB).a
 
+OPTIMIZATION_LEVEL=-O3
+
 all: build unit_tests perf_tests
 
 build: clean
 	mkdir -p $(BUILD_DIR) --mode=755
-	gcc $(CFLAGS) -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c -O3
+	gcc $(CFLAGS) -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c $(OPTIMIZATION_LEVEL)
 	ar rcs $(BUILD_DIR)$(DARRAY_LIB_OUT) $(BUILD_DIR)$(DARRAY_OBJ)
 
 install: build
@@ -28,7 +30,8 @@ unit_tests: build
 	$(CC) $(CFLAGS) -o $(BUILD_DIR)unit_tests $(TEST_DIR)darray.test.c -L$(BUILD_DIR) -I${EMU_ROOT} -l$(DARRAY_LIB)
 
 perf_tests: build
-	$(CPPC) $(CPPFLAGS) -o $(BUILD_DIR)perf_tests $(TEST_DIR)perf.test.cpp  -L$(BUILD_DIR) -l$(DARRAY_LIB) -O3
+	$(CC) $(CFLAGS) -o $(BUILD_DIR)perf_tests_darr $(TEST_DIR)perf_tests/perf.test.c -L$(BUILD_DIR) -l$(DARRAY_LIB) $(OPTIMIZATION_LEVEL)
+	$(CPPC) $(CPPFLAGS) -o $(BUILD_DIR)perf_tests_vector $(TEST_DIR)perf_tests/perf.test.cpp $(OPTIMIZATION_LEVEL)
 
 clean:
 	@rm -rf $(BUILD_DIR)

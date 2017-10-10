@@ -1,26 +1,6 @@
-#include "../darray.h"
-#include <stdio.h>
-#include <time.h>
+#include "perf.test.h"
 #include <vector>
 #include <algorithm>
-
-#define CARR      "built in array         : "
-#define DARR      "darray                 : "
-#define DARR_FE   "darray (foreach)       : "
-#define VECTOR    "std::vector            : "
-#define VECTOR_RF "std::vector (range-for): "
-#define RESULTS_MAY_VARY "*results may vary significantly from run to run"
-#define SMALL_SIZE 100
-#define MED_SIZE   100000
-#define LARGE_SIZE 100000000
-
-void fill_pre_sized(void);
-void fill_push_back(void);
-void insert_front(void);
-void insert_rand(void);
-void remove_front(void);
-void remove_rand(void);
-void swap_rand(void);
 
 int main(void)
 {
@@ -36,70 +16,11 @@ int main(void)
     swap_rand();
 }
 
-long clock_to_msec(clock_t c)
-{
-    return (((double)c) * 1000) / CLOCKS_PER_SEC;
-}
-
-void print_elapsed_time(clock_t begin, clock_t end)
-{
-    clock_t c = end-begin;
-    printf("%ld clocks | %ld msec\n", c, clock_to_msec(c));
-}
-
-void print_numelem(size_t n)
-{
-    printf("vvv %zu ELEMENTS vvv\n", n);
-}
-
-void print_swaps(size_t n)
-{
-    printf("vvv %zu SWAPS vvv\n", n);
-}
-
 // FILL ////////////////////////////////////////////////////////////////////////
 void fill_pre_sized_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* arr;
-    int* darr;
     std::vector<int> vec;
-
     print_numelem(max_sz);
-
-    printf(CARR);
-    arr = (int*)malloc(max_sz*sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        arr[i] = rand();
-    }
-    end = clock();
-    free(arr);
-    print_elapsed_time(begin, end);
-
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        darr[i] = rand();
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
-
-    printf(DARR_FE);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
-    begin = clock();
-    da_foreach(darr, iter)
-    {
-        *iter = rand();
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(max_sz);
@@ -133,42 +54,8 @@ void fill_pre_sized(void)
 // PUSH BACK ///////////////////////////////////////////////////////////////////
 void fill_push_back_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* arr;
-    int* darr;
     std::vector<int> vec;
-    size_t curr_len;
-    const int init_elem = 1;
     print_numelem(max_sz);
-
-    printf(CARR);
-    curr_len = init_elem;
-    arr = (int*)malloc(init_elem*sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        if (i == curr_len)
-        {
-            curr_len = DA_NEW_CAPACITY_FROM_LENGTH(curr_len);
-            arr = (int*)realloc(arr, curr_len*sizeof(int));
-        }
-        arr[i] = rand();
-    }
-    end = clock();
-    free(arr);
-    print_elapsed_time(begin, end);
-
-    printf(DARR);
-    darr = (int*)da_alloc(init_elem, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        da_push(darr, rand());
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(init_elem);
@@ -192,24 +79,8 @@ void fill_push_back(void)
 // INSERT FRONT ////////////////////////////////////////////////////////////////
 void insert_front_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* darr;
     std::vector<int> vec;
-    const int init_elem = 1;
-
     print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(init_elem, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        da_insert(darr, 0, rand());
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(init_elem);
@@ -232,24 +103,8 @@ void insert_front(void)
 // INSERT RAND /////////////////////////////////////////////////////////////////
 void insert_rand_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* darr;
     std::vector<int> vec;
-    const int init_elem = 1;
-
     print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(init_elem, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        da_insert(darr, rand() % da_length(darr), rand());
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(init_elem);
@@ -272,31 +127,10 @@ void insert_rand(void)
 // REMOVE FRONT ////////////////////////////////////////////////////////////////
 void remove_front_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* darr;
     std::vector<int> vec;
     int ans;
     int tot;
-
     print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        da_push(darr, i);
-    }
-    tot = 0;
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        ans = da_remove(darr, 0);
-        tot += ans;
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(max_sz);
@@ -326,31 +160,10 @@ void remove_front(void)
 // REMOVE RAND /////////////////////////////////////////////////////////////////
 void remove_rand_helper(size_t max_sz)
 {
-    clock_t begin;
-    clock_t end;
-    int* darr;
     std::vector<int> vec;
     int ans;
     int tot;
-
     print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
-    begin = clock();
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        da_push(darr, i);
-    }
-    tot = 0;
-    for (size_t i = 0; i < max_sz; ++i)
-    {
-        ans = da_remove(darr, rand() % da_length(darr));
-        tot += ans;
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(max_sz);
@@ -382,41 +195,8 @@ void remove_rand(void)
 // SWAP RAND ///////////////////////////////////////////////////////////////////
 void swap_rand_helper(size_t array_len, size_t num_swaps)
 {
-    clock_t begin;
-    clock_t end;
-    int* arr;
-    int* darr;
     std::vector<int> vec;
-
     print_swaps(num_swaps);
-
-    printf(CARR);
-    arr = (int*)malloc(array_len*sizeof(int));
-    begin = clock();
-    int tmp;
-    size_t a, b;
-    for (size_t i = 0; i < num_swaps; ++i)
-    {
-        a = rand() % array_len;
-        b = rand() % array_len;
-        tmp = arr[a];
-        arr[a] = arr[b];
-        arr[b] = tmp;
-    }
-    end = clock();
-    free(arr);
-    print_elapsed_time(begin, end);
-
-    printf(DARR);
-    begin = clock();
-    darr = (int*)da_alloc(array_len, sizeof(int));
-    for (size_t i = 0; i < num_swaps; ++i)
-    {
-        da_swap(darr, rand() % array_len, rand() % array_len);
-    }
-    end = clock();
-    da_free(darr);
-    print_elapsed_time(begin, end);
 
     printf(VECTOR);
     vec = std::vector<int>(array_len);

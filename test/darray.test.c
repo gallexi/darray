@@ -35,7 +35,6 @@ EMU_TEST(da_alloc_exact__and__da_free)
     EMU_END_TEST();
 }
 
-
 EMU_GROUP(alloc_and_free_functions)
 {
     EMU_ADD(da_alloc__and__da_free);

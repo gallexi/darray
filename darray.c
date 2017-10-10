@@ -14,29 +14,29 @@ static inline void _da_memswap(void* p1, void* p2, size_t sz)
 void* da_alloc(size_t nelem, size_t size)
 {
     size_t capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    void* mem = malloc(capacity*size + DA_HANDLE_OFFSET);
-    if (mem == NULL)
-        return mem;
-    (*(size_t*)((char*)mem + DA_SIZEOF_ELEM_OFFSET)) = size;
-    (*(size_t*)((char*)mem + DA_LENGTH_OFFSET))      = nelem;
-    (*(size_t*)((char*)mem + DA_CAPACITY_OFFSET))    = capacity;
-    return (char*)mem + DA_HANDLE_OFFSET;
+    struct _darray* darr = malloc(sizeof(struct _darray) + capacity*size);
+    if (darr == NULL)
+        return darr;
+    darr->elemsz = size;
+    darr->length = nelem;
+    darr->capacity = capacity;
+    return darr->data;
 }
 
 void* da_alloc_exact(size_t nelem, size_t size)
 {
-    void* mem = malloc(nelem*size + DA_HANDLE_OFFSET);
-    if (mem == NULL)
-        return mem;
-    (*(size_t*)((char*)mem + DA_SIZEOF_ELEM_OFFSET)) = size;
-    (*(size_t*)((char*)mem + DA_LENGTH_OFFSET))      = nelem;
-    (*(size_t*)((char*)mem + DA_CAPACITY_OFFSET))    = nelem;
-    return (char*)mem + DA_HANDLE_OFFSET;
+    struct _darray* darr = malloc(sizeof(struct _darray) + nelem*size);
+    if (darr == NULL)
+        return darr;
+    darr->elemsz = size;
+    darr->length = nelem;
+    darr->capacity = nelem;
+    return darr->data;
 }
 
 void da_free(void* darr)
 {
-    free(DA_HEAD_FROM_HANDLE(darr));
+    free(DA_P_HEAD_FROM_HANDLE(darr));
 }
 
 size_t da_length(void* darr)
@@ -57,24 +57,26 @@ size_t da_sizeof_elem(void* darr)
 void* da_resize(void* darr, size_t nelem)
 {
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    size_t new_arr_size = new_capacity*da_sizeof_elem(darr)+DA_HANDLE_OFFSET;
-    void* ptr = realloc(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
+    size_t new_arr_size = sizeof(struct _darray) +
+        new_capacity*da_sizeof_elem(darr);
+    struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
-    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
-    return (char*)ptr + DA_HANDLE_OFFSET;
+    ptr->length = nelem;
+    ptr->capacity = new_capacity;
+    return ptr->data;
 }
 
 void* da_resize_exact(void* darr, size_t nelem)
 {
-    size_t new_arr_size = nelem*da_sizeof_elem(darr)+DA_HANDLE_OFFSET;
-    void* ptr = realloc(DA_HEAD_FROM_HANDLE(darr), new_arr_size);
+    size_t new_arr_size = sizeof(struct _darray) +
+        nelem*da_sizeof_elem(darr);
+    struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    *((size_t*)((char*)ptr + DA_LENGTH_OFFSET))   = nelem;
-    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = nelem;
-    return (char*)ptr + DA_HANDLE_OFFSET;
+    ptr->length = nelem;
+    ptr->capacity = nelem;
+    return ptr->data;
 }
 
 void* da_reserve(void* darr, size_t nelem)
@@ -84,12 +86,13 @@ void* da_reserve(void* darr, size_t nelem)
     if (curr_capacity >= min_capacity)
         return darr;
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
-    void* ptr = realloc(DA_HEAD_FROM_HANDLE(darr),
-        new_capacity*da_sizeof_elem(darr) + DA_HANDLE_OFFSET);
+    size_t new_arr_size = sizeof(struct _darray) +
+        new_capacity*da_sizeof_elem(darr);
+    struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    *((size_t*)((char*)ptr + DA_CAPACITY_OFFSET)) = new_capacity;
-    return (char*)ptr + DA_HANDLE_OFFSET;
+    ptr->capacity = new_capacity;
+    return ptr->data;
 }
 
 void da_swap(void* darr, size_t index_a, size_t index_b)
