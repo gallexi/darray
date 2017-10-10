@@ -35,9 +35,9 @@ This library provides an implementation of dynamic arrays in C that is similar i
 
 Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element type is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
-+--------+--------+- ------+-----+-----------------+
-| header | arr[0] | arr[1] | ... | arr[capacity-1] |
-+--------+--------+--------+-----+-----------------+
++--------+---------+---------+-----+------------------+
+| header | data[0] | data[1] | ... | data[capacity-1] |
++--------+---------+---------+-----+------------------+
          ^
          Handle to the darray points to the first
          element of the array.

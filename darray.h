@@ -35,21 +35,13 @@ extern "C" {
 
 /* DARRAY MEMORY LAYOUT
  * ====================
- * +--------+--------+- ------+-----+-----------------+
+ * +--------+---------+---------+-----+------------------+
  * | header | data[0] | data[1] | ... | data[capacity-1] |
- * +--------+--------+--------+-----+-----------------+
+ * +--------+---------+---------+-----+------------------+
  *          ^
  *          Handle to the darray points to the first
  *          element of the array.
  */
-
-struct _darray
-{
-    size_t elemsz;
-    size_t length;
-    size_t capacity;
-    char data[];
-};
 
 /**@function
  * @brief Allocate a darray of `nelem` elements each of size `size`.
@@ -295,6 +287,14 @@ void* da_cat(void* dest, void* src, size_t nelem);
 #define darray(type) type*
 
 /////////////////////////////////// INTERNAL ///////////////////////////////////
+struct _darray
+{
+    size_t elemsz;
+    size_t length;
+    size_t capacity;
+    char data[];
+};
+
 #define DA_CAPACITY_FACTOR 1.3
 #define DA_CAPACITY_MIN 10
 #define DA_NEW_CAPACITY_FROM_LENGTH(length) ((length) < DA_CAPACITY_MIN ? \
