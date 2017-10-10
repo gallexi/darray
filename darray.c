@@ -57,8 +57,7 @@ size_t da_sizeof_elem(void* darr)
 void* da_resize(void* darr, size_t nelem)
 {
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    size_t new_arr_size = sizeof(struct _darray) +
-        new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -69,8 +68,7 @@ void* da_resize(void* darr, size_t nelem)
 
 void* da_resize_exact(void* darr, size_t nelem)
 {
-    size_t new_arr_size = sizeof(struct _darray) +
-        nelem*da_sizeof_elem(darr);
+    size_t new_arr_size = sizeof(struct _darray) + nelem*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -86,8 +84,7 @@ void* da_reserve(void* darr, size_t nelem)
     if (curr_capacity >= min_capacity)
         return darr;
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
-    size_t new_arr_size = sizeof(struct _darray) +
-        new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
