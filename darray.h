@@ -307,13 +307,11 @@ struct _darray
 // The following macros use GNU C and are only avaliable for compatible vendors.
 #if defined(__GNUC__) || defined(__clang__) // GNU C compilers
 
-#define DA_AUTO_TYPE __auto_type
-
 #define /* bool */_da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
 ({                                                                             \
     bool _rtn_val = true;                                                      \
-    DA_AUTO_TYPE _p_darr = &darr;                                              \
-    DA_AUTO_TYPE _value = value;                                               \
+    __auto_type _p_darr = &darr;                                               \
+    __auto_type _value = value;                                                \
     if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr) ==                                  \
         *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
     {                                                                          \
@@ -337,7 +335,7 @@ struct _darray
 
 #define /* ELEM_TYPE */_da_pop(/* ELEM_TYPE* */darr)                           \
 ({                                                                             \
-    DA_AUTO_TYPE _darr = darr;                                                 \
+    __auto_type _darr = darr;                                                  \
     /* return */(_darr)[--(*DA_P_LENGTH_FROM_HANDLE(_darr))];                  \
 })
 
@@ -355,8 +353,8 @@ memmove(                                                                       \
     /* ELEM_TYPE */value)                                                      \
 ({                                                                             \
     bool _rtn_val = true;                                                      \
-    DA_AUTO_TYPE _p_darr = &darr;                                              \
-    DA_AUTO_TYPE _value = value;                                               \
+    __auto_type _p_darr = &darr;                                               \
+    __auto_type _value = value;                                                \
     size_t _index = index;                                                     \
     if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr) ==                                  \
         *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
@@ -381,9 +379,9 @@ memmove(                                                                       \
 
 #define /* ELEM_TYPE */_da_remove(/* ELEM_TYPE* */darr, /* size_t */index)     \
 ({                                                                             \
-    DA_AUTO_TYPE _darr = darr;                                                 \
+    __auto_type _darr = darr;                                                  \
     size_t _index = index;                                                     \
-    DA_AUTO_TYPE _rtn_val = _darr[_index];                                     \
+    __auto_type _rtn_val = _darr[_index];                                      \
     memmove(                                                                   \
         _darr+_index,                                                          \
         _darr+_index+1,                                                        \
@@ -397,8 +395,8 @@ memmove(                                                                       \
 #define /* void */_da_fill(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
 do                                                                             \
 {                                                                              \
-    DA_AUTO_TYPE _darr = darr;                                                 \
-    DA_AUTO_TYPE _value = value;                                               \
+    __auto_type _darr = darr;                                                  \
+    __auto_type _value = value;                                                \
     size_t _len = *DA_P_LENGTH_FROM_HANDLE(_darr);                             \
     for (size_t _indx = 0; _indx < _len; ++_indx)                              \
     {                                                                          \
@@ -410,11 +408,11 @@ do                                                                             \
 #define DA_MERGE_IDENTIFIER(a, b) DA_MERGE_IDENTIFIER_HELPER(a, b)
 
 #define _da_foreach(/* ELEM_TYPE* */darr, itername)                            \
-bool __attribute__ ((unused))                                         \
+bool __attribute__ ((unused))                                                  \
     DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__) = true;                 \
-void* __attribute__ ((unused))                                        \
+void* __attribute__ ((unused))                                                 \
     DA_MERGE_IDENTIFIER(_da_stop, __LINE__);                                   \
-for (DA_AUTO_TYPE itername = darr;                                             \
+for (__auto_type itername = darr;                                              \
     ({                                                                         \
         if (DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__))                \
         {                                                                      \
