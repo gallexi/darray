@@ -59,7 +59,7 @@ The `makefile` included with the darray library contains four targets. All targe
 
 ## API
 
-Note: The type `ELEM_TYPE` used throughout the API documentation referes to the `typeof` contained elements for a particular darray (i.e. `ELEM_TYPE` is `int` for an `int*` darray.
+Note: The type `ELEM_TYPE` used throughout the API documentation referes to the `typeof` contained elements for a particular darray (i.e. `ELEM_TYPE` is `int` for an array declared as `int*`.
 
 ### Creation and Deletion
 
