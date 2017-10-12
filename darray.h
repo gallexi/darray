@@ -285,10 +285,8 @@ void* da_cat(void* dest, void* src, size_t nelem);
 /////////////////////////////////// INTERNAL ///////////////////////////////////
 struct _darray
 {
-    size_t elemsz;
-    size_t length;
-    size_t capacity;
-    alignas(alignof(max_align_t)) char data[];
+    size_t _elemsz, _length, _capacity;
+    alignas(alignof(max_align_t)) char _data[];
 };
 
 #define DA_CAPACITY_FACTOR 1.3
@@ -298,11 +296,11 @@ struct _darray
 
 #define DA_P_HEAD_FROM_HANDLE(darr_h) (((char*)darr_h)-sizeof(struct _darray))
 #define DA_P_SIZEOF_ELEM_FROM_HANDLE(darr_h) ((size_t*) \
-    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, elemsz)))
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, _elemsz)))
 #define DA_P_LENGTH_FROM_HANDLE(darr_h) ((size_t*) \
-    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, length)))
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, _length)))
 #define DA_P_CAPACITY_FROM_HANDLE(darr_h) ((size_t*) \
-    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, capacity)))
+    (DA_P_HEAD_FROM_HANDLE(darr_h) + offsetof(struct _darray, _capacity)))
 
 // The following macros use GNU C and are only avaliable for compatible vendors.
 #if defined(__GNUC__) || defined(__clang__) // GNU C compilers

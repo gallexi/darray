@@ -17,10 +17,10 @@ void* da_alloc(size_t nelem, size_t size)
     struct _darray* darr = malloc(sizeof(struct _darray) + capacity*size);
     if (darr == NULL)
         return darr;
-    darr->elemsz = size;
-    darr->length = nelem;
-    darr->capacity = capacity;
-    return darr->data;
+    darr->_elemsz = size;
+    darr->_length = nelem;
+    darr->_capacity = capacity;
+    return darr->_data;
 }
 
 void* da_alloc_exact(size_t nelem, size_t size)
@@ -28,10 +28,10 @@ void* da_alloc_exact(size_t nelem, size_t size)
     struct _darray* darr = malloc(sizeof(struct _darray) + nelem*size);
     if (darr == NULL)
         return darr;
-    darr->elemsz = size;
-    darr->length = nelem;
-    darr->capacity = nelem;
-    return darr->data;
+    darr->_elemsz = size;
+    darr->_length = nelem;
+    darr->_capacity = nelem;
+    return darr->_data;
 }
 
 void da_free(void* darr)
@@ -61,9 +61,9 @@ void* da_resize(void* darr, size_t nelem)
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    ptr->length = nelem;
-    ptr->capacity = new_capacity;
-    return ptr->data;
+    ptr->_length = nelem;
+    ptr->_capacity = new_capacity;
+    return ptr->_data;
 }
 
 void* da_resize_exact(void* darr, size_t nelem)
@@ -72,9 +72,9 @@ void* da_resize_exact(void* darr, size_t nelem)
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    ptr->length = nelem;
-    ptr->capacity = nelem;
-    return ptr->data;
+    ptr->_length = nelem;
+    ptr->_capacity = nelem;
+    return ptr->_data;
 }
 
 void* da_reserve(void* darr, size_t nelem)
@@ -88,8 +88,8 @@ void* da_reserve(void* darr, size_t nelem)
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
-    ptr->capacity = new_capacity;
-    return ptr->data;
+    ptr->_capacity = new_capacity;
+    return ptr->_data;
 }
 
 void da_swap(void* darr, size_t index_a, size_t index_b)

@@ -11,11 +11,11 @@ EMU_TEST(da_length)
 {
     struct _darray dastruct;
 
-    dastruct = (struct _darray){.length=7};
-    EMU_EXPECT_EQ_UINT(da_length(dastruct.data), 7);
+    dastruct = (struct _darray){._length=7};
+    EMU_EXPECT_EQ_UINT(da_length(dastruct._data), 7);
 
-    dastruct = (struct _darray){.length=42};
-    EMU_EXPECT_EQ_UINT(da_length(dastruct.data), 42);
+    dastruct = (struct _darray){._length=42};
+    EMU_EXPECT_EQ_UINT(da_length(dastruct._data), 42);
 
     EMU_END_TEST();
 }
@@ -24,11 +24,11 @@ EMU_TEST(da_capacity)
 {
     struct _darray dastruct;
 
-    dastruct = (struct _darray){.capacity=7};
-    EMU_EXPECT_EQ_UINT(da_capacity(dastruct.data), 7);
+    dastruct = (struct _darray){._capacity=7};
+    EMU_EXPECT_EQ_UINT(da_capacity(dastruct._data), 7);
 
-    dastruct = (struct _darray){.capacity=42};
-    EMU_EXPECT_EQ_UINT(da_capacity(dastruct.data), 42);
+    dastruct = (struct _darray){._capacity=42};
+    EMU_EXPECT_EQ_UINT(da_capacity(dastruct._data), 42);
 
     EMU_END_TEST();
 }
@@ -37,11 +37,11 @@ EMU_TEST(da_sizeof_elem)
 {
     struct _darray dastruct;
 
-    dastruct = (struct _darray){.elemsz=4};
-    EMU_EXPECT_EQ_UINT(da_sizeof_elem(dastruct.data), 4);
+    dastruct = (struct _darray){._elemsz=4};
+    EMU_EXPECT_EQ_UINT(da_sizeof_elem(dastruct._data), 4);
 
-    dastruct = (struct _darray){.elemsz=32};
-    EMU_EXPECT_EQ_UINT(da_sizeof_elem(dastruct.data), 32);
+    dastruct = (struct _darray){._elemsz=32};
+    EMU_EXPECT_EQ_UINT(da_sizeof_elem(dastruct._data), 32);
 
     EMU_END_TEST();
 }
