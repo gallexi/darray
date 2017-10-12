@@ -39,6 +39,15 @@
  *          element of the array.
  */
 
+ /**@macro
+ * @brief Type of a darray that contains elements of `type`. This should be
+ *  used for function parameters/return values that explicitly require a darray,
+ *  or for segments of code where it must be stated that a darray is being used.
+ *
+ * @param type : Type of the contained element.
+ */
+#define darray(type) type*
+
 /**@function
  * @brief Allocate a darray of `nelem` elements each of size `size`.
  *
@@ -272,15 +281,6 @@ void* da_cat(void* dest, void* src, size_t nelem);
  */
 #define da_foreach(/* ELEM_TYPE* */darr, itername)                             \
                                                      _da_foreach(darr, itername)
-
-/**@macro
- * @brief Type of a darray that contains elements of `type`. This should be
- *  used for function parameters/return values that explicitly require a darray,
- *  or for segments of code where it must be stated that a darray is being used.
- *
- * @param type : Type of the contained element.
- */
-#define darray(type) type*
 
 /////////////////////////////////// INTERNAL ///////////////////////////////////
 struct _darray
