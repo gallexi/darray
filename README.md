@@ -22,12 +22,12 @@
         + [da_length](#da_length)
         + [da_capacity](#da_capacity)
         + [da_sizeof_elem](#da_sizeof_elem)
-    + [Misc. Utilities](#misc-utilities)
+    + [General Utilities](#general-utilities)
+        + [container-style type](#container-style-type)
         + [da_swap](#da_swap)
         + [da_cat](#da_cat)
         + [da_fill [GNU C only]](#da_fill)
         + [da_foreach [GNU C only]](#da_foreach)
-        + [container-style type](#container-style-type)
 1. [License](#license)
 
 ## Introduction
@@ -217,8 +217,22 @@ size_t da_sizeof_elem(void* darr);
 
 ----
 
-### Misc. Utilities
+### General Utilities
 In addition to the functions/macros above the darray library ships with the following utilities:
+
+#### container-style type
+The container-style type provides a way to explicitly state that an array is a darray.
+```C
+#define darray(type) type*
+```
+Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no surprise.
+
+This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
+```C
+// darray(foo) can be used instead of foo* to let a user know that darray
+// operations will be used on arr in some_func.
+void some_func(int i, darray(foo) arr, char* str);
+```
 
 #### da_swap
 Swap the values of the two specified elements of `darr`.
@@ -272,20 +286,6 @@ da_foreach(darr, iter)
 {
     *iter += 1;
 }
-```
-
-#### container-style type
-The container-style type provides a way to explicitly state that an array is a darray.
-```C
-#define darray(type) type*
-```
-Notice that `darray(foo)` is really just syntactic sugar for `foo*` just like how `array-of-bar` can be written in C as `bar*`. Since darrays are just normal built-in arrays under the hood, this `#define` should come as no surprise.
-
-This method of typing is especially useful in function declarations and sparsely commented code where you may want to inform readers that the memory being handled by a code segment uses darray operations.
-```C
-// darray(foo) can be used instead of foo* to let a user know that darray
-// operations will be used on arr in some_func.
-void some_func(int i, darray(foo) arr, char* str);
 ```
 
 ----
