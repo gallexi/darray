@@ -238,6 +238,42 @@ EMU_GROUP(da_insert)
     EMU_END_GROUP();
 }
 
+EMU_TEST(da_insert_arr)
+{
+    int* da = da_alloc(2, sizeof(int));
+    da[0] = 3;
+    da[1] = 5;
+
+    int A[] = {7, 9, 11};
+    EMU_REQUIRE_TRUE(da_insert_arr(da, 0, A, 3));
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_REQUIRE_EQ_UINT(da_length(da), 5);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 9);
+    EMU_EXPECT_EQ_INT(da[2], 11);
+    EMU_EXPECT_EQ_INT(da[3], 3);
+    EMU_EXPECT_EQ_INT(da[4], 5);
+
+    int B[] = {13, 15};
+    EMU_REQUIRE_TRUE(da_insert_arr(da, 1, B, 2));
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_REQUIRE_EQ_UINT(da_length(da), 7);
+    EMU_EXPECT_EQ_INT(da[0], 7);
+    EMU_EXPECT_EQ_INT(da[1], 13);
+    EMU_EXPECT_EQ_INT(da[2], 15);
+    EMU_EXPECT_EQ_INT(da[3], 9);
+    EMU_EXPECT_EQ_INT(da[4], 11);
+    EMU_EXPECT_EQ_INT(da[5], 3);
+    EMU_EXPECT_EQ_INT(da[6], 5);
+
+    EMU_REQUIRE_TRUE(da_insert_arr(da, 0, NULL, 0));
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_REQUIRE_EQ_UINT(da_length(da), 7);
+
+    da_free(da);
+    EMU_END_TEST();
+}
+
 EMU_TEST(da_remove)
 {
     int* da1 = da_alloc(4, sizeof(int));
@@ -268,6 +304,26 @@ EMU_TEST(da_remove)
 
     da_free(da1);
     da_free(da2);
+    EMU_END_TEST();
+}
+
+EMU_TEST(da_remove_arr)
+{
+    int* da = da_alloc(6, sizeof(int));
+    for (size_t i = 0; i < da_length(da); ++i)
+        da[i] = i;
+
+    da_remove_arr(da, 2, 3);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_REQUIRE_EQ_UINT(da_length(da), 3);
+    EMU_EXPECT_EQ_INT(da[0], 0);
+    EMU_EXPECT_EQ_INT(da[1], 1);
+    EMU_EXPECT_EQ_INT(da[2], 5);
+
+    da_remove_arr(da, 0, 0);
+    EMU_REQUIRE_NOT_NULL(da);
+    EMU_REQUIRE_EQ_UINT(da_length(da), 3);
+
     EMU_END_TEST();
 }
 
@@ -526,7 +582,9 @@ EMU_GROUP(darray_functions)
     EMU_ADD(da_push);
     EMU_ADD(da_pop);
     EMU_ADD(da_insert);
+    EMU_ADD(da_insert_arr);
     EMU_ADD(da_remove);
+    EMU_ADD(da_remove_arr);
     EMU_ADD(da_swap);
     EMU_ADD(da_cat);
     EMU_ADD(da_fill);

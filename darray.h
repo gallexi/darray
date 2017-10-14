@@ -207,6 +207,27 @@ void* da_reserve(void* darr, size_t nelem);
                                                   _da_insert(darr, index, value)
 
 /**@macro
+ * @brief Insert an array of values into `darr` at the specified index, moving *  the values beyond `index` back nelem elements. Assignment back to the
+ *  provided `darr` lvalue parameter is automatic.
+ *
+ * @param darr : Target darray. Upon function completion, `darr` may or may not
+ *  point to its previous block on the heap. Assignment back to the provided
+ *  `darr` lvalue is automatic, but other references to `darr` may be
+ *  invalidated.
+ * @param index : Array index where the new values will appear.
+ * @param src : Array of elements to insert.
+ * @param nelem : Number of elements from `src` to insert.
+ *
+ * @return `true` on success, `false` on failure. If `da_insert` returns
+ * `false`, reallocation failed and `darr` is left untouched.
+ *
+ * @note Affects the length of the darray.
+ */
+#define /* bool */da_insert_arr(/* ELEM_TYPE* */darr, /* size_t */index,       \
+    /* ELEM_TYPE* */src, /* size_t */nelem)                                    \
+                                         _da_insert_arr(darr, index, src, nelem)
+
+/**@macro
  * @brief Remove the value at `index` from `darr` and return it, moving the
  *  values beyond `index` forward one element.
  *
@@ -222,6 +243,21 @@ void* da_reserve(void* darr, size_t nelem);
 #define /* ELEM_TYPE */da_remove(/* ELEM_TYPE* */darr, /* size_t */index)      \
                                                          _da_remove(darr, index)
 
+/**@macro
+ * @brief Remove `nelem` values starting at `index` from `darr`, moving the
+ *  values beyond `index` forward one element.
+ *
+ * @param darr : Target darray.
+ * @param index : Array index of the start of elements to remove.
+ * @param nelem : Number of elements to remove.
+ *
+ * @note Affects the length of the darray.
+ * @note `da_remove_arr` will never reallocate memory, so removing is always
+ *  allocation-safe.
+ */
+#define /* void */da_remove_arr(/* ELEM_TYPE* */darr, /* size_t */index,       \
+    /* size_t */nelem)                                                         \
+                                              _da_remove_arr(darr, index, nelem)
 /**@function
  * @brief Swap the values of the two specified elements of `darr`.
  *
@@ -347,13 +383,27 @@ memmove(                                                                       \
 (*p_darr)[index] = value;                                                      \
 (*DA_P_LENGTH_FROM_HANDLE(*p_darr))++;                                         \
 
+#define _da_move_and_insert_arr(p_darr, index, src, nelem)                     \
+memmove(                                                                       \
+    (*p_darr)+index+nelem,                                                     \
+    (*p_darr)+index,                                                           \
+    (*DA_P_SIZEOF_ELEM_FROM_HANDLE(*p_darr)) *                                 \
+        ((*DA_P_LENGTH_FROM_HANDLE(*p_darr))-index)                            \
+);                                                                             \
+memcpy(                                                                        \
+    (*p_darr)+index,                                                           \
+    src,                                                                       \
+    (*DA_P_SIZEOF_ELEM_FROM_HANDLE(*p_darr)) * (nelem)                         \
+);                                                                             \
+(*DA_P_LENGTH_FROM_HANDLE(*p_darr)) += nelem;                                  \
+
 #define /* bool */_da_insert(/* ELEM_TYPE* */darr, /* size_t */index,          \
     /* ELEM_TYPE */value)                                                      \
 ({                                                                             \
     bool _rtn_val = true;                                                      \
     __auto_type _p_darr = &darr;                                               \
-    __auto_type _value = value;                                                \
     size_t _index = index;                                                     \
+    __auto_type _value = value;                                                \
     if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr) ==                                  \
         *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
     {                                                                          \
@@ -375,6 +425,35 @@ memmove(                                                                       \
     /* return */_rtn_val;                                                      \
 })
 
+#define /* bool */_da_insert_arr(/* ELEM_TYPE* */darr, /* size_t */index,      \
+    /* ELEM_TYPE* */src, /* size_t */nelem)                                    \
+({                                                                             \
+    bool _rtn_val = true;                                                      \
+    __auto_type _p_darr = &darr;                                               \
+    size_t _index = index;                                                     \
+    __auto_type _src = src;                                                    \
+    size_t _nelem = nelem;                                                     \
+    if (*DA_P_LENGTH_FROM_HANDLE(*_p_darr)+nelem >=                            \
+        *DA_P_CAPACITY_FROM_HANDLE(*_p_darr))                                  \
+    {                                                                          \
+        void* _tmp = (__typeof__(*_p_darr))da_reserve(*_p_darr, 1);            \
+        if (_tmp)                                                              \
+        {                                                                      \
+            *_p_darr = (__typeof__(*_p_darr))_tmp;                             \
+            _da_move_and_insert_arr(_p_darr, _index, _src, _nelem);            \
+        }                                                                      \
+        else /* allocation failure */                                          \
+        {                                                                      \
+            _rtn_val = false;                                                  \
+        }                                                                      \
+    }                                                                          \
+    else                                                                       \
+    {                                                                          \
+        _da_move_and_insert_arr(_p_darr, _index, _src, _nelem);                \
+    }                                                                          \
+    /* return */_rtn_val;                                                      \
+})
+
 #define /* ELEM_TYPE */_da_remove(/* ELEM_TYPE* */darr, /* size_t */index)     \
 ({                                                                             \
     __auto_type _darr = darr;                                                  \
@@ -389,6 +468,22 @@ memmove(                                                                       \
     (*DA_P_LENGTH_FROM_HANDLE(_darr))--;                                       \
     /* return */_rtn_val;                                                      \
 })
+
+#define /* void */_da_remove_arr(/* ELEM_TYPE* */darr, /* size_t */index,      \
+    /* size_t */nelem)                                                         \
+do                                                                             \
+{                                                                              \
+    __auto_type _darr = darr;                                                  \
+    size_t _index = index;                                                     \
+    size_t _nelem = nelem;                                                     \
+    memmove(                                                                   \
+        _darr+_index,                                                          \
+        _darr+_index+_nelem,                                                   \
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(_darr)) *                               \
+            ((*DA_P_LENGTH_FROM_HANDLE(_darr))-_index-_nelem)                  \
+    );                                                                         \
+    (*DA_P_LENGTH_FROM_HANDLE(_darr)) -= _nelem;                               \
+}while(0)
 
 #define /* void */_da_fill(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value)         \
 do                                                                             \
