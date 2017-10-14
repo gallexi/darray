@@ -1,5 +1,7 @@
 #include "darray.h"
+#include "dstring.h"
 
+//////////////////////////////////// DARRAY ////////////////////////////////////
 static inline void _da_memswap(void* p1, void* p2, size_t sz)
 {
     char tmp, *a = p1, *b = p2;
@@ -110,4 +112,73 @@ void* da_cat(void* dest, void* src, size_t nelem)
         return NULL;
     memcpy(dest+offset, src, nelem*da_sizeof_elem(dest));
     return dest;
+}
+
+/////////////////////////////////// DSTRING ////////////////////////////////////
+darray(char) dstr_alloc_empty()
+{
+    char* darr = da_alloc(1, sizeof(char));
+    darr[0] = '\0';
+    return darr;
+}
+
+darray(char) dstr_alloc_from_cstr(char* src)
+{
+    size_t src_len_with_nullterm = strlen(src)+1;
+    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
+    memcpy(darr, src, src_len_with_nullterm);
+    return darr;
+}
+
+darray(char) dstr_alloc_from_dstr(darray(char) src)
+{
+    size_t src_len_with_nullterm = da_length(src);
+    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
+    memcpy(darr, src, src_len_with_nullterm);
+    return darr;
+}
+
+void dstr_free(darray(char) dstr)
+{
+    da_free(dstr);
+}
+
+darray(char) dstr_cat_cstr(darray(char) dest, char* src)
+{
+    size_t dest_len = da_length(dest)-1;
+    size_t src_len_with_nullterm = strlen(src)+1;
+    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    if (dest == NULL)
+        return NULL;
+    memcpy(dest+dest_len, src, src_len_with_nullterm);
+    return dest;
+}
+
+darray(char) dstr_cat_dstr(darray(char) dest, darray(char) src)
+{
+    size_t dest_len = da_length(dest)-1;
+    size_t src_len_with_nullterm = da_length(src);
+    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    if (dest == NULL)
+        return NULL;
+    memcpy(dest+dest_len, src, src_len_with_nullterm);
+    return dest;
+}
+
+size_t dstr_length(const darray(char) dstr)
+{
+    // dstrings always have a null terminator so this should never underflow.
+    return da_length((void*)dstr)-1;
+}
+
+void dstr_transform_lower(darray(char) dstr)
+{
+    da_foreach(dstr, c)
+        *c = tolower(*c);
+}
+
+void dstr_transform_upper(darray(char) dstr)
+{
+    da_foreach(dstr, c)
+        *c = toupper(*c);
 }
