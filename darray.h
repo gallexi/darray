@@ -207,8 +207,9 @@ void* da_reserve(void* darr, size_t nelem);
                                                   _da_insert(darr, index, value)
 
 /**@macro
- * @brief Insert an array of values into `darr` at the specified index, moving *  the values beyond `index` back nelem elements. Assignment back to the
- *  provided `darr` lvalue parameter is automatic.
+ * @brief Insert `nelem` values from `src` into `darr` at the specified index,
+ *  moving the values beyond `index` back `nelem` elements. Assignment back to
+ *  the provided `darr` lvalue parameter is automatic.
  *
  * @param darr : Target darray. Upon function completion, `darr` may or may not
  *  point to its previous block on the heap. Assignment back to the provided
@@ -245,7 +246,7 @@ void* da_reserve(void* darr, size_t nelem);
 
 /**@macro
  * @brief Remove `nelem` values starting at `index` from `darr`, moving the
- *  values beyond `index` forward one element.
+ *  values beyond `index` forward `nelem` elements.
  *
  * @param darr : Target darray.
  * @param index : Array index of the start of elements to remove.
