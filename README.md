@@ -14,9 +14,11 @@
         + [da_reserve](#da_reserve)
     + [Insertion](#insertion)
         + [da_insert [GNU C only]](#da_insert)
+        + [da_insert_arr [GNU C only]](#da_insert_arr)
         + [da_push [GNU C only]](#da_push)
     + [Removal](#removal)
         + [da_remove [GNU C only]](#da_remove)
+        + [da_remove_arr [GNU C only]](#da_remove_arr)
         + [da_pop [GNU C only]](#da_pop)
     + [Accessing Header Data](#accessing-header-data)
         + [da_length](#da_length)
@@ -159,6 +161,16 @@ Returns `true` on success, `false` on failure. If `da_insert` returns `false`, r
 ```
 Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
 
+#### da_insert_arr
+Insert an `nelem` values from `src` into `darr` at the specified index, moving the values beyond `index` back `nelem` elements. Assignment back to the provided `darr` lvalue parameter is automatic.
+
+Returns `true` on success, `false` on failure. If `da_insert` returns `false`, reallocation failed and `darr` is left untouched.
+```C
+#define /* bool */da_insert_arr(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE* */src, /* size_t */nelem) \
+    /* ...macro implementation */
+```
+Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
+
 #### da_push
 Insert a value at the back of `darr`. Assignment back to the provided `darr` lvalue parameter is automatic.
 
@@ -172,7 +184,7 @@ Upon function completion, `darr` may or may not point to its previous block on t
 ----
 
 ### Removal
-Two functions `da_remove` and `da_pop` are the mirrored versions of `da_insert` and `da_push` removing/returning the target value and decrementing the length of the darray. Neither macro will invalidate a pointer to the provided darray.
+Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing/returning the target value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
 
 #### da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
@@ -180,7 +192,15 @@ Remove the value at `index` from `darr` and return it, moving the values beyond 
 Returns the value removed from the darray.
 ```C
 #define /* ELEM_TYPE */da_remove(/* ELEM_TYPE* */darr, /* size_t */index) \
-    /*
+    /* ...macro implementation */
+```
+
+#### da_remove_arr
+Remove `nelem` values starting at `index` from `darr`, moving the values beyond `index` forward `nelem` elements.
+
+```C
+#define /* void */da_remove_arr(/* ELEM_TYPE* */darr, /* size_t */index, /* size_t */nelem)
+    /* ...macro implementation */
 ```
 
 #### da_pop
