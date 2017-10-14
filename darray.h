@@ -23,6 +23,9 @@
 #ifndef _DARRAY_H_
 #define _DARRAY_H_
 
+#define _GNU_SOURCE /* strcasestr */
+
+#include <ctype.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdlib.h>

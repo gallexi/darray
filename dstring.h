@@ -24,20 +24,28 @@
 #define _DSTRING_H_
 
 #include "darray.h"
-#include <ctype.h>
 
 darray(char) dstr_alloc_empty();
-darray(char) dstr_alloc_from_cstr(char* src);
-darray(char) dstr_alloc_from_dstr(darray(char) src);
+darray(char) dstr_alloc_from_cstr(const char* src);
+darray(char) dstr_alloc_from_dstr(const darray(char) src);
 void dstr_free(darray(char) darr);
 
-darray(char) dstr_cat_cstr(darray(char) dest, char* src);
-darray(char) dstr_cat_dstr(darray(char) dest, darray(char) src);
-
-int dstr_cmp(const char* s1, const char* s2);
-int dstr_cmp_case(const char* s1, const char* s2);
-
 size_t dstr_length(const darray(char) dstr);
+
+darray(char) dstr_cat_cstr(darray(char) dest, const char* src);
+darray(char) dstr_cat_dstr(darray(char) dest, const darray(char) src);
+
+int dstr_cmp(const darray(char) s1, const char* s2);
+int dstr_cmp_case(const darray(char) s1, const char* s2);
+
+// Index of found stubstr on success. -1 on not found.
+long dstr_find(darray(char) dstr, const char* substr);
+long dstr_find_case(darray(char) dstr, const char* substr);
+
+darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
+    const char* new_substr);
+darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
+    const char* new_substr);
 
 void dstr_transform_lower(darray(char) dstr);
 void dstr_transform_upper(darray(char) dstr);

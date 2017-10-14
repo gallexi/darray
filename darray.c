@@ -122,7 +122,7 @@ darray(char) dstr_alloc_empty()
     return darr;
 }
 
-darray(char) dstr_alloc_from_cstr(char* src)
+darray(char) dstr_alloc_from_cstr(const char* src)
 {
     size_t src_len_with_nullterm = strlen(src)+1;
     char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
@@ -130,9 +130,9 @@ darray(char) dstr_alloc_from_cstr(char* src)
     return darr;
 }
 
-darray(char) dstr_alloc_from_dstr(darray(char) src)
+darray(char) dstr_alloc_from_dstr(const darray(char) src)
 {
-    size_t src_len_with_nullterm = da_length(src);
+    size_t src_len_with_nullterm = da_length((void*)src);
     char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
     memcpy(darr, src, src_len_with_nullterm);
     return darr;
@@ -143,7 +143,35 @@ void dstr_free(darray(char) dstr)
     da_free(dstr);
 }
 
-int dstr_cmp(const char* s1, const char* s2)
+size_t dstr_length(const darray(char) dstr)
+{
+    // dstrings always have a null terminator so this should never underflow.
+    return da_length((void*)dstr)-1;
+}
+
+darray(char) dstr_cat_cstr(darray(char) dest, const char* src)
+{
+    size_t dest_len = da_length((void*)dest)-1;
+    size_t src_len_with_nullterm = strlen(src)+1;
+    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    if (dest == NULL)
+        return NULL;
+        memcpy(dest+dest_len, src, src_len_with_nullterm);
+    return dest;
+}
+
+darray(char) dstr_cat_dstr(darray(char) dest, const darray(char) src)
+{
+    size_t dest_len = da_length((void*)dest)-1;
+    size_t src_len_with_nullterm = da_length((void*)src);
+    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    if (dest == NULL)
+    return NULL;
+    memcpy(dest+dest_len, src, src_len_with_nullterm);
+    return dest;
+}
+
+int dstr_cmp(const darray(char) s1, const char* s2)
 {
     while (*s1 == *s2 && *s1 != '\0')
     {
@@ -153,7 +181,7 @@ int dstr_cmp(const char* s1, const char* s2)
     return *s1 - *s2;
 }
 
-int dstr_cmp_case(const char* s1, const char* s2)
+int dstr_cmp_case(const darray(char) s1, const char* s2)
 {
     while (tolower(*s1) == tolower(*s2) && *s1 != '\0')
     {
@@ -163,32 +191,50 @@ int dstr_cmp_case(const char* s1, const char* s2)
     return *s1 - *s2;
 }
 
-darray(char) dstr_cat_cstr(darray(char) dest, char* src)
+long dstr_find(darray(char) dstr, const char* substr)
 {
-    size_t dest_len = da_length(dest)-1;
-    size_t src_len_with_nullterm = strlen(src)+1;
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
-    if (dest == NULL)
-        return NULL;
-    memcpy(dest+dest_len, src, src_len_with_nullterm);
-    return dest;
+    char* loc = strstr(dstr, substr);
+    if (loc == NULL)
+        return -1;
+    return loc - dstr;
 }
 
-darray(char) dstr_cat_dstr(darray(char) dest, darray(char) src)
+long dstr_find_case(darray(char) dstr, const char* substr)
 {
-    size_t dest_len = da_length(dest)-1;
-    size_t src_len_with_nullterm = da_length(src);
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
-    if (dest == NULL)
-        return NULL;
-    memcpy(dest+dest_len, src, src_len_with_nullterm);
-    return dest;
+    char* loc = strcasestr(dstr, substr);
+    if (loc == NULL)
+        return -1;
+    return loc - dstr;
 }
 
-size_t dstr_length(const darray(char) dstr)
+darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
+    const char* new_substr)
 {
-    // dstrings always have a null terminator so this should never underflow.
-    return da_length((void*)dstr)-1;
+    size_t substr_len = strlen(substr);
+    size_t new_substr_len = strlen(new_substr);
+    long loc;
+    while ((loc = dstr_find(dstr, substr)) != -1)
+    {
+        da_remove_arr(dstr, loc, substr_len);
+        if (!da_insert_arr(dstr, loc, new_substr, new_substr_len))
+            return NULL;
+    }
+    return dstr;
+}
+
+darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
+    const char* new_substr)
+{
+    size_t substr_len = strlen(substr);
+    size_t new_substr_len = strlen(new_substr);
+    long loc;
+    while ((loc = dstr_find_case(dstr, substr)) != -1)
+    {
+        da_remove_arr(dstr, loc, substr_len);
+        if (!da_insert_arr(dstr, loc, new_substr, new_substr_len))
+            return NULL;
+    }
+    return dstr;
 }
 
 void dstr_transform_lower(darray(char) dstr)

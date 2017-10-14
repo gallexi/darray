@@ -668,6 +668,17 @@ EMU_GROUP(dstring_alloc_and_free_functions)
     EMU_END_GROUP();
 }
 
+EMU_TEST(dstr_length)
+{
+    char* dstr = dstr_alloc_empty();
+    EMU_EXPECT_EQ_UINT(dstr_length(dstr), 0);
+    dstr_free(dstr);
+    dstr = dstr_alloc_from_cstr(TEST_STR0);
+    EMU_EXPECT_EQ_UINT(dstr_length(dstr), strlen(TEST_STR0));
+    dstr_free(dstr);
+    EMU_END_TEST();
+}
+
 EMU_TEST(dstr_cat_cstr)
 {
     char* dstr = dstr_alloc_from_cstr(TEST_STR0);
@@ -692,7 +703,7 @@ EMU_TEST(dstr_cat_dstr)
     EMU_END_TEST();
 }
 
-EMU_GROUP(dstr_cat)
+EMU_GROUP(dstr_cat_functions)
 {
     EMU_ADD(dstr_cat_cstr);
     EMU_ADD(dstr_cat_dstr);
@@ -717,7 +728,6 @@ EMU_TEST(dstr_cmp_case)
     EMU_EXPECT_EQ_INT(dstr_cmp_case(A, A), -0);
     EMU_EXPECT_EQ_INT(dstr_cmp_case(B, A), 1);
 
-
     char C[] = "some string";
     char D[] = "SOME STRING";
     EMU_EXPECT_EQ_INT(dstr_cmp_case(C, D), 0);
@@ -729,22 +739,70 @@ EMU_TEST(dstr_cmp_case)
     EMU_END_TEST();
 }
 
-EMU_GROUP(dstr_comparison)
+EMU_GROUP(dstr_cmp_functions)
 {
     EMU_ADD(dstr_cmp);
     EMU_ADD(dstr_cmp_case);
     EMU_END_GROUP();
 }
 
-EMU_TEST(dstr_length)
+EMU_TEST(dstr_find)
 {
-    char* dstr = dstr_alloc_empty();
-    EMU_EXPECT_EQ_UINT(dstr_length(dstr), 0);
-    dstr_free(dstr);
-    dstr = dstr_alloc_from_cstr(TEST_STR0);
-    EMU_EXPECT_EQ_UINT(dstr_length(dstr), strlen(TEST_STR0));
+    darray(char) dstr = dstr_alloc_from_cstr("Hello, World!");
+    EMU_EXPECT_EQ_INT(dstr_find(dstr, "Hello"), 0);
+    EMU_EXPECT_EQ_INT(dstr_find(dstr, "hello"), -1);
+    EMU_EXPECT_EQ_INT(dstr_find(dstr, "World!"), 7);
     dstr_free(dstr);
     EMU_END_TEST();
+}
+
+EMU_TEST(dstr_find_case)
+{
+    darray(char) dstr = dstr_alloc_from_cstr("Hello, World!");
+    EMU_EXPECT_EQ_INT(dstr_find_case(dstr, "Hello"), 0);
+    EMU_EXPECT_EQ_INT(dstr_find_case(dstr, "hello"), 0);
+    EMU_EXPECT_EQ_INT(dstr_find_case(dstr, "World!"), 7);
+    EMU_EXPECT_EQ_INT(dstr_find_case(dstr, "WoRlD!"), 7);
+    dstr_free(dstr);
+    EMU_END_TEST();
+}
+
+EMU_GROUP(dstr_find_functions)
+{
+    EMU_ADD(dstr_find);
+    EMU_ADD(dstr_find_case);
+    EMU_END_GROUP();
+}
+
+EMU_TEST(dstr_replace_all)
+{
+    char some_str[] = "Hello, World! Hello again.";
+    darray(char) dstr = dstr_alloc_from_cstr(some_str);
+    dstr = dstr_replace_all(dstr, "world", "foo");
+    EMU_EXPECT_STREQ(dstr, some_str);
+    dstr = dstr_replace_all(dstr, "Hello", "foo");
+    EMU_EXPECT_STREQ(dstr, "foo, World! foo again.");
+    dstr_free(dstr);
+    EMU_END_TEST();
+}
+
+EMU_TEST(dstr_replace_all_case)
+{
+    char some_str[] = "Hello, World! Hello again.";
+    darray(char) dstr = dstr_alloc_from_cstr(some_str);
+    dstr = dstr_replace_all_case(dstr, "world", "foo");
+    EMU_EXPECT_STREQ(dstr, "Hello, foo! Hello again.");
+    dstr = dstr_replace_all_case(dstr, "Hello", "foo");
+    EMU_EXPECT_STREQ(dstr, "foo, foo! foo again.");
+    dstr_free(dstr);
+    EMU_END_TEST();
+}
+
+EMU_GROUP(dstr_replace_functions)
+{
+    EMU_ADD(dstr_replace_all);
+    EMU_ADD(dstr_replace_all_case);
+    EMU_END_GROUP();
 }
 
 EMU_TEST(dstr_transform_lower)
@@ -777,7 +835,7 @@ EMU_TEST(dstr_transform_upper)
     EMU_END_TEST();
 }
 
-EMU_GROUP(dstr_transform)
+EMU_GROUP(dstr_transform_functions)
 {
     EMU_ADD(dstr_transform_lower);
     EMU_ADD(dstr_transform_upper);
@@ -787,10 +845,12 @@ EMU_GROUP(dstr_transform)
 EMU_GROUP(dstring_functions)
 {
     EMU_ADD(dstring_alloc_and_free_functions);
-    EMU_ADD(dstr_cat);
-    EMU_ADD(dstr_comparison);
     EMU_ADD(dstr_length);
-    EMU_ADD(dstr_transform);
+    EMU_ADD(dstr_cat_functions);
+    EMU_ADD(dstr_cmp_functions);
+    EMU_ADD(dstr_find_functions);
+    EMU_ADD(dstr_replace_functions);
+    EMU_ADD(dstr_transform_functions);
     EMU_END_GROUP();
 }
 
