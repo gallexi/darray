@@ -9,6 +9,7 @@ INSTALL_LIB_DIR=/usr/local/lib/
 INSTALL_INCLUDE_DIR=/usr/local/include/
 
 DARRAY_HEADER=darray.h
+DSTRING_HEADER=dstring.h
 DARRAY_OBJ=darray.o
 DARRAY_LIB=darray
 DARRAY_LIB_OUT=lib$(DARRAY_LIB).a
@@ -25,6 +26,7 @@ build: clean
 install: build
 	install $(BUILD_DIR)$(DARRAY_LIB_OUT) $(INSTALL_LIB_DIR)$(DARRAY_LIB_OUT)
 	install $(DARRAY_HEADER) $(INSTALL_INCLUDE_DIR)$(DARRAY_HEADER)
+	install $(DSTRING_HEADER) $(INSTALL_INCLUDE_DIR)$(DSTRING_HEADER)
 
 unit_tests: build
 	$(CC) $(CFLAGS) -o $(BUILD_DIR)unit_tests $(TEST_DIR)darray.test.c -L$(BUILD_DIR) -I${EMU_ROOT} -l$(DARRAY_LIB)

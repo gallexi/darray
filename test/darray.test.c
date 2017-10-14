@@ -699,6 +699,43 @@ EMU_GROUP(dstr_cat)
     EMU_END_GROUP();
 }
 
+EMU_TEST(dstr_cmp)
+{
+    char A[] = "ABCD A";
+    char B[] = "ABCD B";
+    EMU_EXPECT_EQ_INT(dstr_cmp(A, B), -1);
+    EMU_EXPECT_EQ_INT(dstr_cmp(A, A), -0);
+    EMU_EXPECT_EQ_INT(dstr_cmp(B, A), 1);
+    EMU_END_TEST();
+}
+
+EMU_TEST(dstr_cmp_case)
+{
+    char A[] = "ABCD A";
+    char B[] = "ABCD B";
+    EMU_EXPECT_EQ_INT(dstr_cmp_case(A, B), -1);
+    EMU_EXPECT_EQ_INT(dstr_cmp_case(A, A), -0);
+    EMU_EXPECT_EQ_INT(dstr_cmp_case(B, A), 1);
+
+
+    char C[] = "some string";
+    char D[] = "SOME STRING";
+    EMU_EXPECT_EQ_INT(dstr_cmp_case(C, D), 0);
+
+    char E[] = "sOmE sTrInG";
+    char F[] = "SoMe StRiNg";
+    EMU_EXPECT_EQ_INT(dstr_cmp_case(E, F), 0);
+
+    EMU_END_TEST();
+}
+
+EMU_GROUP(dstr_comparison)
+{
+    EMU_ADD(dstr_cmp);
+    EMU_ADD(dstr_cmp_case);
+    EMU_END_GROUP();
+}
+
 EMU_TEST(dstr_length)
 {
     char* dstr = dstr_alloc_empty();
@@ -751,6 +788,7 @@ EMU_GROUP(dstring_functions)
 {
     EMU_ADD(dstring_alloc_and_free_functions);
     EMU_ADD(dstr_cat);
+    EMU_ADD(dstr_comparison);
     EMU_ADD(dstr_length);
     EMU_ADD(dstr_transform);
     EMU_END_GROUP();
@@ -784,7 +822,7 @@ EMU_TEST(struct_type)
     EMU_END_TEST();
 }
 
-EMU_GROUP(testing_with_different_types)
+EMU_GROUP(testing_with_additional_types)
 {
     EMU_ADD(struct_type);
     EMU_END_GROUP();
@@ -794,7 +832,7 @@ EMU_GROUP(all_tests)
 {
     EMU_ADD(darray_functions);
     EMU_ADD(dstring_functions);
-    EMU_ADD(testing_with_different_types);
+    EMU_ADD(testing_with_additional_types);
     EMU_END_GROUP();
 }
 

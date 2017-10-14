@@ -34,6 +34,9 @@ void dstr_free(darray(char) darr);
 darray(char) dstr_cat_cstr(darray(char) dest, char* src);
 darray(char) dstr_cat_dstr(darray(char) dest, darray(char) src);
 
+int dstr_cmp(const char* s1, const char* s2);
+int dstr_cmp_case(const char* s1, const char* s2);
+
 size_t dstr_length(const darray(char) dstr);
 
 void dstr_transform_lower(darray(char) dstr);

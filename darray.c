@@ -143,6 +143,26 @@ void dstr_free(darray(char) dstr)
     da_free(dstr);
 }
 
+int dstr_cmp(const char* s1, const char* s2)
+{
+    while (*s1 == *s2 && *s1 != '\0')
+    {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
+
+int dstr_cmp_case(const char* s1, const char* s2)
+{
+    while (tolower(*s1) == tolower(*s2) && *s1 != '\0')
+    {
+        s1++;
+        s2++;
+    }
+    return *s1 - *s2;
+}
+
 darray(char) dstr_cat_cstr(darray(char) dest, char* src)
 {
     size_t dest_len = da_length(dest)-1;
