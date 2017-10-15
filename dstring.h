@@ -27,70 +27,187 @@
 #include <stdarg.h>
 #include <stdio.h>
 
-// Allocate a dstring as the empty string "".
+/**@function
+ * @brief Allocate a dstring as the empty string "".
+ *
+ * @return Pointer to a new dstring on success. `NULL` on allocation failure.
+ */
 darray(char) dstr_alloc_empty();
 
-// Allocate a dstring as copy of cstring `src`.
+/**@function
+ * @brief Allocate a dstring as copy of cstring `src`. `src` may also be a
+ *  dstring.
+ *
+ * @param src : string to copy.
+ *
+ * @return Pointer to a new dstring on success. `NULL` on allocation failure.
+ */
 darray(char) dstr_alloc_from_cstr(const char* src);
 
-// Allocate a dstring as a copy of dstring `src`. Faster than
-// `dstr_alloc_from_cstr` for allocating a dstring from another dstring as,
-// the copy is performed with one large `memcpy` instead of a char-by-char copy.
+/**@function
+ * @brief Allocate a dstring as a copy of dstring `src`. Faster than
+ *  `dstr_alloc_from_cstr` when copying a dstring.
+ *
+ * @param src : dstring to copy.
+ *
+ * @return Pointer to a new dstring on success. `NULL` on allocation failure.
+ */
 darray(char) dstr_alloc_from_dstr(const darray(char) src);
 
-// Allocate a dstring using `sprintf` style formatting.
+/**@function
+ * @brief Allocate a dstring using `sprintf` style formatting.
+ *
+ * @param format : `printf` style format string.
+ * @param ... : va arg list for the format string.
+ *
+ * @return Pointer to a new dstring on success. `NULL` on allocation failure.
+ */
 darray(char) dstr_alloc_from_format(const char* format, ...);
 
-// Free a dstring. Equivalent to calling `da_free` on `dstr`.
+/**@function
+ * @brief Free a dstring. Equivalent to calling `da_free` on `dstr`.
+ * 
+ * @param dstr : dstring to free.
+ */
 void dstr_free(darray(char) dstr);
 
-// Returns the length of `dstr` without it's null terminator. Equivalent to
-// `da_length(dstr)-1`.
+/**@function
+ * @brief Returns the length of `dstr` without its null terminator. Equivalent
+ *  to `da_length(dstr)-1`.
+ *
+ * @param dstr : Target dstring.
+ *
+ * @return Length of `dstr` without its null terminator.
+ */
 size_t dstr_length(const darray(char) dstr);
 
-// Append `src` to dstring `dest`. Like `da_cat` references to `dest` may be
-// invalidated across the function call. Use the return value as truth for the
-// location of `dest` after function completion.
+/**@function
+ * @brief Append `src` to dstring `dest`. `src` may also be a dstring.
+ *
+ * @param dest : Target dstring that will be appended to. Like `da_cat`
+ *  references to `dest` may be invalidated across the function call. Use the
+ *  return value of `dstr_cat_cstr` as truth for the location of `dest` after
+ *  function completion.
+ * @param src : cstring to append to `dest`.
+ *
+ * @return Pointer to the new location of the dstring upon successful function
+ *  completion. If `dstr_cat_cstr` returns `NULL`, reallocation failed and
+ *  `dstr` is left untouched.
+ */
 darray(char) dstr_cat_cstr(darray(char) dest, const char* src);
 
-// Append `src` to dstring `dest`. Like `da_cat` references to `dest` may be
-// invalidated across the function call. Use the return value as truth for the
-// location of `dest` after function completion. Faster than
-// `dstr_cat_cstr` for cat-ing a dstring to another dstring.
+/**@function
+ * @brief Append `src` to dstring `dest`. Faster than `dstr_cat_cstr` for
+ *  cat-ing a dstring to another dstring.
+ * 
+ * @param dest : Target dstring that will be appended to. Like `da_cat`
+ *  references to `dest` may be invalidated across the function call. Use the
+ *  return value of `dstr_cat_cstr` as truth for the location of `dest` after
+ *  function completion.
+ * @param src : dstring to append to `dest`.
+ */
 darray(char) dstr_cat_dstr(darray(char) dest, const darray(char) src);
 
-// Comparison function. Currently functionally equivalent to `strcmp`.
+/**@function
+ * @brief Comparison function. Currently functionally equivalent to `strcmp`.
+ *
+ * @param s1 : First dstring.
+ * @param s2 : Second dstring.
+ *
+ * @return `strcmp` style comparison of `s1` and `s2`.
+ */
 int dstr_cmp(const darray(char) s1, const char* s2);
 
-// Comparison function. Currently functionally equivalent to `strcasecmp`.
+/**@function
+ * @brief Comparison function. Currently functionally equivalent to
+ *  `strcasecmp`.
+ *
+ * @param s1 : First dstring.
+ * @param s2 : Second dstring.
+ *
+ * @return `strcmp` style comparison of `s1` and `s2`.
+ */
 int dstr_cmp_case(const darray(char) s1, const char* s2);
 
-// Returns the index of the first occurrence of `substr` in `dstr`. Returns -1
-// if `substr` was not found. Similar to python's `str.find`.
+/**@function
+ * @brief Returns the index of the first occurrence of `substr` in `dstr` or
+ *  -1 if `substr` was not found. Similar to python's `str.find`.
+ *
+ * @param dstr : Target dstring to search.
+ * @param substr : Target substring to find in `dstr`.
+ *
+ * @return Index of the first occurence of `substr` if `substr` was found. -1 if
+ *  substr was not found.
+ */
 long dstr_find(darray(char) dstr, const char* substr);
 
-// Returns the index of the first case insensitive occurrence of `substr` in
-// `dstr`. Returns -1 if `substr` was not found. Similar to python's `str.find`.
+/**@function
+ * @brief Returns the index of the first case insensitive occurrence of
+ *  `substr` in `dstr` or -1 if `substr` was not found. Similar to python's
+ *  `str.find`.
+ *
+ * @param dstr : Target dstring to search.
+ * @param substr : Target substring to find in `dstr`.
+ *
+ * @return Index of the first occurence of `substr` if `substr` was found. -1 if
+ *  substr was not found.
+ */
 long dstr_find_case(darray(char) dstr, const char* substr);
 
-// Replace all occurrences of `substr` in `dstr` with `new_substr`. Returns the
-// new location of `dstr` after replacement.
+/**@function
+ * @brief Replace all occurrences of `substr` in `dstr` with `new_str`.
+ *
+ * @param dstr : Target dstring. Upon function completion, `dstr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
+ * @param substr : Substring in `dstr` that will be replaces.
+ * @param new_substr : String that will replace `substr`.
+ *
+ * @return The new location of `dstr` after function completion. If
+ *  `dstr_replace_all` returns `NULL` reallocation failed and `dstr` is left
+ *  untouched.
+ */
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
-    const char* new_substr);
+    const char* new_str);
 
-// Replace all occurrences of `substr` (case insensitive) in `dstr` with
-// `new_substr`. Returns the new location of `dstr` after replacement.
+/**@function
+ * @brief Replace all occurrences of `substr` (case insensitive) in `dstr` with
+ *  `new_str`.
+ *
+ * @param dstr : Target dstring. Upon function completion, `dstr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
+ * @param substr : Substring in `dstr` that will be replaces.
+ * @param new_substr : String that will replace `substr`.
+ *
+ * @return The new location of `dstr` after function completion. If
+ *  `dstr_replace_all_case` returns `NULL` reallocation failed and `dstr` is
+ *  left untouched.
+ */
 darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
-    const char* new_substr);
+    const char* new_str);
 
-// Transform `dstr` to lower case in place.
+/**@function
+ * @brief Transform `dstr` to lower case in place.
+ *
+ * @param dstr : Target dstring to transform.
+ */
 void dstr_transform_lower(darray(char) dstr);
 
-// Transform `dstr` to upper case in place.
+/**@function
+ * @brief Transform `dstr` to upper case in place.
+ *
+ * @param dstr : Target dstring to transform.
+ */
 void dstr_transform_upper(darray(char) dstr);
 
-// Trim's leading and trailing whitespace from dstr. Returns the new location
-// of `dstr` after trimming.
+/**@function
+ * @brief Trims leading and trailing whitespace from dstr.
+ *
+ * @param : Target dstring. Upon function completion, `dstr` may or may not
+ *  point to its previous block on the heap, potentially breaking references.
+ *
+ * @return The new location of `dstr` after function completion. If `dstr_trim`
+ *  returns `NULL` reallocation failed and `dstr` is left untouched.
+ */
 darray(char) dstr_trim(darray(char) dstr);
 
 #endif // !_DSTRING_H_

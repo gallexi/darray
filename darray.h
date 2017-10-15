@@ -57,7 +57,7 @@
  * @param nelem : Initial number of elements in the darray.
  * @param size : `sizeof` each element.
  *
- * @return Pointer to a new darray.
+ * @return Pointer to a new darray on success. `NULL` on allocation failure.
  */
 void* da_alloc(size_t nelem, size_t size);
 
@@ -68,7 +68,7 @@ void* da_alloc(size_t nelem, size_t size);
  * @param nelem : Initial number of elements in the darray.
  * @param size : `sizeof` each element.
  *
- * @return Pointer to a new darray.
+ * @return Pointer to a new darray on success. `NULL` on allocation failure.
  */
 void* da_alloc_exact(size_t nelem, size_t size);
 
@@ -116,7 +116,7 @@ size_t da_sizeof_elem(void* darr);
  * @param nelem : New length of the darray.
  *
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_resize` returns `NULL`, reallocation failed and `darr` is
+ *  completion. If `da_resize` returns `NULL` reallocation failed and `darr` is
  *  left untouched.
  *
  * @note Affects the length of the darray.
@@ -133,7 +133,7 @@ void* da_resize(void* darr, size_t nelem);
  * @param nelem : New length/capacity of the darray.
  *
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_resize_exact` returns `NULL`, reallocation failed and
+ *  completion. If `da_resize_exact` returns `NULL` reallocation failed and
  *  `darr` is left untouched.
  *
  * @note Affects the length of the darray.
@@ -149,7 +149,7 @@ void* da_resize_exact(void* darr, size_t nelem);
  * @param nelem : Number of additional elements that may be inserted.
  *
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_reserve` returns `NULL`, reallocation failed and `darr`
+ *  completion. If `da_reserve` returns `NULL` reallocation failed and `darr`
  *  is left untouched.
  *
  * @note Does NOT affect the length of the darray.
@@ -293,7 +293,7 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
  * @param nelem : Number of elements from `src` to append to `dest`.
  *
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_cat` returns `NULL`, reallocation failed and `darr`
+ *  completion. If `da_cat` returns `NULL` reallocation failed and `darr`
  *  is left untouched.
  *
  * @note Unlike `strcat` in libc, references to `dest` may be broken across

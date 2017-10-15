@@ -255,7 +255,7 @@ long dstr_find_case(darray(char) dstr, const char* substr)
 }
 
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
-    const char* new_substr)
+    const char* new_str)
 {
     size_t substr_len = strlen(substr);
     size_t new_substr_len = strlen(new_substr);
@@ -270,7 +270,7 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
 }
 
 darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
-    const char* new_substr)
+    const char* new_str)
 {
     size_t substr_len = strlen(substr);
     size_t new_substr_len = strlen(new_substr);
