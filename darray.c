@@ -138,6 +138,29 @@ darray(char) dstr_alloc_from_dstr(const darray(char) src)
     return darr;
 }
 
+darray(char) dstr_alloc_from_format(const char* format, ...)
+{
+    va_list args;
+    va_list copy;
+    va_start(args, format);
+
+    va_copy(copy, args);
+    size_t size = vsnprintf(NULL, 0, format, copy);
+    va_end(copy);
+
+    char* dstr = da_alloc(size+1, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    if (size != (size_t)vsprintf(dstr, format, args))
+    {
+        da_free(dstr);
+        return NULL;
+    }
+
+    va_end(args);
+    return dstr;
+}
+
 void dstr_free(darray(char) dstr)
 {
     da_free(dstr);
@@ -247,4 +270,26 @@ void dstr_transform_upper(darray(char) dstr)
 {
     da_foreach(dstr, c)
         *c = toupper(*c);
+}
+
+darray(char) dstr_trim(darray(char) dstr)
+{
+    size_t n;
+    char* tmp;
+
+    // Trim leading whitespace.
+    n = 0;
+    tmp = dstr;
+    while (isspace(*tmp++))
+        ++n;
+    da_remove_arr(dstr, 0, n);
+
+    // Trim trailing whitespace.
+    n = 0;
+    tmp = dstr + dstr_length(dstr) - 1;
+    while (isspace(*tmp--))
+        n++;
+    da_remove_arr(dstr, dstr_length(dstr)-n, n);
+
+    return dstr;
 }

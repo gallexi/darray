@@ -660,11 +660,22 @@ EMU_TEST(dstr_alloc_from_dstr__and__dstr_free);
     EMU_END_TEST();
 }
 
+EMU_TEST(dstr_alloc_from_format__and__dstr_free)
+{
+    char* dstr = dstr_alloc_from_format("%d %s", 5, "foo");
+    EMU_REQUIRE_NOT_NULL(dstr);
+    EMU_REQUIRE_EQ_UINT(strlen(dstr), 5);
+    EMU_REQUIRE_STREQ(dstr, "5 foo");
+    dstr_free(dstr);
+    EMU_END_TEST();
+}
+
 EMU_GROUP(dstring_alloc_and_free_functions)
 {
     EMU_ADD(dstr_alloc_empty__and__dstr_free);
     EMU_ADD(dstr_alloc_from_cstr__and__dstr_free);
     EMU_ADD(dstr_alloc_from_dstr__and__dstr_free);
+    EMU_ADD(dstr_alloc_from_format__and__dstr_free);
     EMU_END_GROUP();
 }
 
@@ -842,6 +853,14 @@ EMU_GROUP(dstr_transform_functions)
     EMU_END_GROUP();
 }
 
+EMU_TEST(dstr_trim)
+{
+    char* dstr = dstr_alloc_from_cstr(" \t\n\v\f\rfoo \t\n\v\f\r");
+    dstr = dstr_trim(dstr);
+    EMU_EXPECT_STREQ(dstr, "foo");
+    EMU_END_TEST();
+}
+
 EMU_GROUP(dstring_functions)
 {
     EMU_ADD(dstring_alloc_and_free_functions);
@@ -851,6 +870,7 @@ EMU_GROUP(dstring_functions)
     EMU_ADD(dstr_find_functions);
     EMU_ADD(dstr_replace_functions);
     EMU_ADD(dstr_transform_functions);
+    EMU_ADD(dstr_trim);
     EMU_END_GROUP();
 }
 
