@@ -6,7 +6,7 @@ CPPFLAGS=-Wall -Wextra -std=c++11
 BUILD_DIR=build/
 TEST_DIR=test/
 INSTALL_LIB_DIR=/usr/local/lib/
-INSTALL_INCLUDE_DIR=/usr/local/include/
+INSTALL_INCLUDE_DIR=/usr/local/include/darray/
 
 DARRAY_HEADER=darray.h
 DSTRING_HEADER=dstring.h
@@ -25,6 +25,7 @@ build: clean
 
 install: build
 	install $(BUILD_DIR)$(DARRAY_LIB_OUT) $(INSTALL_LIB_DIR)$(DARRAY_LIB_OUT)
+	mkdir -p $(INSTALL_INCLUDE_DIR)
 	install $(DARRAY_HEADER) $(INSTALL_INCLUDE_DIR)$(DARRAY_HEADER)
 	install $(DSTRING_HEADER) $(INSTALL_INCLUDE_DIR)$(DSTRING_HEADER)
 
