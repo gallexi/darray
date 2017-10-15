@@ -258,12 +258,12 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
     const char* new_str)
 {
     size_t substr_len = strlen(substr);
-    size_t new_substr_len = strlen(new_substr);
+    size_t new_str_len = strlen(new_str);
     long loc;
     while ((loc = dstr_find(dstr, substr)) != -1)
     {
         da_remove_arr(dstr, loc, substr_len);
-        if (!da_insert_arr(dstr, loc, new_substr, new_substr_len))
+        if (!da_insert_arr(dstr, loc, new_str, new_str_len))
             return NULL;
     }
     return dstr;
@@ -273,12 +273,12 @@ darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
     const char* new_str)
 {
     size_t substr_len = strlen(substr);
-    size_t new_substr_len = strlen(new_substr);
+    size_t new_str_len = strlen(new_str);
     long loc;
     while ((loc = dstr_find_case(dstr, substr)) != -1)
     {
         da_remove_arr(dstr, loc, substr_len);
-        if (!da_insert_arr(dstr, loc, new_substr, new_substr_len))
+        if (!da_insert_arr(dstr, loc, new_str, new_str_len))
             return NULL;
     }
     return dstr;
