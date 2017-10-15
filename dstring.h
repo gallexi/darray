@@ -24,6 +24,8 @@
 #define _DSTRING_H_
 
 #include "darray.h"
+#include <stdarg.h>
+#include <stdio.h>
 
 // Allocate a dstring as the empty string "".
 darray(char) dstr_alloc_empty();

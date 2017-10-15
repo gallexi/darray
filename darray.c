@@ -222,9 +222,33 @@ long dstr_find(darray(char) dstr, const char* substr)
     return loc - dstr;
 }
 
+static const char* _da_strcasestr(const char* haystack, const char* needle)
+{
+    const char* currh = haystack;
+    const char* currn = needle;
+    while (1)
+    {
+        if (*currn == '\0')
+            return haystack;
+        else if (*currh == '\0')
+            return NULL;
+
+        if (tolower(*currh) != tolower(*currn))
+        {
+            haystack = ++currh;
+            currn = needle;
+        }
+        else
+        {
+            currh++;
+            currn++;
+        }
+    }
+}
+
 long dstr_find_case(darray(char) dstr, const char* substr)
 {
-    char* loc = strcasestr(dstr, substr);
+    const char* loc = _da_strcasestr(dstr, substr);
     if (loc == NULL)
         return -1;
     return loc - dstr;
