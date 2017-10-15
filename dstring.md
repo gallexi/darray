@@ -1,4 +1,4 @@
-# Dstring - Darray string specialization
+# Dstring - Darray String Specialization
 
 ## Table of contents
 1. [Introduction](#introduction) 
