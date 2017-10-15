@@ -28,7 +28,7 @@
 #include <stdio.h>
 
 /**@function
- * @brief Allocate a dstring as the empty string "".
+ * @brief Allocate a dstring as the empty string `""`.
  *
  * @return Pointer to a new dstring on success. `NULL` on allocation failure.
  */
@@ -137,8 +137,8 @@ int dstr_cmp_case(const darray(char) s1, const char* s2);
  * @param dstr : Target dstring to search.
  * @param substr : Target substring to find in `dstr`.
  *
- * @return Index of the first occurence of `substr` if `substr` was found. -1 if
- *  substr was not found.
+ * @return Index of the first occurence of `substr` if `substr` was found. `-1`
+ *  if  substr was not found.
  */
 long dstr_find(darray(char) dstr, const char* substr);
 
@@ -150,8 +150,8 @@ long dstr_find(darray(char) dstr, const char* substr);
  * @param dstr : Target dstring to search.
  * @param substr : Target substring to find in `dstr`.
  *
- * @return Index of the first occurence of `substr` if `substr` was found. -1 if
- *  substr was not found.
+ * @return Index of the first occurence of `substr` if `substr` was found. `-1`
+ *  if substr was not found.
  */
 long dstr_find_case(darray(char) dstr, const char* substr);
 

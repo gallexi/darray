@@ -29,9 +29,9 @@
         + [dstr_trim](#dstr_trim)
 
 ## Introduction
-Character arrays are by far the most common array type in C. Many functions in the C standard library like `strcmp` and `printf` will work exactly the same with `darray(char)` as built-in cstrings, but some functions such as `strcpy` and `sprintf` will "break" character darrays by desynching the length of the darray from the actual length of the string. To prevent bugs that may occur from using the C standard library functions with character darrays, the dstring extension of darrays was created. For reference, a dstring is written as `darray(char)` and refered to as such in all documentation.
+Character arrays are by far the most common array type in C. Many functions in the C standard library like `strcmp` and `printf` will work exactly the same with `darray(char)` as built-in cstrings, but some functions such as `strcpy` and `sprintf` will "break" character darrays by desynching the length property of the darray from the actual length of the string. To prevent bugs that may occur from using the C standard library functions with character darrays, the dstring extension of darrays was created. A dstring is written as `darray(char)` and refered to as such in all documentation.
 
-By default dstrings are not included by `darray.h`. To access the dstring library `#include <dstring.h>` to access dstring function declarations.
+By default dstrings are not included by `darray.h`. `#include <dstring.h>` to access dstring function declarations.
 
 Generally speaking, if you are using dstrings, you should prefer the functions in this library over the C standard library when possible.
 
@@ -40,7 +40,7 @@ Generally speaking, if you are using dstrings, you should prefer the functions i
 ### Creation and Deletion
 
 #### dstr_alloc_empty
-Allocate a dstring as the empty string "".
+Allocate a dstring as the empty string `""`.
 
 Returns a pointer to a new dstring on success. `NULL` on allocation failure.
 ```C
@@ -130,13 +130,13 @@ int dstr_cmp_case(const darray(char) s1, const char* s2);
 ### Find and Replace Functions
 
 #### dstr_find
-Returns the index of the first occurrence of `substr` in `dstr` or -1 if `substr` was not found. Similar to Python's `str.find`.
+Returns the index of the first occurrence of `substr` in `dstr` or `-1` if `substr` was not found. Similar to Python's `str.find`.
 ```C
 long dstr_find(darray(char) dstr, const char* substr);
 ```
 
 #### dstr_find_case
-Returns the index of the first case insensitive occurrence of `substr` in `dstr` or -1 if `substr` was not found. Similar to Python's `str.find`.
+Returns the index of the first case insensitive occurrence of `substr` in `dstr` or `-1` if `substr` was not found. Similar to Python's `str.find`.
 ```C
 long dstr_find_case(darray(char) dstr, const char* substr);
 ```
@@ -153,6 +153,9 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char*
 Replace all occurrences of `substr` (case insensitive) in `dstr` with `new_str`.
 
 Returns the new location of `dstr` after function completion. If `dstr_replace_all_case` returns `NULL` reallocation failed and `dstr` is left untouched.
+```C
+darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char* new_str);
+```
 
 ----
 
