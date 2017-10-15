@@ -32,7 +32,7 @@
  *
  * @return Pointer to a new dstring on success. `NULL` on allocation failure.
  */
-darray(char) dstr_alloc_empty();
+darray(char) dstr_alloc_empty(void);
 
 /**@function
  * @brief Allocate a dstring as copy of cstring `src`. `src` may also be a
@@ -73,11 +73,12 @@ void dstr_free(darray(char) dstr);
 
 /**@function
  * @brief Returns the length of `dstr` without its null terminator. Equivalent
- *  to `da_length(dstr)-1`.
+ *  to `da_length(dstr)-1`. O(1) compared to the O(n) `strlen`.
  *
  * @param dstr : Target dstring.
  *
  * @return Length of `dstr` without its null terminator.
+ *
  */
 size_t dstr_length(const darray(char) dstr);
 
@@ -131,7 +132,7 @@ int dstr_cmp_case(const darray(char) s1, const char* s2);
 
 /**@function
  * @brief Returns the index of the first occurrence of `substr` in `dstr` or
- *  -1 if `substr` was not found. Similar to python's `str.find`.
+ *  -1 if `substr` was not found. Similar to Python's `str.find`.
  *
  * @param dstr : Target dstring to search.
  * @param substr : Target substring to find in `dstr`.
@@ -143,7 +144,7 @@ long dstr_find(darray(char) dstr, const char* substr);
 
 /**@function
  * @brief Returns the index of the first case insensitive occurrence of
- *  `substr` in `dstr` or -1 if `substr` was not found. Similar to python's
+ *  `substr` in `dstr` or -1 if `substr` was not found. Similar to Python's
  *  `str.find`.
  *
  * @param dstr : Target dstring to search.
@@ -200,7 +201,7 @@ void dstr_transform_lower(darray(char) dstr);
 void dstr_transform_upper(darray(char) dstr);
 
 /**@function
- * @brief Trims leading and trailing whitespace from dstr.
+ * @brief Trims leading and trailing whitespace from `dstr`.
  *
  * @param : Target dstring. Upon function completion, `dstr` may or may not
  *  point to its previous block on the heap, potentially breaking references.

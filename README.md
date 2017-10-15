@@ -30,6 +30,7 @@
         + [da_cat](#da_cat)
         + [da_fill [GNU C only]](#da_fill)
         + [da_foreach [GNU C only]](#da_foreach)
+1. [String Specialization](#string-specialization)
 1. [License](#license)
 
 ## Introduction
@@ -68,7 +69,7 @@ Note: The type `ELEM_TYPE` used throughout the API documentation referes to the 
 #### da_alloc
 Allocate a darray of `nelem` elements each of size `size`.
 
-Returns a pointer to a new darray.
+Returns a pointer to a new darray on success. `NULL` on allocation failure.
 ```C
 void* da_alloc(size_t nelem, size_t size);
 ```
@@ -90,7 +91,7 @@ Be aware that the `size` parameter is stored internally by the darray and is use
 #### da_alloc_exact
 Allocate a darray of `nelem` elements each of size `size`. The capacity of the darray will be be exactly `nelem`.
 
-Returns a pointer to a new darray.
+Returns a pointer to a new darray on success. `NULL` on allocation failure.
 ```C
 void* da_alloc_exact(size_t nelem, size_t size);
 ```
@@ -309,6 +310,9 @@ da_foreach(darr, iter)
 ```
 
 ----
+
+## String Specialization
+The `dstring.h` header file contains special functions for creating and manipulating dstrings (`darray(char)`). See `dstring.md` for the full dstring API.
 
 ## License
 MIT (contributers welcome)

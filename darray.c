@@ -115,7 +115,7 @@ void* da_cat(void* dest, void* src, size_t nelem)
 }
 
 /////////////////////////////////// DSTRING ////////////////////////////////////
-darray(char) dstr_alloc_empty()
+darray(char) dstr_alloc_empty(void)
 {
     char* darr = da_alloc(1, sizeof(char));
     darr[0] = '\0';
