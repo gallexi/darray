@@ -93,7 +93,7 @@ void fill_push_back_helper(size_t max_sz)
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_push(darr, rand());
+        darr = da_push(darr, rand());
     }
     end = clock();
     da_free(darr);
@@ -118,7 +118,7 @@ void insert_front_helper(size_t max_sz)
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_insert(darr, 0, rand());
+        darr = da_insert(darr, 0, rand());
     }
     end = clock();
     da_free(darr);
@@ -142,7 +142,7 @@ void insert_rand_helper(size_t max_sz)
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_insert(darr, rand() % da_length(darr), rand());
+        darr = da_insert(darr, rand() % da_length(darr), rand());
     }
     end = clock();
     da_free(darr);
@@ -169,7 +169,7 @@ void remove_front_helper(size_t max_sz)
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_push(darr, i);
+        darr = da_push(darr, i);
     }
     tot = 0;
     for (size_t i = 0; i < max_sz; ++i)
@@ -202,7 +202,7 @@ void remove_rand_helper(size_t max_sz)
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
-        da_push(darr, i);
+        darr = da_push(darr, i);
     }
     tot = 0;
     for (size_t i = 0; i < max_sz; ++i)

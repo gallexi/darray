@@ -293,7 +293,8 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
  *  a function call to `da_cat`. The return value of `da_cat` should be used as
  *  truth for the location of `dest` after function completion.
  */
-void* da_cat(void* dest, void* src, size_t nelem);
+void* da_cat(void* dest, void* src, size_t nelem)
+    __attribute__((warn_unused_result));
 
 /**@macro
  * @brief Set every element of `darr` to `value`.
