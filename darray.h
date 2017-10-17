@@ -23,14 +23,18 @@
 #ifndef _DARRAY_H_
 #define _DARRAY_H_
 
-#define _GNU_SOURCE /* strcasestr */
-
 #include <ctype.h>
 #include <stdalign.h>
 #include <stddef.h>
 #include <stdlib.h>
 #include <stdbool.h>
 #include <string.h>
+
+#if defined(__GNUC__) || defined(__clang__) // GNU C compiler attributes
+#   define DA_WARN_UNUSED_RESULT __attribute__((warn_unused_result))
+#else
+#   define DA_WARN_UNUSED_RESULT /* nothing */
+#endif // !GNU C compiler attributes
 
 /* DARRAY MEMORY LAYOUT
  * ====================
@@ -59,7 +63,7 @@
  *
  * @return Pointer to a new darray on success. `NULL` on allocation failure.
  */
-void* da_alloc(size_t nelem, size_t size);
+void* da_alloc(size_t nelem, size_t size) DA_WARN_UNUSED_RESULT;
 
 /**@function
  * @brief Allocate a darray of `nelem` elements each of size `size`. The
@@ -70,7 +74,7 @@ void* da_alloc(size_t nelem, size_t size);
  *
  * @return Pointer to a new darray on success. `NULL` on allocation failure.
  */
-void* da_alloc_exact(size_t nelem, size_t size);
+void* da_alloc_exact(size_t nelem, size_t size) DA_WARN_UNUSED_RESULT;
 
 /**@function
  * @brief Free a darray.
@@ -121,7 +125,7 @@ size_t da_sizeof_elem(void* darr);
  *
  * @note Affects the length of the darray.
  */
-void* da_resize(void* darr, size_t nelem);
+void* da_resize(void* darr, size_t nelem) DA_WARN_UNUSED_RESULT;
 
 /**@function
  * @brief Change the length of a darray to `nelem`. The new capacity of the
@@ -138,7 +142,7 @@ void* da_resize(void* darr, size_t nelem);
  *
  * @note Affects the length of the darray.
  */
-void* da_resize_exact(void* darr, size_t nelem);
+void* da_resize_exact(void* darr, size_t nelem) DA_WARN_UNUSED_RESULT;
 
 /**@function
  * @brief Guarantee that at least `nelem` elements beyond the current length of
@@ -154,7 +158,7 @@ void* da_resize_exact(void* darr, size_t nelem);
  *
  * @note Does NOT affect the length of the darray.
  */
-void* da_reserve(void* darr, size_t nelem);
+void* da_reserve(void* darr, size_t nelem) DA_WARN_UNUSED_RESULT;
 
 /**@macro
  * @brief Insert a value at the back of `darr`.
@@ -223,7 +227,8 @@ void* da_reserve(void* darr, size_t nelem);
  *  performed via `memcpy`.
  * @note Affects the length of the darray.
  */
-void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem);
+void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem)
+    DA_WARN_UNUSED_RESULT;
 
 /**@macro
  * @brief Remove the value at `index` from `darr` and return it, moving the
@@ -286,15 +291,14 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
  * @param nelem : Number of elements from `src` to append to `dest`.
  *
  * @return Pointer to the new location of the darray upon successful function
- *  completion. If `da_cat` returns `NULL` reallocation failed and `darr`
+ *  completion. If `da_concat` returns `NULL` reallocation failed and `darr`
  *  is left untouched.
  *
  * @note Unlike `strcat` in libc, references to `dest` may be broken across
- *  a function call to `da_cat`. The return value of `da_cat` should be used as
- *  truth for the location of `dest` after function completion.
+ *  a function call to `da_concat`. The return value of `da_concat` should be
+ *  used as truth for the location of `dest` after function completion.
  */
-void* da_cat(void* dest, void* src, size_t nelem)
-    __attribute__((warn_unused_result));
+void* da_concat(void* dest, void* src, size_t nelem) DA_WARN_UNUSED_RESULT;
 
 /**@macro
  * @brief Set every element of `darr` to `value`.

@@ -159,7 +159,7 @@ EMU_TEST(da_push)
 
     for (int i = 0; i <= max_index; ++i)
     {
-        da = da_push(da, i);
+        da_push(da, i);
         EMU_REQUIRE_NOT_NULL(da);
     }
     EMU_REQUIRE_EQ_UINT(da_length(da), max_index+1);
@@ -356,7 +356,7 @@ EMU_TEST(da_swap)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_cat__darray_cat)
+EMU_TEST(da_concat__darray_cat)
 {
     int* src = da_alloc(2, sizeof(int));
     src[0] = 3;
@@ -367,7 +367,7 @@ EMU_TEST(da_cat__darray_cat)
     dest[1] = 1;
     dest[2] = 2;
 
-    dest = da_cat(dest, src, 2);
+    dest = da_concat(dest, src, 2);
     EMU_REQUIRE_NOT_NULL(dest);
     EMU_REQUIRE_NOT_NULL(src);
     EMU_REQUIRE_EQ_UINT(da_length(dest), 5);
@@ -381,7 +381,7 @@ EMU_TEST(da_cat__darray_cat)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_cat__array_cat)
+EMU_TEST(da_concat__array_cat)
 {
     int src[] = {3, 4};
 
@@ -390,7 +390,7 @@ EMU_TEST(da_cat__array_cat)
     dest[1] = 1;
     dest[2] = 2;
 
-    dest = da_cat(dest, src, 2);
+    dest = da_concat(dest, src, 2);
     EMU_REQUIRE_NOT_NULL(dest);
     EMU_REQUIRE_NOT_NULL(src);
     EMU_REQUIRE_EQ_UINT(da_length(dest), 5);
@@ -403,14 +403,14 @@ EMU_TEST(da_cat__array_cat)
     EMU_END_TEST();
 }
 
-EMU_TEST(da_cat__cstring_cat)
+EMU_TEST(da_concat__cstring_cat)
 {
     char* src = "World!";
 
     char* dest = da_alloc(strlen("Hello "), sizeof(char));
     memcpy(dest, "Hello ", strlen("Hello "));
 
-    dest = da_cat(dest, src, strlen(src)+1);
+    dest = da_concat(dest, src, strlen(src)+1);
     EMU_PRINT_INDENT(); printf("%s\n", dest);
     EMU_EXPECT_STREQ(dest, "Hello World!");
     EMU_EXPECT_EQ_UINT(da_length(dest), strlen("Hello World!")+1);
@@ -418,7 +418,7 @@ EMU_TEST(da_cat__cstring_cat)
     da_pop(dest); // remove null terminator
 
     char another[] = " Another one!";
-    dest = da_cat(dest, another, strlen(another)+1);
+    dest = da_concat(dest, another, strlen(another)+1);
     EMU_PRINT_INDENT(); printf("%s\n", dest);
     EMU_EXPECT_STREQ(dest, "Hello World! Another one!");
     EMU_EXPECT_EQ_UINT(da_length(dest), strlen("Hello World! Another one!")+1);
@@ -427,11 +427,11 @@ EMU_TEST(da_cat__cstring_cat)
     EMU_END_TEST();
 }
 
-EMU_GROUP(da_cat)
+EMU_GROUP(da_concat)
 {
-    EMU_ADD(da_cat__darray_cat);
-    EMU_ADD(da_cat__array_cat);
-    EMU_ADD(da_cat__cstring_cat);
+    EMU_ADD(da_concat__darray_cat);
+    EMU_ADD(da_concat__array_cat);
+    EMU_ADD(da_concat__cstring_cat);
     EMU_END_GROUP();
 }
 
@@ -591,7 +591,7 @@ EMU_GROUP(darray_functions)
     EMU_ADD(da_remove);
     EMU_ADD(da_remove_arr);
     EMU_ADD(da_swap);
-    EMU_ADD(da_cat);
+    EMU_ADD(da_concat);
     EMU_ADD(da_fill);
     EMU_ADD(da_foreach);
     EMU_ADD(container_style_type);
@@ -690,10 +690,10 @@ EMU_TEST(dstr_length)
     EMU_END_TEST();
 }
 
-EMU_TEST(dstr_cat_cstr)
+EMU_TEST(dstr_concat_cstr)
 {
     char* dstr = dstr_alloc_from_cstr(TEST_STR0);
-    dstr = dstr_cat_cstr(dstr, TEST_STR1);
+    dstr = dstr_concat_cstr(dstr, TEST_STR1);
     EMU_REQUIRE_NOT_NULL(dstr);
     EMU_REQUIRE_EQ_UINT(strlen(dstr), strlen(TEST_STR0 TEST_STR1));
     EMU_REQUIRE_STREQ(dstr, TEST_STR0 TEST_STR1);
@@ -701,11 +701,11 @@ EMU_TEST(dstr_cat_cstr)
     EMU_END_TEST();
 }
 
-EMU_TEST(dstr_cat_dstr)
+EMU_TEST(dstr_concat_dstr)
 {
     char* dest = dstr_alloc_from_cstr(TEST_STR0);
     char* src = dstr_alloc_from_cstr(TEST_STR1);
-    dest = dstr_cat_dstr(dest, src);
+    dest = dstr_concat_dstr(dest, src);
     EMU_REQUIRE_NOT_NULL(dest);
     EMU_REQUIRE_EQ_UINT(strlen(dest), strlen(TEST_STR0 TEST_STR1));
     EMU_REQUIRE_STREQ(dest, TEST_STR0 TEST_STR1);
@@ -714,10 +714,10 @@ EMU_TEST(dstr_cat_dstr)
     EMU_END_TEST();
 }
 
-EMU_GROUP(dstr_cat_functions)
+EMU_GROUP(dstr_concat_functions)
 {
-    EMU_ADD(dstr_cat_cstr);
-    EMU_ADD(dstr_cat_dstr);
+    EMU_ADD(dstr_concat_cstr);
+    EMU_ADD(dstr_concat_dstr);
     EMU_END_GROUP();
 }
 
@@ -865,7 +865,7 @@ EMU_GROUP(dstring_functions)
 {
     EMU_ADD(dstring_alloc_and_free_functions);
     EMU_ADD(dstr_length);
-    EMU_ADD(dstr_cat_functions);
+    EMU_ADD(dstr_concat_functions);
     EMU_ADD(dstr_cmp_functions);
     EMU_ADD(dstr_find_functions);
     EMU_ADD(dstr_replace_functions);
@@ -891,7 +891,7 @@ EMU_TEST(struct_type)
     // da_push(da, (struct foo){.a=4, .b='z', .c=4.14159});
     // ^^^ this will cause a compile time error since the commas in the
     // declaration get parsed as separate arguments to the push macro.
-    da_push(da, some_struct);
+    da = da_push(da, some_struct);
 
     struct foo bar = da_remove(da, 0);
     EMU_EXPECT_EQ(some_struct.a, bar.a);

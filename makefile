@@ -19,7 +19,7 @@ OPTIMIZATION_LEVEL=-O3
 all: build unit_tests perf_tests
 
 build: clean
-	mkdir -p $(BUILD_DIR) --mode=755
+	mkdir -p $(BUILD_DIR)
 	gcc $(CFLAGS) -c -o $(BUILD_DIR)$(DARRAY_OBJ) darray.c $(OPTIMIZATION_LEVEL)
 	ar rcs $(BUILD_DIR)$(DARRAY_LIB_OUT) $(BUILD_DIR)$(DARRAY_OBJ)
 

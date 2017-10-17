@@ -139,7 +139,7 @@ void da_swap(void* darr, size_t index_a, size_t index_b)
     );
 }
 
-void* da_cat(void* dest, void* src, size_t nelem)
+void* da_concat(void* dest, void* src, size_t nelem)
 {
     size_t offset = da_length(dest)*da_sizeof_elem(dest);
     dest = da_resize(dest, da_length(dest)+nelem);
@@ -207,7 +207,7 @@ size_t dstr_length(const darray(char) dstr)
     return da_length((void*)dstr)-1;
 }
 
-darray(char) dstr_cat_cstr(darray(char) dest, const char* src)
+darray(char) dstr_concat_cstr(darray(char) dest, const char* src)
 {
     size_t dest_len = da_length((void*)dest)-1;
     size_t src_len_with_nullterm = strlen(src)+1;
@@ -218,7 +218,7 @@ darray(char) dstr_cat_cstr(darray(char) dest, const char* src)
     return dest;
 }
 
-darray(char) dstr_cat_dstr(darray(char) dest, const darray(char) src)
+darray(char) dstr_concat_dstr(darray(char) dest, const darray(char) src)
 {
     size_t dest_len = da_length((void*)dest)-1;
     size_t src_len_with_nullterm = da_length((void*)src);
