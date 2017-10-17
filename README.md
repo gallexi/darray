@@ -14,11 +14,11 @@
         + [da_reserve](#da_reserve)
     + [Insertion](#insertion)
         + [da_insert [GNU C only]](#da_insert)
-        + [da_insert_arr [GNU C only]](#da_insert_arr)
+        + [da_insert_arr](#da_insert_arr)
         + [da_push [GNU C only]](#da_push)
     + [Removal](#removal)
         + [da_remove [GNU C only]](#da_remove)
-        + [da_remove_arr [GNU C only]](#da_remove_arr)
+        + [da_remove_arr](#da_remove_arr)
         + [da_pop [GNU C only]](#da_pop)
     + [Accessing Header Data](#accessing-header-data)
         + [da_length](#da_length)
@@ -153,34 +153,31 @@ my_arr = da_reserve(my_arr, 50);
 ### Insertion
 
 #### da_insert
-Insert a value into `darr` at the specified index, moving the values beyond `index` back one element. Assignment back to the provided `darr` lvalue parameter is automatic.
+Insert a value into `darr` at the specified index, moving the values beyond `index` back one element.
 
-Returns `true` on success, `false` on failure. If `da_insert` returns `false`, reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_insert` returns `NULL` reallocation failed and `darr` is left untouched.
 ```C
-#define /* bool */da_insert(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE */value) \
+#define /* ELEM_TYPE* */da_insert(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE */value)
     /* ...macro implementation */
 ```
-Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
 
 #### da_insert_arr
-Insert an `nelem` values from `src` into `darr` at the specified index, moving the values beyond `index` back `nelem` elements. Assignment back to the provided `darr` lvalue parameter is automatic.
+Insert an `nelem` values from `src` into `darr` at the specified index, moving the values beyond `index` back `nelem` elements.
 
-Returns `true` on success, `false` on failure. If `da_insert` returns `false`, reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_insert_arr` returns `NULL` reallocation failed and `darr` is left untouched.
 ```C
-#define /* bool */da_insert_arr(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE* */src, /* size_t */nelem) \
-    /* ...macro implementation */
+void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem);
 ```
-Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
+Note that the `typeof` src must match the `ELEM_TYPE` of `darr` as assignment is performed via `memcpy`.
 
 #### da_push
-Insert a value at the back of `darr`. Assignment back to the provided `darr` lvalue parameter is automatic.
+Insert a value at the back of `darr`.
 
-Returns `true` on success, `false` on failure. If `da_insert` returns `false`, reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_push` returns `NULL` reallocation failed and `darr` is left untouched.
 ```C
-#define /* bool */da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value) \
+#define /* ELEM_TYPE* */da_push(/* ELEM_TYPE* */darr, /* ELEM_TYPE */value) \
     /* ...macro implementation */
 ```
-Upon function completion, `darr` may or may not point to its previous block on the heap. Assignment back to the provided `darr` lvalue is automatic, but other references to `darr` may be invalidated.
 
 ----
 
@@ -200,8 +197,7 @@ Returns the value removed from the darray.
 Remove `nelem` values starting at `index` from `darr`, moving the values beyond `index` forward `nelem` elements.
 
 ```C
-#define /* void */da_remove_arr(/* ELEM_TYPE* */darr, /* size_t */index, /* size_t */nelem)
-    /* ...macro implementation */
+void da_remove_arr(void* darr, size_t index, size_t nelem);
 ```
 
 #### da_pop

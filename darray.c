@@ -94,6 +94,41 @@ void* da_reserve(void* darr, size_t nelem)
     return ptr->_data;
 }
 
+void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem)
+{
+    if (*DA_P_LENGTH_FROM_HANDLE(darr)+nelem >=
+        *DA_P_CAPACITY_FROM_HANDLE(darr))
+    {
+        darr = da_reserve(darr, nelem);
+        if (darr == NULL)
+            return NULL;
+    }
+    memmove(
+        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
+        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
+            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index)
+    );
+    memcpy(
+        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
+        src,
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*nelem
+    );
+    (*DA_P_LENGTH_FROM_HANDLE(darr)) += nelem;
+    return darr;
+}
+
+void da_remove_arr(void* darr, size_t index, size_t nelem)
+{
+    memmove(
+        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
+        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
+        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
+            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index-nelem)
+    );
+    (*DA_P_LENGTH_FROM_HANDLE(darr)) -= nelem;
+}
+
 void da_swap(void* darr, size_t index_a, size_t index_b)
 {
     size_t size = da_sizeof_elem(darr);
@@ -263,7 +298,7 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr,
     while ((loc = dstr_find(dstr, substr)) != -1)
     {
         da_remove_arr(dstr, loc, substr_len);
-        if (!da_insert_arr(dstr, loc, new_str, new_str_len))
+        if ((dstr = da_insert_arr(dstr, loc, new_str, new_str_len)) == NULL)
             return NULL;
     }
     return dstr;
@@ -278,7 +313,7 @@ darray(char) dstr_replace_all_case(darray(char) dstr, const char* substr,
     while ((loc = dstr_find_case(dstr, substr)) != -1)
     {
         da_remove_arr(dstr, loc, substr_len);
-        if (!da_insert_arr(dstr, loc, new_str, new_str_len))
+        if ((dstr = da_insert_arr(dstr, loc, new_str, new_str_len)) == NULL)
             return NULL;
     }
     return dstr;

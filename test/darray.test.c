@@ -159,9 +159,9 @@ EMU_TEST(da_push)
 
     for (int i = 0; i <= max_index; ++i)
     {
-        EMU_EXPECT_TRUE(da_push(da, i));
+        da = da_push(da, i);
+        EMU_REQUIRE_NOT_NULL(da);
     }
-    EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), max_index+1);
     EMU_REQUIRE_GE_UINT(da_capacity(da),da_length(da));
     for (int i = 0; i <= max_index; ++i)
@@ -197,14 +197,14 @@ EMU_TEST(da_insert__basic)
     da[0] = 3;
     da[1] = 5;
 
-    EMU_REQUIRE_TRUE(da_insert(da, 0, 7));
+    da = da_insert(da, 0, 7);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), 3);
     EMU_EXPECT_EQ_INT(da[0], 7);
     EMU_EXPECT_EQ_INT(da[1], 3);
     EMU_EXPECT_EQ_INT(da[2], 5);
 
-    EMU_REQUIRE_TRUE(da_insert(da, 1, 9));
+    da = da_insert(da, 1, 9);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), 4);
     EMU_EXPECT_EQ_INT(da[0], 7);
@@ -223,7 +223,7 @@ EMU_TEST(da_insert__mimic_push_front)
 
     for (int i = max_index; i >= 0; --i)
     {
-        EMU_REQUIRE_TRUE(da_insert(da, 0, i));
+        da = da_insert(da, 0, i);
         EMU_REQUIRE_NOT_NULL(da);
     }
     EMU_REQUIRE_EQ_UINT(da_length(da), max_index+1);
@@ -250,7 +250,7 @@ EMU_TEST(da_insert_arr)
     da[1] = 5;
 
     int A[] = {7, 9, 11};
-    EMU_REQUIRE_TRUE(da_insert_arr(da, 0, A, 3));
+    da = da_insert_arr(da, 0, A, 3);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), 5);
     EMU_EXPECT_EQ_INT(da[0], 7);
@@ -260,7 +260,7 @@ EMU_TEST(da_insert_arr)
     EMU_EXPECT_EQ_INT(da[4], 5);
 
     int B[] = {13, 15};
-    EMU_REQUIRE_TRUE(da_insert_arr(da, 1, B, 2));
+    da = da_insert_arr(da, 1, B, 2);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), 7);
     EMU_EXPECT_EQ_INT(da[0], 7);
@@ -271,7 +271,7 @@ EMU_TEST(da_insert_arr)
     EMU_EXPECT_EQ_INT(da[5], 3);
     EMU_EXPECT_EQ_INT(da[6], 5);
 
-    EMU_REQUIRE_TRUE(da_insert_arr(da, 0, NULL, 0));
+    da = da_insert_arr(da, 0, NULL, 0);
     EMU_REQUIRE_NOT_NULL(da);
     EMU_REQUIRE_EQ_UINT(da_length(da), 7);
 
