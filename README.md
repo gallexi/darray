@@ -168,7 +168,7 @@ Returns a pointer to the new location of the darray upon successful function com
 ```C
 void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem);
 ```
-Note that the `typeof` src must match the `ELEM_TYPE` of `darr` as assignment is performed via `memcpy`.
+Note that the `typeof(src)` must match the `ELEM_TYPE` of `darr` as assignment is performed via `memcpy`.
 
 #### da_push
 Insert a value at the back of `darr`.
@@ -262,7 +262,7 @@ Append `nelem` array elements from `src` to the back of darray `dest` reallocati
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_cat` returns `NULL`, reallocation failed and `darr` is left untouched.
 ```C
-void* da_cat(void* dest, void* src, size_t nelem)
+void* da_cat(void* dest, void* src, size_t nelem);
 ```
 Unlike `strcat` and `strncat` in libc, references to `dest` may be broken across a function call to `da_cat`. The return value of `da_cat` should be used as truth for the location of `dest` after function completion.
 ```C
