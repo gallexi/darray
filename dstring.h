@@ -100,7 +100,7 @@ darray(char) dstr_concat_cstr(darray(char) dest, const char* src)
     DA_WARN_UNUSED_RESULT;
 
 /**@function
- * @brief Append `src` to dstring `dest`. Faster than `dstr_cat_cstr` for
+ * @brief Append `src` to dstring `dest`. Faster than `dstr_concat_cstr` for
  *  cat-ing a dstring to another dstring.
  * 
  * @param dest : Target dstring that will be appended to. Like `da_concat`

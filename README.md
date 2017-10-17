@@ -27,7 +27,7 @@
     + [General Utilities](#general-utilities)
         + [container-style type](#container-style-type)
         + [da_swap](#da_swap)
-        + [da_cat](#da_cat)
+        + [da_concat](#da_concat)
         + [da_fill [GNU C only]](#da_fill)
         + [da_foreach [GNU C only]](#da_foreach)
 1. [String Specialization](#string-specialization)
@@ -257,23 +257,23 @@ Swap the values of the two specified elements of `darr`.
 void da_swap(void* darr, size_t index_a, size_t index_b);
 ```
 
-#### da_cat
+#### da_concat
 Append `nelem` array elements from `src` to the back of darray `dest` reallocating memory in `dest` if neccesary. `src` is preserved across the call. `src` may be a built-in array or a darray.
 
-Returns a pointer to the new location of the darray upon successful function completion. If `da_cat` returns `NULL`, reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_concat` returns `NULL`, reallocation failed and `darr` is left untouched.
 ```C
-void* da_cat(void* dest, void* src, size_t nelem);
+void* da_concat(void* dest, void* src, size_t nelem);
 ```
-Unlike `strcat` and `strncat` in libc, references to `dest` may be broken across a function call to `da_cat`. The return value of `da_cat` should be used as truth for the location of `dest` after function completion.
+Unlike `strcat` and `strncat` in libc, references to `dest` may be broken across a function call to `da_concat`. The return value of `da_concat` should be used as truth for the location of `dest` after function completion.
 ```C
 // cat darray src to the back of darray dest
-dest = da_cat(dest, src, da_length(src));
+dest = da_concat(dest, src, da_length(src));
 ```
 
 An easy way to create a darray from a built-in array is to cat the built-in array onto a zero-length darray.
 ```C
 foo* my_darr = da_alloc(0, sizeof(foo));
-my_darr = da_cat(my_darr, built_in_array, built_in_array_len);
+my_darr = da_concat(my_darr, built_in_array, built_in_array_len);
 ```
 
 #### da_fill

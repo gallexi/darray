@@ -12,8 +12,8 @@
     + [Dstring Data](#dstring-data)
         + [dstr_length](#dstr_length)
     + [Concatination](#concatination)
-        + [dstr_cat_cstr](#dstr_cat_cstr)
-        + [dstr_cat_dstr](#dstr_cat_dstr)
+        + [dstr_concat_cstr](#dstr_concat_cstr)
+        + [dstr_concat_dstr](#dstr_concat_dstr)
     + [Comparison](#comparison)
         + [dstr_cmp](#dstr_cmp)
         + [dstr_cmp_case](#dstr_cmp_case)
@@ -91,23 +91,23 @@ size_t dstr_length(const darray(char) dstr);
 
 ### Concatination
 
-#### dstr_cat_cstr
+#### dstr_concat_cstr
 Append `src` to dstring `dest`. `src` may also be a dstring.
 
-Returns a pointer to the new location of the dstring upon successful function completion. If `dstr_cat_cstr` returns `NULL`, reallocation failed and `dstr` is left untouched.
+Returns a pointer to the new location of the dstring upon successful function completion. If `dstr_concat_cstr` returns `NULL`, reallocation failed and `dstr` is left untouched.
 ```C
-darray(char) dstr_cat_cstr(darray(char) dest, const char* src);
+darray(char) dstr_concat_cstr(darray(char) dest, const char* src);
 ```
-Like `da_cat` references to `dest` may be invalidated across the function call. Use the return value of `dstr_cat_cstr` as truth for the location of `dest` after function completion.
+Like `da_concat` references to `dest` may be invalidated across the function call. Use the return value of `dstr_concat_cstr` as truth for the location of `dest` after function completion.
 
-#### dstr_cat_dstr
-Append `src` to dstring `dest`. Faster than `dstr_cat_cstr` for cat-ing a dstring to another dstring.
+#### dstr_concat_dstr
+Append `src` to dstring `dest`. Faster than `dstr_concat_cstr` for cat-ing a dstring to another dstring.
 
-Returns a pointer to the new location of the dstring upon successful function completion. If `dstr_cat_dstr` returns `NULL`, reallocation failed and `dstr` is left untouched.
+Returns a pointer to the new location of the dstring upon successful function completion. If `dstr_concat_dstr` returns `NULL`, reallocation failed and `dstr` is left untouched.
 ```C
-darray(char) dstr_cat_dstr(darray(char) dest, const darray(char) src);
+darray(char) dstr_concat_dstr(darray(char) dest, const darray(char) src);
 ```
-Like `da_cat` references to `dest` may be invalidated across the function call. Use the return value of `dstr_cat_dstr` as truth for the location of `dest` after function completion.
+Like `da_concat` references to `dest` may be invalidated across the function call. Use the return value of `dstr_concat_dstr` as truth for the location of `dest` after function completion.
 
 ----
 
