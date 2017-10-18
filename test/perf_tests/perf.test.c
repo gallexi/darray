@@ -1,30 +1,13 @@
 #include "perf.test.h"
 #include "../../darray.h"
 
-int main(void)
-{
-    time_t seed = time(NULL);
-    printf("seed: %ld\n\n", seed);
-    srand(seed);
-    fill_pre_sized(); putchar('\n');
-    fill_push_back(); putchar('\n');
-    insert_front();   putchar('\n');
-    insert_rand();    putchar('\n');
-    remove_front();   putchar('\n');
-    remove_rand();    putchar('\n');
-    swap_rand();
-}
-
 int* arr;
 int* darr;
 
 // FILL ////////////////////////////////////////////////////////////////////////
 void fill_pre_sized_helper(size_t max_sz)
 {
-    print_numelem(max_sz);
-
-    printf(CARR);
-    arr = (int*)malloc(max_sz*sizeof(int));
+    arr = malloc(max_sz*sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -32,10 +15,9 @@ void fill_pre_sized_helper(size_t max_sz)
     }
     end = clock();
     free(arr);
-    print_elapsed_time(begin, end);
+    print_results(CARR, max_sz, begin, end);
 
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
+    darr = da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -43,10 +25,9 @@ void fill_pre_sized_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 
-    printf(DARR_FE);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
+    darr = da_alloc(max_sz, sizeof(int));
     begin = clock();
     da_foreach(darr, iter)
     {
@@ -54,7 +35,7 @@ void fill_pre_sized_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR_FE, max_sz, begin, end);
 }
 
 void fill_pre_sized(void)
@@ -68,27 +49,23 @@ void fill_pre_sized(void)
 // PUSH BACK ///////////////////////////////////////////////////////////////////
 void fill_push_back_helper(size_t max_sz)
 {
-    print_numelem(max_sz);
-
     size_t curr_len;
-    printf(CARR);
     curr_len = init_elem;
-    arr = (int*)malloc(init_elem*sizeof(int));
+    arr = malloc(init_elem*sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
         if (i == curr_len)
         {
             curr_len = DA_NEW_CAPACITY_FROM_LENGTH(curr_len);
-            arr = (int*)realloc(arr, curr_len*sizeof(int));
+            arr = realloc(arr, curr_len*sizeof(int));
         }
         arr[i] = rand();
     }
     end = clock();
     free(arr);
-    print_elapsed_time(begin, end);
+    print_results(CARR, max_sz, begin, end);
 
-    printf(DARR);
     darr = (int*)da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
@@ -97,7 +74,7 @@ void fill_push_back_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 }
 
 void fill_push_back(void)
@@ -111,10 +88,7 @@ void fill_push_back(void)
 // INSERT FRONT ////////////////////////////////////////////////////////////////
 void insert_front_helper(size_t max_sz)
 {
-    print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(init_elem, sizeof(int));
+    darr = da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -122,7 +96,7 @@ void insert_front_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 }
 
 void insert_front(void)
@@ -135,10 +109,7 @@ void insert_front(void)
 // INSERT RAND /////////////////////////////////////////////////////////////////
 void insert_rand_helper(size_t max_sz)
 {
-    print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(init_elem, sizeof(int));
+    darr = da_alloc(init_elem, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -146,7 +117,7 @@ void insert_rand_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 }
 
 void insert_rand(void)
@@ -162,10 +133,7 @@ void remove_front_helper(size_t max_sz)
     int ans;
     int tot;
 
-    print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
+    darr = da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -179,7 +147,7 @@ void remove_front_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 }
 
 void remove_front(void)
@@ -195,10 +163,7 @@ void remove_rand_helper(size_t max_sz)
     int ans;
     int tot;
 
-    print_numelem(max_sz);
-
-    printf(DARR);
-    darr = (int*)da_alloc(max_sz, sizeof(int));
+    darr = da_alloc(max_sz, sizeof(int));
     begin = clock();
     for (size_t i = 0; i < max_sz; ++i)
     {
@@ -212,7 +177,7 @@ void remove_rand_helper(size_t max_sz)
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, max_sz, begin, end);
 }
 
 void remove_rand(void)
@@ -225,10 +190,7 @@ void remove_rand(void)
 // SWAP RAND ///////////////////////////////////////////////////////////////////
 void swap_rand_helper(size_t array_len, size_t num_swaps)
 {
-    print_swaps(num_swaps);
-
-    printf(CARR);
-    arr = (int*)malloc(array_len*sizeof(int));
+    arr = malloc(array_len*sizeof(int));
     begin = clock();
     int tmp;
     size_t a, b;
@@ -242,18 +204,17 @@ void swap_rand_helper(size_t array_len, size_t num_swaps)
     }
     end = clock();
     free(arr);
-    print_elapsed_time(begin, end);
+    print_results(CARR, num_swaps, begin, end);
 
-    printf(DARR);
     begin = clock();
-    darr = (int*)da_alloc(array_len, sizeof(int));
+    darr = da_alloc(array_len, sizeof(int));
     for (size_t i = 0; i < num_swaps; ++i)
     {
         da_swap(darr, rand() % array_len, rand() % array_len);
     }
     end = clock();
     da_free(darr);
-    print_elapsed_time(begin, end);
+    print_results(DARR, num_swaps, begin, end);
 }
 
 void swap_rand(void)
