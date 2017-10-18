@@ -182,7 +182,7 @@ Returns a pointer to the new location of the darray upon successful function com
 ----
 
 ### Removal
-Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing/returning the target value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
+Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
 
 #### da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
@@ -217,19 +217,19 @@ Darrays know their own length, capacity, and `sizeof` their contained elements. 
 #### da_length
 Returns the number of elements in `darr`.
 ```C
-size_t da_length(void* darr);
+size_t da_length(const void* darr);
 ```
 
 #### da_capacity
 Returns the maximum number of elements `darr` can hold without requiring memory reallocation.
 ```C
-size_t da_capacity(void* darr);
+size_t da_capacity(const void* darr);
 ```
 
 #### da_sizeof_elem
 Returns the `sizeof` contained elements in a `darr`.
 ```C
-size_t da_sizeof_elem(void* darr);
+size_t da_sizeof_elem(const void* darr);
 ```
 
 ----

@@ -90,7 +90,7 @@ void da_free(void* darr);
  *
  * @return Number of elements in the `darr`.
  */
-size_t da_length(void* darr);
+size_t da_length(const void* darr);
 
 /**@function
  * @brief Returns the maximum number of elements a darray can hold without
@@ -100,7 +100,7 @@ size_t da_length(void* darr);
  *
  * @return Total number of allocated elements in `darr`.
  */
-size_t da_capacity(void* darr);
+size_t da_capacity(const void* darr);
 
 /**@function
  * @brief Returns the `sizeof` contained elements in a darray.
@@ -109,7 +109,7 @@ size_t da_capacity(void* darr);
  *
  * @return `sizeof` elements in `darr`.
  */
-size_t da_sizeof_elem(void* darr);
+size_t da_sizeof_elem(const void* darr);
 
 /**@function
  * @brief Change the length of a darray to `nelem`. Data in elements with
@@ -298,7 +298,8 @@ void da_swap(void* darr, size_t index_a, size_t index_b);
  *  a function call to `da_concat`. The return value of `da_concat` should be
  *  used as truth for the location of `dest` after function completion.
  */
-void* da_concat(void* dest, void* src, size_t nelem) DA_WARN_UNUSED_RESULT;
+void* da_concat(void* dest, const void* src, size_t nelem)
+    DA_WARN_UNUSED_RESULT;
 
 /**@macro
  * @brief Set every element of `darr` to `value`.

@@ -57,7 +57,7 @@ darray(char) dstr_alloc_from_dstr(const darray(char) src) DA_WARN_UNUSED_RESULT;
 /**@function
  * @brief Allocate a dstring using `sprintf` style formatting.
  *
- * @param format : `printf` style format string.
+ * @param format : `sprintf` style format string.
  * @param ... : va arg list for the format string.
  *
  * @return Pointer to a new dstring on success. `NULL` on allocation failure.
@@ -73,13 +73,67 @@ darray(char) dstr_alloc_from_format(const char* format, ...)
 void dstr_free(darray(char) dstr);
 
 /**@function
+ * @brief Reassign the contents of an allocated dstring to the empty string
+ *  `""`, reallocating memory only when neccesary.
+ *
+ * @param allocated_dstr : Dstring containing memory allocated by one of the
+ *  dstr_alloc functions.
+ *
+ * @return Pointer to the reassigned dstring on success. `NULL` on allocation
+ *  failure.
+ */
+darray(char) dstr_reassign_empty(darray(char) allocated_dstr)
+    DA_WARN_UNUSED_RESULT;
+
+/**@function
+ * @brief Reassign the contents of an allocated dstring to that of a cstring,
+ *  reallocating memory only when neccesary.
+ *
+ * @param allocated_dstr : Dstring containing memory allocated by one of the
+ *  dstr_alloc functions.
+ * @param src : string to copy.
+ *
+ * @return Pointer to the reassigned dstring on success. `NULL` on allocation
+ *  failure.
+ */
+darray(char) dstr_reassign_from_cstr(darray(char) allocated_dstr,
+    const char* src) DA_WARN_UNUSED_RESULT;
+
+
+/**@function
+ * @brief Reassign the contents of an allocated dstring to that of a dstring,
+ *  reallocating memory only when neccesary.
+ *
+ * @param allocated_dstr : Dstring containing memory allocated by one of the
+ *  dstr_alloc functions.
+ * @param src : dstring to copy.
+ *
+ * @return Pointer to the reassigned dstring on success. `NULL` on allocation
+ *  failure.
+ */
+darray(char) dstr_reassign_from_dstr(darray(char) allocated_dstr,
+    const darray(char) src) DA_WARN_UNUSED_RESULT;
+
+/**@function
+ * @brief Reassign the contents of an allocated dstring using `sprintf` style
+ *  formatting, reallocating memory only when neccesary.
+ *
+ * @param format : `sprintf` style format string.
+ * @param ... : va arg list for the format string.
+ *
+ * @return Pointer to the reassigned dstring on success. `NULL` on allocation
+ *  failure.
+ */
+darray(char) dstr_reassign_from_format(darray(char) allocated_dstr,
+    const char* format, ...) DA_WARN_UNUSED_RESULT;
+
+/**@function
  * @brief Returns the length of `dstr` without its null terminator. Equivalent
  *  to `da_length(dstr)-1`. O(1) compared to the O(n) `strlen`.
  *
  * @param dstr : Target dstring.
  *
  * @return Length of `dstr` without its null terminator.
- *
  */
 size_t dstr_length(const darray(char) dstr);
 

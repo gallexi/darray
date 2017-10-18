@@ -9,6 +9,11 @@
         + [dstr_alloc_from_dstr](#dstr_alloc_from_dstr)
         + [dstr_alloc_from_format](#dstr_alloc_from_format)
         + [dstr_free](#dstr_free)
+    + [Reassignment](#reassignment)
+        + [dstr_reassign_empty](#dstr_reassign_empty)
+        + [dstr_reassign_from_cstr](#dstr_reassign_from_cstr)
+        + [dstr_reassign_from_dstr](#dstr_reassign_from_dstr)
+        + [dstr_reassign_from_format](#dstr_reassign_from_format)
     + [Dstring Data](#dstring-data)
         + [dstr_length](#dstr_length)
     + [Concatination](#concatination)
@@ -75,6 +80,43 @@ darray(char) dstr_alloc_from_format(const char* format, ...);
 Free a dstring. Equivalent to calling `da_free` on `dstr`.
 ```C
 void dstr_free(darray(char) dstr);
+```
+
+----
+
+### Reassignment
+These functions can be used to reassign the contents of a dstring. The functions reallocate memory only when necessary to avoid costly syscalls to `malloc` and `free`.
+
+#### dstr_reassign_empty
+Reassign the contents of an allocated dstring to the empty string `""`, reallocating memory only when neccesary.
+
+Returns a pointer to the reassigned dstring on success. `NULL` on allocation failure.
+```C
+darray(char) dstr_reassign_empty(darray(char) allocated_dstr);
+```
+
+#### dstr_reassign_from_cstr
+Reassign the contents of an allocated dstring to that of a cstring, reallocating memory only when neccesary.
+
+Returns a pointer to the reassigned dstring on success. `NULL` on allocation failure.
+```C
+darray(char) dstr_reassign_from_cstr(darray(char) allocated_dstr, const char* src)
+```
+
+#### dstr_reassign_from_dstr
+Reassign the contents of an allocated dstring to that of a dstring, reallocating memory only when neccesary.
+
+Returns a pointer to the reassigned dstring on success. `NULL` on allocation failure.
+```C
+darray(char) dstr_reassign_from_dstr(darray(char) allocated_dstr, const darray(char) src)
+```
+
+#### dstr_reassign_from_format
+Reassign the contents of an allocated dstring using `sprintf` style formatting, reallocating memory only when neccesary.
+
+Returns a pointer to the reassigned dstring on success. `NULL` on allocation failure.
+```C
+darray(char) dstr_reassign_from_format(darray(char) allocated_dstr, const char* format, ...)
 ```
 
 ----
