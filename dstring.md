@@ -27,7 +27,7 @@
         + [dstr_find_case](#dstr_find_case)
         + [dstr_replace_all](#dstr_replace_all)
         + [dstr_replace_all_case](#dstr_replace_all_case)
-    + [In-place Tranformation Functions](#in-place-tranformation-functions)
+    + [In-place Transformation Functions](#in-place-transformation-functions)
         + [dstr_transform_lower](#dstr_transform_lower)
         + [dstr_transform_upper](#dstr_transform_upper)
     + [Misc.](#misc)
@@ -201,7 +201,7 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char*
 
 ----
 
-### In-place Tranformation Functions
+### In-place Transformation Functions
 
 #### dstr_transform_lower
 Transform `dstr` to lower case in place.
