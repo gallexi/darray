@@ -59,7 +59,8 @@ size_t da_sizeof_elem(const void* darr)
 void* da_resize(void* darr, size_t nelem)
 {
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size =
+        sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -81,12 +82,12 @@ void* da_resize_exact(void* darr, size_t nelem)
 
 void* da_reserve(void* darr, size_t nelem)
 {
-    size_t curr_capacity = da_capacity(darr);
     size_t min_capacity = da_length(darr) + nelem;
-    if (curr_capacity >= min_capacity)
+    if (da_capacity(darr) >= min_capacity)
         return darr;
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
-    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size =
+        sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -96,45 +97,39 @@ void* da_reserve(void* darr, size_t nelem)
 
 void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem)
 {
-    if (*DA_P_LENGTH_FROM_HANDLE(darr)+nelem >=
-        *DA_P_CAPACITY_FROM_HANDLE(darr))
-    {
-        darr = da_reserve(darr, nelem);
-        if (darr == NULL)
-            return NULL;
-    }
+    darr = da_reserve(darr, nelem);
+    if (darr == NULL)
+        return NULL;
     memmove(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
-            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index)
+        darr + da_sizeof_elem(darr)*(index+nelem),
+        darr + da_sizeof_elem(darr)*index,
+        da_sizeof_elem(darr)*(da_length(darr)-index)
     );
     memcpy(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
+        darr + da_sizeof_elem(darr)*index,
         src,
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*nelem
+        da_sizeof_elem(darr)*nelem
     );
-    (*DA_P_LENGTH_FROM_HANDLE(darr)) += nelem;
+    *DA_P_LENGTH_FROM_HANDLE(darr) += nelem;
     return darr;
 }
 
 void da_remove_arr(void* darr, size_t index, size_t nelem)
 {
     memmove(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
-            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index-nelem)
+        darr + da_sizeof_elem(darr)*index,
+        darr + da_sizeof_elem(darr)*(index+nelem),
+        da_sizeof_elem(darr)*(da_length(darr)-index-nelem)
     );
-    (*DA_P_LENGTH_FROM_HANDLE(darr)) -= nelem;
+    *DA_P_LENGTH_FROM_HANDLE(darr) -= nelem;
 }
 
 void da_swap(void* darr, size_t index_a, size_t index_b)
 {
     size_t size = da_sizeof_elem(darr);
     _da_memswap(
-        ((char*)darr) + (index_a * size),
-        ((char*)darr) + (index_b * size),
+        ((char*)darr) + (index_a*size),
+        ((char*)darr) + (index_b*size),
         size
     );
 }
@@ -142,10 +137,11 @@ void da_swap(void* darr, size_t index_a, size_t index_b)
 void* da_concat(void* dest, const void* src, size_t nelem)
 {
     size_t offset = da_length(dest)*da_sizeof_elem(dest);
-    dest = da_resize(dest, da_length(dest)+nelem);
+    dest = da_reserve(dest, nelem);
     if (dest == NULL)
         return NULL;
-    memcpy(dest+offset, src, nelem*da_sizeof_elem(dest));
+    memcpy((char*)dest+offset, src, nelem*da_sizeof_elem(dest));
+    *DA_P_LENGTH_FROM_HANDLE(dest) += nelem;
     return dest;
 }
 

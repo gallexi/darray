@@ -182,7 +182,7 @@ Returns a pointer to the new location of the darray upon successful function com
 ----
 
 ### Removal
-Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
+Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing value(s) and decrementing the length of the darray. None of these utilities will invalidate a pointer to the provided darray or reallocate memory.
 
 #### da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
