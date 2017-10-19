@@ -186,7 +186,7 @@ long dstr_find_case(darray(char) dstr, const char* substr);
 #### dstr_replace_all
 Replace all occurrences of `substr` in `dstr` with `new_str`.
 
-Returns the new location of `dstr` after function completion. If `dstr_replace_all` returns `NULL` reallocation failed and `dstr` is left untouched.
+Returns the new location of `dstr` after function completion. If `dstr_replace_all` returns `NULL` reallocation failed somewhere and `dstr` may be corrupted.
 ```C
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char* new_str);
 ```
@@ -194,7 +194,7 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char*
 #### dstr_replace_all_case
 Replace all occurrences of `substr` (case insensitive) in `dstr` with `new_str`.
 
-Returns the new location of `dstr` after function completion. If `dstr_replace_all_case` returns `NULL` reallocation failed and `dstr` is left untouched.
+Returns the new location of `dstr` after function completion. If `dstr_replace_all_case` returns `NULL` reallocation failed somewhere and `dstr` may be corrupted.
 ```C
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char* new_str);
 ```

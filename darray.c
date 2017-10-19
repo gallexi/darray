@@ -148,33 +148,39 @@ void* da_concat(void* dest, const void* src, size_t nelem)
 /////////////////////////////////// DSTRING ////////////////////////////////////
 darray(char) dstr_alloc_empty(void)
 {
-    char* darr = da_alloc(1, sizeof(char));
-    darr[0] = '\0';
-    return darr;
+    char* dstr = da_alloc(1, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    dstr[0] = '\0';
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_cstr(const char* src)
 {
     size_t src_len_with_nullterm = strlen(src)+1;
-    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
-    memcpy(darr, src, src_len_with_nullterm);
-    return darr;
+    char* dstr = da_alloc(src_len_with_nullterm, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    memcpy(dstr, src, src_len_with_nullterm);
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_dstr(const darray(char) src)
 {
-    size_t src_len_with_nullterm = da_length((void*)src);
-    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
-    memcpy(darr, src, src_len_with_nullterm);
-    return darr;
+    size_t src_len_with_nullterm = da_length(src);
+    char* dstr = da_alloc(src_len_with_nullterm, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    memcpy(dstr, src, src_len_with_nullterm);
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_format(const char* format, ...)
 {
     va_list args;
-    va_list copy;
     va_start(args, format);
-
+    
+    va_list copy;
     va_copy(copy, args);
     size_t size = vsnprintf(NULL, 0, format, copy) + 1 /* +1 for '\0' */;
     va_end(copy);
@@ -196,7 +202,7 @@ void dstr_free(darray(char) dstr)
 darray(char) dstr_reassign_empty(darray(char) allocated_dstr)
 {
     *DA_P_LENGTH_FROM_HANDLE(allocated_dstr) = 0;
-    allocated_dstr = da_concat(allocated_dstr, "", 2);
+    allocated_dstr = da_concat(allocated_dstr, "", 1);
     return allocated_dstr;
 }
 
@@ -211,9 +217,8 @@ darray(char) dstr_reassign_from_cstr(darray(char) allocated_dstr,
 darray(char) dstr_reassign_from_dstr(darray(char) allocated_dstr,
     const darray(char) src)
 {
-    size_t len = da_length(src);
     *DA_P_LENGTH_FROM_HANDLE(allocated_dstr) = 0;
-    allocated_dstr = da_concat(allocated_dstr, src, len);
+    allocated_dstr = da_concat(allocated_dstr, src, da_length(src));
     return allocated_dstr;
 }
 
@@ -221,9 +226,9 @@ darray(char) dstr_reassign_from_format(darray(char) allocated_dstr,
     const char* format, ...)
 {
     va_list args;
-    va_list copy;
     va_start(args, format);
-
+    
+    va_list copy;
     va_copy(copy, args);
     size_t size = vsnprintf(NULL, 0, format, copy) + 1 /* +1 for '\0' */;
     va_end(copy);
@@ -247,23 +252,23 @@ size_t dstr_length(const darray(char) dstr)
 
 darray(char) dstr_concat_cstr(darray(char) dest, const char* src)
 {
-    size_t dest_len = da_length((void*)dest)-1;
-    size_t src_len_with_nullterm = strlen(src)+1;
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    size_t dest_strlen = dstr_length(dest);
+    size_t src_strlen = strlen(src);
+    dest = da_reserve(dest, src_strlen);
     if (dest == NULL)
         return NULL;
-        memcpy(dest+dest_len, src, src_len_with_nullterm);
+    memcpy(dest+dest_strlen, src, src_strlen+1);
     return dest;
 }
 
 darray(char) dstr_concat_dstr(darray(char) dest, const darray(char) src)
 {
-    size_t dest_len = da_length((void*)dest)-1;
-    size_t src_len_with_nullterm = da_length((void*)src);
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    size_t dest_strlen = dstr_length(dest);
+    size_t src_strlen = dstr_length(src);
+    dest = da_reserve(dest, src_strlen);
     if (dest == NULL)
-    return NULL;
-    memcpy(dest+dest_len, src, src_len_with_nullterm);
+        return NULL;
+    memcpy(dest+dest_strlen, src, src_strlen+1);
     return dest;
 }
 
