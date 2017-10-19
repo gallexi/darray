@@ -34,9 +34,7 @@
 1. [License](#license)
 
 ## Introduction
-This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`.
-
-Darrays are implemented much like `std::vector`. A buffer of some size is allocated for a user-requested `n` element array and expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without requiring resizing (capacity), and the `sizeof` the contained element type is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
+This library provides an implementation of dynamic arrays in C that is similar in functionality to C++'s `std::vector`. A buffer of some size is allocated for a user-requested `n`-element array, and it expands to fit additional elements as needed. The number of elements in use (length), the total number of elements the darray can store without resizing (capacity), and the `sizeof` the element type is stored at the front of the darray in a header section. The user is given a handle to the darray's data section (i.e. the array itself) and it is this handle that is used by both the library and by the user for operations on the darray.
 ```
 +--------+---------+---------+-----+------------------+
 | header | data[0] | data[1] | ... | data[capacity-1] |
@@ -62,7 +60,7 @@ The `makefile` included with the darray library contains four targets. All targe
 
 ## API
 
-Note: The type `ELEM_TYPE` used throughout the API documentation referes to the `typeof` contained elements for a particular darray (i.e. `ELEM_TYPE` is `int` for an array declared as `int*`.
+Note: The type `ELEM_TYPE` used throughout the API documentation referes to the `typeof` contained elements for a particular darray (i.e. `ELEM_TYPE` is `int` for an array declared as `int*`).
 
 ### Creation and Deletion
 
@@ -73,20 +71,20 @@ Returns a pointer to a new darray on success. `NULL` on allocation failure.
 ```C
 void* da_alloc(size_t nelem, size_t size);
 ```
-The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element. Elements of a darray initially contain garbage values.
+The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element. Unlike with `calloc`, elements of a darray initially contain garbage values.
 
 ```C
 // Allocate a darray of foo on the heap with an initial length of 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
 ```
 
-Unlike `calloc`, `da_alloc` can be called with `nelem` equal to `0`. You will simply be left with a darray of zero elements. The function call
+Also unlike `calloc`, `da_alloc` can be called with `nelem` equal to `0`. You will simply be left with a darray of zero elements. The function call
 ```C
 foo* my_stack = da_alloc(0, sizeof(foo));
 ```
-can be used to declare an empty array-based stack of `foo`.
+can be used to declare an empty array-based stack of `foo` type elements.
 
-Be aware that the `size` parameter is stored internally by the darray and is used throughout the library for pointer math. If the `size` parameter doesn't match the `sizeof` contained elements many darray functions will have undefined behavior.
+Be aware that the `size` parameter is stored internally by the darray and is used throughout the library for pointer math. If the `size` parameter doesn't match the `sizeof` contained elements, many darray functions will have undefined behavior.
 
 #### da_alloc_exact
 Allocate a darray of `nelem` elements each of size `size`. The capacity of the darray will be be exactly `nelem`.
@@ -109,7 +107,7 @@ Due to the fact that the handle to a darray is not actually the start of the dar
 ### Resizing
 If you know how many elements a darray will need to hold for a particular section of code you can use `da_resize`, `da_resize_exact`,or `da_reserve` to allocate proper storage ahead of time. The fundamental difference between resizing and reserving is that `da_resize` and `da_resize_exact` will alter both the length and capacity of the darray, while `da_reserve` will only alter the capacity of the darray.
 
-Pointers returned by `da_resize`, `da_resize_exact`, and `da_reserve` for the location of the darray after resizing may or may not point to the same location in memory as before function execution depending on whether memory reallocation was required or not. **Always** assume pointer invalidation.
+Pointers returned by `da_resize`, `da_resize_exact`, and `da_reserve` for the location of the darray after resizing may or may not point to the same location in memory as before function execution, depending on whether memory reallocation was required. **Always** assume pointer invalidation.
 
 #### da_resize
 Change the length of a darray to `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
@@ -153,18 +151,18 @@ my_arr = da_reserve(my_arr, 50);
 ### Insertion
 
 #### da_insert
-Insert a value into `darr` at the specified index, moving the values beyond `index` back one element.
+Insert a value into `darr` at the specified index, moving all elements of index >= `index` back one.
 
-Returns a pointer to the new location of the darray upon successful function completion. If `da_insert` returns `NULL` reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_insert` returns `NULL`, reallocation failed and `darr` is left untouched.
 ```C
 #define /* ELEM_TYPE* */da_insert(/* ELEM_TYPE* */darr, /* size_t */index, /* ELEM_TYPE */value)
     /* ...macro implementation */
 ```
 
 #### da_insert_arr
-Insert an `nelem` values from `src` into `darr` at the specified index, moving the values beyond `index` back `nelem` elements.
+Insert `nelem` values from `src` into `darr` at the specified index, moving the values beyond `index` back `nelem` elements.
 
-Returns a pointer to the new location of the darray upon successful function completion. If `da_insert_arr` returns `NULL` reallocation failed and `darr` is left untouched.
+Returns a pointer to the new location of the darray upon successful function completion. If `da_insert_arr` returns `NULL`, reallocation failed and `darr` is left untouched.
 ```C
 void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem);
 ```
@@ -182,10 +180,10 @@ Returns a pointer to the new location of the darray upon successful function com
 ----
 
 ### Removal
-Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
+Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push`, removing value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
 
 #### da_remove
-Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one element.
+Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one spot.
 
 Returns the value removed from the darray.
 ```C
@@ -212,7 +210,7 @@ Returns the value removed from the darray.
 ----
 
 ### Accessing Header Data
-Darrays know their own length, capacity, and `sizeof` their contained elements. All of this data lives in the darray header and can be accessed through the following functions:
+Darrays know their own length, capacity, and `sizeof` contained elements. All of this data lives in the darray header and can be accessed through the following functions:
 
 #### da_length
 Returns the number of elements in `darr`.
@@ -235,7 +233,7 @@ size_t da_sizeof_elem(const void* darr);
 ----
 
 ### General Utilities
-In addition to the functions/macros above the darray library ships with the following utilities:
+In addition to the functions/macros above, the darray library ships with the following utilities:
 
 #### container-style type
 The container-style type provides a way to explicitly state that an array is a darray.
