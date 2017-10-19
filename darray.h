@@ -350,8 +350,8 @@ struct _darray
     __auto_type _value = value;                                                \
     if (*DA_P_LENGTH_FROM_HANDLE(_darr) == *DA_P_CAPACITY_FROM_HANDLE(_darr))  \
     {                                                                          \
-        _darr = (__typeof__(_darr))da_reserve(_darr, 1);                       \
-        if (_darr)                                                             \
+        _darr = da_reserve(_darr, 1);                                          \
+        if (_darr != NULL)                                                     \
             _darr[(*DA_P_LENGTH_FROM_HANDLE(_darr))++] = _value;               \
     }                                                                          \
     else                                                                       \
@@ -385,8 +385,8 @@ darr[index] = value;                                                           \
     __auto_type _value = value;                                                \
     if (*DA_P_LENGTH_FROM_HANDLE(_darr) == *DA_P_CAPACITY_FROM_HANDLE(_darr))  \
     {                                                                          \
-        _darr = (__typeof__(_darr))da_reserve(_darr, 1);                       \
-        if (_darr)                                                             \
+        _darr = da_reserve(_darr, 1);                                          \
+        if (_darr != NULL)                                                     \
             _da_move_and_insert(_darr, _index, _value);                        \
     }                                                                          \
     else                                                                       \
@@ -418,19 +418,15 @@ do                                                                             \
     __auto_type _value = value;                                                \
     size_t _len = *DA_P_LENGTH_FROM_HANDLE(_darr);                             \
     for (size_t _indx = 0; _indx < _len; ++_indx)                              \
-    {                                                                          \
         _darr[_indx] = _value;                                                 \
-    }                                                                          \
 }while(0)
 
 #define DA_MERGE_IDENTIFIER_HELPER(a, b) a##b
 #define DA_MERGE_IDENTIFIER(a, b) DA_MERGE_IDENTIFIER_HELPER(a, b)
 
 #define _da_foreach(/* ELEM_TYPE* */darr, itername)                            \
-bool __attribute__ ((unused))                                                  \
-    DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__) = true;                 \
-void* __attribute__ ((unused))                                                 \
-    DA_MERGE_IDENTIFIER(_da_stop, __LINE__);                                   \
+bool DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__) = true;                \
+void* DA_MERGE_IDENTIFIER(_da_stop, __LINE__);                                 \
 for (__auto_type itername = darr;                                              \
     ({                                                                         \
         if (DA_MERGE_IDENTIFIER(_da_first_iteration, __LINE__))                \

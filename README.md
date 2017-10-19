@@ -72,9 +72,9 @@ Returns a pointer to a new darray on success. `NULL` on allocation failure.
 void* da_alloc(size_t nelem, size_t size);
 ```
 The function signature of `da_alloc` is identical to that of `calloc` and is used the same way where `nelem` is the initial number of elements (length) of the array and `size` is the `sizeof` each element. Unlike with `calloc`, elements of a darray initially contain garbage values.
-
 ```C
-// Allocate a darray of foo on the heap with an initial length of 15.
+// Allocate a darray of foo on the heap with an initial length of 15, and a
+// capacity > 15.
 foo* my_arr = da_alloc(15, sizeof(foo));
 ```
 
@@ -125,7 +125,6 @@ my_arr = da_resize(my_arr, 25); // new length of 25
 Change the length of a darray to `nelem`. The new capacity of the darray will be be exactly `nelem`. Data in elements with indices >= `nelem` may be lost when downsizing.
 
 Returns a pointer to the new location of the darray upon successful function completion. If `da_resize_exact` returns `NULL`, reallocation failed and `darr` is left untouched.
-
 ```C
 void* da_resize_exact(void* darr, size_t nelem);
 ```
@@ -180,7 +179,7 @@ Returns a pointer to the new location of the darray upon successful function com
 ----
 
 ### Removal
-Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push`, removing value(s) and decrementing the length of the darray. None of these macros will invalidate a pointer to the provided darray.
+Three functions `da_remove`, `da_remove_arr`, and `da_pop` are the mirrored versions of `da_insert`, `da_insert_arr`, and `da_push` removing value(s) and decrementing the length of the darray. None of these utilities will invalidate a pointer to the provided darray or reallocate memory.
 
 #### da_remove
 Remove the value at `index` from `darr` and return it, moving the values beyond `index` forward one spot.

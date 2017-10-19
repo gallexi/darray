@@ -59,7 +59,8 @@ size_t da_sizeof_elem(const void* darr)
 void* da_resize(void* darr, size_t nelem)
 {
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(nelem);
-    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size =
+        sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -81,12 +82,12 @@ void* da_resize_exact(void* darr, size_t nelem)
 
 void* da_reserve(void* darr, size_t nelem)
 {
-    size_t curr_capacity = da_capacity(darr);
     size_t min_capacity = da_length(darr) + nelem;
-    if (curr_capacity >= min_capacity)
+    if (da_capacity(darr) >= min_capacity)
         return darr;
     size_t new_capacity = DA_NEW_CAPACITY_FROM_LENGTH(min_capacity);
-    size_t new_arr_size = sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
+    size_t new_arr_size =
+        sizeof(struct _darray) + new_capacity*da_sizeof_elem(darr);
     struct _darray* ptr = realloc(DA_P_HEAD_FROM_HANDLE(darr), new_arr_size);
     if (ptr == NULL)
         return NULL;
@@ -96,45 +97,39 @@ void* da_reserve(void* darr, size_t nelem)
 
 void* da_insert_arr(void* darr, size_t index, const void* src, size_t nelem)
 {
-    if (*DA_P_LENGTH_FROM_HANDLE(darr)+nelem >=
-        *DA_P_CAPACITY_FROM_HANDLE(darr))
-    {
-        darr = da_reserve(darr, nelem);
-        if (darr == NULL)
-            return NULL;
-    }
+    darr = da_reserve(darr, nelem);
+    if (darr == NULL)
+        return NULL;
     memmove(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
-            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index)
+        darr + da_sizeof_elem(darr)*(index+nelem),
+        darr + da_sizeof_elem(darr)*index,
+        da_sizeof_elem(darr)*(da_length(darr)-index)
     );
     memcpy(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
+        darr + da_sizeof_elem(darr)*index,
         src,
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*nelem
+        da_sizeof_elem(darr)*nelem
     );
-    (*DA_P_LENGTH_FROM_HANDLE(darr)) += nelem;
+    *DA_P_LENGTH_FROM_HANDLE(darr) += nelem;
     return darr;
 }
 
 void da_remove_arr(void* darr, size_t index, size_t nelem)
 {
     memmove(
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*index,
-        darr + (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr))*(index+nelem),
-        (*DA_P_SIZEOF_ELEM_FROM_HANDLE(darr)) *
-            ((*DA_P_LENGTH_FROM_HANDLE(darr))-index-nelem)
+        darr + da_sizeof_elem(darr)*index,
+        darr + da_sizeof_elem(darr)*(index+nelem),
+        da_sizeof_elem(darr)*(da_length(darr)-index-nelem)
     );
-    (*DA_P_LENGTH_FROM_HANDLE(darr)) -= nelem;
+    *DA_P_LENGTH_FROM_HANDLE(darr) -= nelem;
 }
 
 void da_swap(void* darr, size_t index_a, size_t index_b)
 {
     size_t size = da_sizeof_elem(darr);
     _da_memswap(
-        ((char*)darr) + (index_a * size),
-        ((char*)darr) + (index_b * size),
+        ((char*)darr) + (index_a*size),
+        ((char*)darr) + (index_b*size),
         size
     );
 }
@@ -142,43 +137,50 @@ void da_swap(void* darr, size_t index_a, size_t index_b)
 void* da_concat(void* dest, const void* src, size_t nelem)
 {
     size_t offset = da_length(dest)*da_sizeof_elem(dest);
-    dest = da_resize(dest, da_length(dest)+nelem);
+    dest = da_reserve(dest, nelem);
     if (dest == NULL)
         return NULL;
-    memcpy(dest+offset, src, nelem*da_sizeof_elem(dest));
+    memcpy((char*)dest+offset, src, nelem*da_sizeof_elem(dest));
+    *DA_P_LENGTH_FROM_HANDLE(dest) += nelem;
     return dest;
 }
 
 /////////////////////////////////// DSTRING ////////////////////////////////////
 darray(char) dstr_alloc_empty(void)
 {
-    char* darr = da_alloc(1, sizeof(char));
-    darr[0] = '\0';
-    return darr;
+    char* dstr = da_alloc(1, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    dstr[0] = '\0';
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_cstr(const char* src)
 {
     size_t src_len_with_nullterm = strlen(src)+1;
-    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
-    memcpy(darr, src, src_len_with_nullterm);
-    return darr;
+    char* dstr = da_alloc(src_len_with_nullterm, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    memcpy(dstr, src, src_len_with_nullterm);
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_dstr(const darray(char) src)
 {
-    size_t src_len_with_nullterm = da_length((void*)src);
-    char* darr = da_alloc(src_len_with_nullterm, sizeof(char));
-    memcpy(darr, src, src_len_with_nullterm);
-    return darr;
+    size_t src_len_with_nullterm = da_length(src);
+    char* dstr = da_alloc(src_len_with_nullterm, sizeof(char));
+    if (dstr == NULL)
+        return NULL;
+    memcpy(dstr, src, src_len_with_nullterm);
+    return dstr;
 }
 
 darray(char) dstr_alloc_from_format(const char* format, ...)
 {
     va_list args;
-    va_list copy;
     va_start(args, format);
-
+    
+    va_list copy;
     va_copy(copy, args);
     size_t size = vsnprintf(NULL, 0, format, copy) + 1 /* +1 for '\0' */;
     va_end(copy);
@@ -200,7 +202,7 @@ void dstr_free(darray(char) dstr)
 darray(char) dstr_reassign_empty(darray(char) allocated_dstr)
 {
     *DA_P_LENGTH_FROM_HANDLE(allocated_dstr) = 0;
-    allocated_dstr = da_concat(allocated_dstr, "", 2);
+    allocated_dstr = da_concat(allocated_dstr, "", 1);
     return allocated_dstr;
 }
 
@@ -215,9 +217,8 @@ darray(char) dstr_reassign_from_cstr(darray(char) allocated_dstr,
 darray(char) dstr_reassign_from_dstr(darray(char) allocated_dstr,
     const darray(char) src)
 {
-    size_t len = da_length(src);
     *DA_P_LENGTH_FROM_HANDLE(allocated_dstr) = 0;
-    allocated_dstr = da_concat(allocated_dstr, src, len);
+    allocated_dstr = da_concat(allocated_dstr, src, da_length(src));
     return allocated_dstr;
 }
 
@@ -225,9 +226,9 @@ darray(char) dstr_reassign_from_format(darray(char) allocated_dstr,
     const char* format, ...)
 {
     va_list args;
-    va_list copy;
     va_start(args, format);
-
+    
+    va_list copy;
     va_copy(copy, args);
     size_t size = vsnprintf(NULL, 0, format, copy) + 1 /* +1 for '\0' */;
     va_end(copy);
@@ -251,23 +252,23 @@ size_t dstr_length(const darray(char) dstr)
 
 darray(char) dstr_concat_cstr(darray(char) dest, const char* src)
 {
-    size_t dest_len = da_length((void*)dest)-1;
-    size_t src_len_with_nullterm = strlen(src)+1;
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    size_t dest_strlen = dstr_length(dest);
+    size_t src_strlen = strlen(src);
+    dest = da_reserve(dest, src_strlen);
     if (dest == NULL)
         return NULL;
-        memcpy(dest+dest_len, src, src_len_with_nullterm);
+    memcpy(dest+dest_strlen, src, src_strlen+1);
     return dest;
 }
 
 darray(char) dstr_concat_dstr(darray(char) dest, const darray(char) src)
 {
-    size_t dest_len = da_length((void*)dest)-1;
-    size_t src_len_with_nullterm = da_length((void*)src);
-    dest = da_resize(dest, dest_len+src_len_with_nullterm);
+    size_t dest_strlen = dstr_length(dest);
+    size_t src_strlen = dstr_length(src);
+    dest = da_reserve(dest, src_strlen);
     if (dest == NULL)
-    return NULL;
-    memcpy(dest+dest_len, src, src_len_with_nullterm);
+        return NULL;
+    memcpy(dest+dest_strlen, src, src_strlen+1);
     return dest;
 }
 

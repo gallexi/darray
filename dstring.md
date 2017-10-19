@@ -34,7 +34,7 @@
         + [dstr_trim](#dstr_trim)
 
 ## Introduction
-Character arrays are by far the most common array type in C. Many functions in the C standard library like `strcmp` and `printf` will work exactly the same with `darray(char)` as built-in cstrings, but some functions such as `strcpy` and `sprintf` will "break" character darrays by desynching the length property of the darray from the actual length of the string. To prevent bugs that may occur from using the C standard library functions with character darrays, the dstring extension of darrays was created. A dstring is written as `darray(char)` and refered to as such in all documentation.
+Character arrays are by far the most common array type in C. Many functions in the C standard library like `strcmp` and `printf` will work exactly the same with `darray(char)` as built-in cstrings, but some functions such as `strcpy` and `sprintf` will "break" character darrays by desynching the length property of the darray from the actual length of the string. The dstring extension to the darray library was created to prevent these issues. A dstring is written as `darray(char)` and refered to as such in all documentation.
 
 By default dstrings are not included by `darray.h`. `#include <darray/dstring.h>` to access dstring function declarations.
 
@@ -186,7 +186,7 @@ long dstr_find_case(darray(char) dstr, const char* substr);
 #### dstr_replace_all
 Replace all occurrences of `substr` in `dstr` with `new_str`.
 
-Returns the new location of `dstr` after function completion. If `dstr_replace_all` returns `NULL` reallocation failed and `dstr` is left untouched.
+Returns the new location of `dstr` after function completion. If `dstr_replace_all` returns `NULL` reallocation failed somewhere and `dstr` may be corrupted.
 ```C
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char* new_str);
 ```
@@ -194,7 +194,7 @@ darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char*
 #### dstr_replace_all_case
 Replace all occurrences of `substr` (case insensitive) in `dstr` with `new_str`.
 
-Returns the new location of `dstr` after function completion. If `dstr_replace_all_case` returns `NULL` reallocation failed and `dstr` is left untouched.
+Returns the new location of `dstr` after function completion. If `dstr_replace_all_case` returns `NULL` reallocation failed somewhere and `dstr` may be corrupted.
 ```C
 darray(char) dstr_replace_all(darray(char) dstr, const char* substr, const char* new_str);
 ```
